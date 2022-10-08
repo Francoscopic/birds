@@ -1,0 +1,284 @@
+
+.note-article-cover {
+    background-color: #fff;
+    margin: 0 auto;
+
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid #0000001a;
+    border-top: none;
+}
+
+.note-article-quick-comment,
+.na-one-two,
+.comment-back-article,
+.na-two {
+    width: calc(100% - 200px);
+    margin: 0 auto;
+}
+.note-options {
+    width: auto;
+    min-width: 40px;
+    text-align: center;
+
+    padding: 0 5px;
+}
+.note-options > span:first-of-type {
+    color: #808080;
+}
+.note-options:hover span:first-of-type {
+    color: rgba(0, 0, 0, 0.9);
+    color: #000000e6;
+}
+.note-options-move-left {
+    margin-right: .5em;
+}
+.note-seen-number {
+    color: #505050;
+    font-size: .8em;
+    font-weight: 600;
+}
+
+.note-article-quick-comment {
+    margin-bottom: 10px;
+}
+.note-article-quick-comment-textarea,
+.note-article-quick-comment-img,
+.note-article-quick-comment-input {
+    float: left;
+}
+.note-article-quick-comment-img {
+    width: 30px;
+    height: 30px;
+    background-color: #f5f5f5;
+}
+.note-article-quick-comment-textarea {
+    width: calc(100% - (30px + 32px));
+    height: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid #0000001a;
+    margin-left: 10px;
+    padding: 6px 10px 0px 10px;
+
+    color: #404040;
+    font-size: 0.8em;
+    background-color: #f5f5f5;
+}
+.note-article-quick-comment-input:focus {
+    border-color: #a0a0a0;
+}
+
+
+.comment-back-article {
+    margin: 2em auto;
+}
+.comment-back-article a {
+    font-size: 0.9em;
+    font-weight: lighter;
+    color: #606060;
+}
+.note-article-abode {
+    width: 100%;
+    margin: 2em auto;
+}
+.n-a-a-paragraphs {
+    margin-bottom: 1em;
+}
+.first-paragraph::first-letter {
+    font-size: 2.5em;
+}
+.n-a-a-p-note {
+    width: 100px;
+    height: auto;
+    display: block;
+    font-size: 0.7em;
+    text-align: center;
+}
+.n-a-a-p-note:hover button {
+    color: dodgerblue
+}
+.n-a-a-p-paragraph {
+    width: calc(100% - 200px);
+    height: auto;
+    display: block;
+    font-size: 1.1em;
+}
+.n-a-a-p-note p,
+.n-a-a-p-paragraph p {
+    padding: 0;
+    margin: 0;
+    color: #404040;
+    line-height: 1.5em;
+}
+.n-a-a-p-note button {
+    width: 40px;
+    height: auto;
+    border: none;
+    text-align: center;
+    color: #d0d0d0;
+    background: transparent;
+}
+.n-a-a-picture {
+    width: calc(100% - 200px);
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+}
+.n-a-a-picture img {
+    background-color: #e0e0e0;
+}
+.n-a-a-picture button {
+    width: 30px;
+    height: 30px;
+    color: dodgerblue;
+    border: none;
+    background: #fff;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+}
+.n-a-a-picture:hover .n-a-a-picture-button {
+    display: inherit;
+}
+.npcol-comment {
+    width: calc(100% - 100px);
+    margin-left: 100px;
+}
+
+
+.note-option-ul,
+.nao-option-ul {
+    position: absolute;
+    right: 0;
+    top: 30px;
+}
+.note-option-ul {
+    top: 0em;
+}
+.nao-option-li {
+    width: auto;
+    padding: 3px 0;
+    text-align: right;
+
+    font-size: 0.9em;
+    font-weight: 500;
+    color: dodgerblue;
+}
+
+.na-two h1 {
+    font-size: 2.5em;
+    line-height: 1.3em;
+
+    margin: 0;
+}
+.note-buttons {
+    width: 40px;
+    height: auto;
+
+    border: none;
+    color: #505050;
+    padding: 5px 0;
+    background-color: transparent;
+
+    font-weight: 100;
+    cursor: pointer;
+}
+.note-buttons:hover {
+    background-color: #f2f2f2;
+}
+.note-buttons-move-right {
+    margin-left: 1em;
+}
+#note-buttons-clicked {
+    color: dodgerblue;
+}
+.na-four {
+    width: 100%;
+    height: auto;
+}
+.na-four img {
+    width: 100%;
+    height: auto;
+    
+    background-color: #e0e0e0;
+}
+.note-article-actions {
+    font-size: 0.8em;
+    font-weight: 100;
+
+    color: #909090;
+}
+
+
+
+/* Art History */
+
+.article-history {
+    margin: 0 auto;
+    
+    background-color: #fff;
+}
+.article-history > h1 {
+    font-size: var(--nt-txt-section-head);
+    font-weight: var(--nt-txt-section-head-weight);
+    font-family: var(--nt-txt-section-head-family);
+    color: #202020;
+
+    margin: 20px 0 20px 20px;
+}
+.article-history hr {
+    width: calc(100% - 40px);
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+.artHist {
+    width: calc((100% - 60px) / 2);
+    height: auto;
+
+    float: left;
+    margin: 0 0 20px 20px;
+}
+.artHist-a:hover .artHist-h1 {
+    color: dodgerblue;
+}
+.artHist-display {
+    width: 30%;
+    height: 0;
+    padding-bottom: 28%;
+    background-color: #d0d0d0;
+}
+.artHist-title {
+    width: 70%;
+}
+.artHist-title section {
+    width: 100%;
+    height: 118px;
+} 
+.artHst-title-center {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translate(-10px, -50%);
+}
+.artHist-title p {
+    font-size: 0.7em;
+    font-weight: 600;
+    color: #909090;
+    font-family: 'Lato', calibri, sans-serif;
+
+    padding: 0;
+    margin: 0;
+}
+.artHist-title h1 {
+    font-size: 0.9em;
+    font-weight: 700;
+    color: #202020;
+    font-family: 'Lato', calibri, sans-serif;
+
+    padding: 0;
+    margin: 10px 0;
+}
+
+.note-div .article-history {
+    border: none;    
+}

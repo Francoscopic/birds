@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {# META #}
+            <meta charset="UTF-8">
+            <meta name="viewport" content="initial-scale=1, maximum-scale=1, width=device-width, height=device-height" />
+            <meta name="author" content="Netintui Ent. Ajegunle, Lagos" />
+            <meta name="application-name" content="Netintui Notes" />
+            <meta name="keywords" content="Netintui,Notes,Creativity,Business,Money,Ideas,Innovation,News,Blog,Blogging,Design,Productivity,Passion,Tesla,Apple" />
+            <meta name="robots" content="{% block robots %}{{ true }}{% endblock %}" />
+            <meta name="description" content="{% block description %}{% endblock %}" />
+
+        {# BEAUTY #}
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:image" content="{% block twitter_image %}{% endblock %}" />
+            <meta name="twitter:site" content="@netintui" />
+            <meta name="twitter:description" content="{{ block('description') }}" />
+            <meta name="twitter:title" content="{% block title %}{% endblock %}" />
+            <meta property="og:site_name" content="Netintui" />
+            <meta property="og:type" content="website" />
+            <meta property="og:locale" content="en_US" />
+            <meta property="og:title" content="{{ block('title') }}" />
+            <meta property="og:image" content="{{ block('twitter_image') }}" />
+            <meta property="og:description" content="{{ block('description') }}" />
+            <meta property="og:url" content="{% block page_url %}{% endblock %}" />
+
+        {# TITLE #}
+            <title>{{ block('title') }} :: Netintui Notes</title>
+
+        {# STYLES #}
+            <link href="{{ asset('lib/icons/fontawesome6/css/all.min.css') }}" rel="stylesheet" />
+            <link href="{{ asset('stylesheets/framework.css') }}" rel="stylesheet" />
+            <link href="{{ asset('images/logo/favicon.ico') }}" rel="icon" type="image/x-icon" />
+            <link href="{{ asset('stylesheets/notes_v2.css') }}" rel="stylesheet" />
+            {% block stylesheets %}{% endblock %}
+            {% block darkmode_stylesheet %}
+                <link href="{{ asset('stylesheets/{{ dark_style }}css') }}" rel="stylesheet" watch="theme" />
+            {% endblock %}
+    </head>
+    <body>
+        <input type="hidden" id="page-assistant" uid="'. $uid .'" disp="'.$display.'" nm="'.$name.'" unm="'.$username.'" path="'.$__pageContent__['path'].'" thm_st_chk_icn_txt="'.$user_theme_state.'/'.$user_theme_checked.'/'.$theme_mode_icon.'/'.$theme_mode_text.'" />
+        {% block body %}
+            {% block content %}{% endblock %}
+        {% endblock %}
+
+        {# SCRIPTS #}
+        <script src="{{ asset('scripts/jquery/jquery-3.1.1.min.js') }}"></script>
+        <script src="{{ asset('scripts/plugins/lozad.js') }}"></script>
+        {% block script_modules %}{% endblock %}
+        {% block script_others %}{% endblock %}
+    </body>
+</html>
