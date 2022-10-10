@@ -9,32 +9,38 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-//
 use App\Database\DatabaseAccess;
-use App\Functions\IndexFunction;
-use mysqli;
+use App\Function\IndexFunction;
+use App\Validation\SigninValidation;
 
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'note_home')]
     public function corpus(Connection $connection): Response
     {
-        $uid = '6364fhhf';
+        // Profile data
+        $login = new SigninValidation();
+        $login_state = $login->alright($login->page_state);
+        $uid = $login_state['uid'];
+        $visitor_state = $login_state['visit'];
+
+        // Database Access
         $connection_sur = new DatabaseAccess();
         $connection_sur = $connection_sur->connect('sur');
 
-        // HERE
+        // Work
             $canvas = array(
                 'notes' => array(),
                 'profile' => array(
-                    'visitor_state' => true,
+                    'uid' => $uid,
+                    'visitor_state' => $visitor_state,
                 ),
+                'misc' => array(),
             );
-            $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY sid DESC LIMIT 3");
+            $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY sid DESC LIMIT 15");
             $stmt->execute();
             $get_result = $stmt->get_result();
             $num_rows = $get_result->num_rows;
-            // $get_rows = $get_result->fetch_array(MYSQLI_ASSOC);
             while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
                 # Get post and my details
                     $the_pid = $get_rows['pid'];
@@ -44,8 +50,8 @@ class HomeController extends AbstractController
                     $my_note_row = IndexFunction::get_this_note($the_pid);
                     $note_title  = stripslashes($my_note_row['title']);
                     $note_parags = $my_note_row['paragraphs'];
-                    $note_cover  = IndexFunction::note_cover($my_note_row['cover'], 'notes', 'home');
-                    $note_state_article_or_image = ($my_note_row['state'] == 'art') ? 'hd' : '';
+                    $note_cover  = IndexFunction::note_cover($my_note_row['cover'], 'notes');
+                    $note_state_is_image = ($my_note_row['state'] == 'art') ? false : true;
                     $note_date   = IndexFunction::timeAgo($my_note_row['date']);
                 #
                 $get_me            = IndexFunction::get_me($poster_uid);
@@ -63,8 +69,7 @@ class HomeController extends AbstractController
                 #
                 $article_url = $this->generateUrl('note_posts', array('post_id'=>$the_pid));
                 $profile_url = $this->generateUrl('note_profiles', array('user_id'=>$note_poster_uname));
-                // $article_url = 'note_posts';
-                // $profile_url = 'note_profiles';
+                $show_load_more = ($num_rows==15) ? true : false;
 
                 $canvas['notes'][] = [
                     'pid'          => $the_pid,
@@ -72,7 +77,7 @@ class HomeController extends AbstractController
                     'title'        => $note_title,
                     'paragraphs'   => $note_parags,
                     'cover'        => $note_cover,
-                    'art_state'    => $note_state_article_or_image,
+                    'note_is_img'  => $note_state_is_image,
                     'date'         => $note_date,
                     'poster_name'  => $note_poster_name,
                     'poster_uname' => $note_poster_uname,
@@ -85,10 +90,14 @@ class HomeController extends AbstractController
                 ];
                 // */
             }
-        // HERE - END
+            $canvas['misc'] = [
+                'load_more' => $show_load_more,
+            ];
+        // Work - END
 
         return $this->render('pages/in/index.html.twig', [
             'canvas' => $canvas,
+            // 'canvas_debug' => var_dump($canvas),
         ]);
     }
 

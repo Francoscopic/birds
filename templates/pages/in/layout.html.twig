@@ -56,42 +56,6 @@
                 </div>
             </div>
         {% endif %}
-        
-        {# <div class="n-header desktop mobile glsmpsm" id="n-header">
-            <div class="plain">
-                <div class="plain-left">
-                    <a href="{{ url('note_home') }}">
-                        <p><img src="{{ asset('images/logo/notes.png') }}" alt="Notes" /><br><span>(Beta)</span></p>
-                    </a>
-                </div>
-                <div class="plain-right">
-                    <a href="#" class="note-menu-open" title="Show menu">
-                        <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
-                    </a>
-                    <a href="write.php" class="note-yours-prevent" title="Share something great">
-                        <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
-                    </a>
-                    <a href="{{ url('note_home') }}" title="From the community">
-                        <p><i class="fa-solid fa-house"></i><br><span>Home</span></p>
-                    </a>
-                </div>
-            </div>
-        </div><div class="n-header-height"></div>
-        <div class="n-header n-header-mobile desktop mobile glsmpsm" id="n-header">
-            <div class="plain">
-                <div class="plain-center">
-                    <a href="#" class="note-menu-open" title="Show menu">
-                        <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
-                    </a>
-                    <a href="write.php" class="note-yours-prevent" title="Share something great">
-                        <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
-                    </a>
-                    <a href="{{ url('note_home') }}" title="From the community">
-                        <p><i class="fa-solid fa-house"></i><br><span>Home</span></p>
-                    </a>
-                </div>
-            </div>
-        </div> #}
     {% endblock %}
 
     {% block block_small_menu %}
@@ -99,7 +63,7 @@
             <a href="#" class="note-small-menu-container-close a">
                 <div class="glsmpsm men-cvr"></div>
             </a>
-            {% block small_menu %}{% endblock %}
+            <div class="nts-host-menu"></div>
         </div>
     {% endblock %}
 

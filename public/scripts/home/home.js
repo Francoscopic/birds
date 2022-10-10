@@ -8,7 +8,12 @@ function article_click_home(){
     $(n).on('click',function(){
         var e = $(this).siblings("#page-assistant");
         !function(n,e){
-            $.post("pages/in/depends/profiles/article/verbs.php",{views:i,note_id:n,viewer_id:e},function(){}).fail(function(i,n,e){console.error(e)})
+            $.post("pages/in/depends/profiles/article/verbs.php",{views:i,note_id:n,viewer_id:e},function(){
+
+            }).fail(function(i,n,e){
+                // console.error(e)
+                alert(e)
+            })
         }(e.attr("pid"), e.attr("uid"))
     })
 }

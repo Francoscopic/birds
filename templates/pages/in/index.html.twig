@@ -3,13 +3,13 @@
 
 
 {# HEADERS #}
-    {% block title %}Home :: Netintui Notes{% endblock %}
+    {% block title %}Home{% endblock %}
     {% block robots %}false{% endblock %}
     {% block description %}Notes helps you share, educate and inspire with writing. And do it in just 7 paragraphs. It's for the creators who write.{% endblock %}
     {% block twitter_image %}{{ absolute_url('images/logo/logo-white-full.png') }}{% endblock %}
-    {% block page_url %}{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}
+    {% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}
     {% block stylesheets %}
-        <link href="{{ asset('stylesheets/thirds.css') }}" rel="stylesheet" />
+        {#  #}
     {% endblock %}
     {% block darkmode_stylesheet %}
         <link rel="stylesheet" href="{{ asset('stylesheets/lightmode.css') }}" watch="theme" >
@@ -20,7 +20,7 @@
 {# CONTENT #}
     {% block page_contents %}
 
-        {# <h1>{{ note_title }}</h1> #}
+        {# <h1>{{ canvas_debug }}</h1> #}
 
         {# {#  #}
         {% if canvas.profile.visitor_state == true %}
@@ -41,9 +41,11 @@
             {% for board in canvas.notes %}
                 <div class="nts-host relative">
                     <span id="page-assistant" class="hd" pid="" puid="" uid="" read="" title="" poster="" save_state="" like_state="" unlike_state=""></span>
-                    <a href="{{ board.post_url }}" class="vw-anchor nts-host-anchor a">
+                    <a href="{{ board.post_url }}" class="vw-anchor-pages nts-host-anchor a">
                         <div class="nts-host-display lozad bck relative" data-background-image="{{ asset(board.cover) }}">
-                            <div class="nts-host-display-type nt-ui-rad4 ft-sect "><span>photo</span></div>
+                            {% if board.note_is_img == true %}
+                                <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
+                            {% endif %}
                             <div class="nts-host-display-filter"></div>
                         </div>
                         <div class="nts-host-verb ft-sect">
@@ -66,6 +68,11 @@
                 </div>
             {% endfor %}
         </div>
+        {% if canvas.misc.load_more == true %}
+            <div class="nt-infinitescroll-div">
+                <button class="infinite-home nt-infinitescroll nt-ui-rad20">Find more <i class="fa fa-chevron-right"></i></button>
+            </div>
+        {% endif %}
         {#  #}
 
     {% endblock %}
@@ -75,5 +82,4 @@
 {% block script_modules %}
     <script type="module" type="text/javascript" src="{{  asset('scripts/index.js')}}"></script>
     <script type="module" type="text/javascript" src="{{  asset('scripts/grow.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('scripts/home/home.js')}}"></script>
 {% endblock %}

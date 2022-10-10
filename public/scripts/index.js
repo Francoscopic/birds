@@ -1,5 +1,4 @@
 
-
 // GET Parameters
     function get_image_parameters(path) {
         return ($.trim(path) == 'base') ? 'people/community/profiles/' : '../../people/community/profiles/' 
@@ -10,16 +9,22 @@
 // GET Parameters - END
 
 function article_click() {
-    const t = "1",
+    var t = "1",
         e = $(".vw-anchor-pages");
-    $(e).on("click", function () {
+    $(e).on("click", function (ev) {
+        ev.preventDefault();
+        alert('Working');
+
         var e = $(this).siblings("#page-assistant");
         as();
 
         function as() {
             !(function (e, n) {
-                $.post("depends/profiles/article/verbs.php", { views: t, note_id: e, viewer_id: n },function(){}).fail(function(t,e,n){
-                    console.error(n)
+                $.post("depends/profiles/article/verbs.php", { views: t, note_id: e, viewer_id: n },function(){
+
+                }).fail(function(t,e,n){
+                    // console.error(n)
+                    alert(n)
                 });
             })(e.attr("pid"), e.attr("uid"));
         }

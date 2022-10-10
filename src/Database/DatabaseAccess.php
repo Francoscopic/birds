@@ -6,7 +6,6 @@ use mysqli;
 
 class DatabaseAccess
 {
-
     private $dbhost = 'localhost';
     //
     private $db_user_1 = 'root';
@@ -66,6 +65,5 @@ class DatabaseAccess
         return $connection;
     }
 }
-
 
 ?>

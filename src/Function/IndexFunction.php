@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Functions;
+namespace App\Function;
 
 use App\Database\DatabaseAccess;
 use mysqli;
 
 class IndexFunction
 {
-
     public static function user_profile_state($uid): array
     {
         $user_file = self::retrieve_details($uid);
@@ -308,7 +307,7 @@ class IndexFunction
                 'images' => $images
             );
         }
-        public static function note_cover($file, $typ, $path='pages', $size='')
+        public static function note_cover($file, $typ, $path='images', $size='small'): string
         {
             # Check other pages and fit directory, properly
             /* DOCUMENT:
@@ -319,8 +318,8 @@ class IndexFunction
             */
             $test_default = self::def_cover_display($file, $path);
             if($test_default == false) {
-                $dir_a = self::get_path($path) . 'people/community/notes/shk_' . $file;
-                $dir_b = self::get_path($path) . 'people/community/profiles/' . self::get_size($size) . $file;
+                $dir_a = self::get_path($path) . '/community/notes/shk_' . $file;
+                $dir_b = self::get_path($path) . '/community/profiles/' . self::get_size($size) . $file;
 
                 $dir = ($typ == 'notes') ? $dir_a : $dir_b; # Find which folder: notes/profile
 
@@ -329,23 +328,34 @@ class IndexFunction
             }
             return $test_default;
         }
-        public static function get_display($file, $path='pages')
+        public static function get_display($file, $path='images'): string
         {
             $disp_name = explode('.', $file)[0];
-            if($disp_name == 'display') return get_path($path).'people/users/display.jpg';
-            $dir = ($path=='pages') ? ('../../people/community/profiles/shk_'.$file) : ('people/community/profiles/shk_'.$file);
-            return file_exists($dir) ? $dir : (get_path($path).'people/users/display.jpg');
+            if($disp_name == 'display') return get_path($path).'/users/display.jpg';
+            $dir = ($path=='images') ? ('../../community/profiles/shk_'.$file) : ('/community/profiles/shk_'.$file);
+            return file_exists($dir) ? $dir : (get_path($path).'/users/display.jpg');
         }
         public static function def_cover_display($file, $path)
         {
             $disp_name = explode('.', $file)[0];
-            if($disp_name == 'display') return self::get_path($path).'people/users/display.jpg';
-            if($disp_name == 'cover') return self::get_path($path).'people/users/cover.jpg';
+            if($disp_name == 'display') return self::get_path($path).'/users/display.jpg';
+            if($disp_name == 'cover') return self::get_path($path).'/users/cover.jpg';
             return false;
         }
         public static function get_path($page): string
         {
-            return ($page == 'pages') ? '../../' : '';
+            switch ($page) {
+                case 'images':
+                    return '/images';
+                    break;
+                case 'scripts':
+                    return '/scripts';
+                case 'stylesheets':
+                    return '/stylesheets';
+                default:
+                    return '';
+                    break;
+            }
         }
         public static function get_size($size): string
         {

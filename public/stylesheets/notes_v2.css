@@ -270,7 +270,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-clip: border-box;
-    background-image: url(../../public/images/masthead1.webp);
+    background-image: url(../images/support/masthead1.webp);
 }
 .nts-host-jumbotron-opacity {
     width: 100%;
