@@ -1,4 +1,8 @@
 
+
+// import Cookies from '../../../scripts/plugins/cookies/api.js';
+import Cookies from './plugins/cookies/api.js';
+
 // GET Parameters
     function get_image_parameters(path) {
         return ($.trim(path) == 'base') ? 'people/community/profiles/' : '../../people/community/profiles/' 
@@ -9,24 +13,21 @@
 // GET Parameters - END
 
 function article_click() {
-    var t = "1",
-        e = $(".vw-anchor-pages");
-    $(e).on("click", function (ev) {
-        ev.preventDefault();
-        alert('Working');
+
+    var e = $(".vw-anchor-pages");
+    $(e).on("click", function () {
 
         var e = $(this).siblings("#page-assistant");
         as();
 
         function as() {
-            !(function (e, n) {
-                $.post("depends/profiles/article/verbs.php", { views: t, note_id: e, viewer_id: n },function(){
+            !(function (en) {
+                $.post("/ajax/verb/home/article_click", { views: '1', note_id: en, viewer_id: '' }, function(){
 
                 }).fail(function(t,e,n){
-                    // console.error(n)
-                    alert(n)
+                    console.error(n)
                 });
-            })(e.attr("pid"), e.attr("uid"));
+            })(e.attr("pid"));
         }
     });
 }
@@ -412,6 +413,17 @@ function note_light_mode() {
             console.error(n)
         });
     }
+}
+
+function get_random_string(len = 11) {
+
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+        str = '';
+    for (var i = 0; i < len; i++) {
+        str += chars.charAt(Math.floor(Math.random() * len));
+    }
+
+    return str;
 }
 
 $(document).ready(function () {

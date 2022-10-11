@@ -20,7 +20,8 @@
 {# CONTENT #}
     {% block page_contents %}
 
-        {# <h1>{{ canvas_debug }}</h1> #}
+        {# <h1>"{{ canvas.profile.uid }}"</h1> #}
+        {# <h1>"{{ canvas.misc.page }}"</h1> #}
 
         {# {#  #}
         {% if canvas.profile.visitor_state == true %}
@@ -40,7 +41,7 @@
             {# Articles #}
             {% for board in canvas.notes %}
                 <div class="nts-host relative">
-                    <span id="page-assistant" class="hd" pid="" puid="" uid="" read="" title="" poster="" save_state="" like_state="" unlike_state=""></span>
+                    <span id="page-assistant" class="hd" pid="{{ board.pid }}" puid="" uid="" read="" title="" poster="" save_state="" like_state="" unlike_state=""></span>
                     <a href="{{ board.post_url }}" class="vw-anchor-pages nts-host-anchor a">
                         <div class="nts-host-display lozad bck relative" data-background-image="{{ asset(board.cover) }}">
                             {% if board.note_is_img == true %}

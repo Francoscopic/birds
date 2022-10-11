@@ -2,6 +2,10 @@
 
 namespace App\Validation;
 
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
 use App\Database\DatabaseAccess;
 use App\Function\IndexFunction;
 
@@ -96,32 +100,40 @@ class SigninValidation
         }
     }
 
-    protected function set_cookie_variables($cookie_name, $cookie_value, $cookie_time): bool
+    protected function set_cookie_variables($cookie_name, $cookie_value, $cookie_time)
     {
-        # Set cookie
-        $domain = $_SERVER['HTTP_HOST'];
-        setcookie($cookie_name, $cookie_value, time()+(60*60*24*$cookie_time), '/', $domain, true);
-        unset($cookie_name, $cookie_time, $cookie_value, $domain);
-        return false;
+        $response = new Response();
+        $response->headers->setCookie(new Cookie($cookie_name, $cookie_value, strtotime('+6 months')));
+        // setcookie('vst', 'haha', strtotime('+1 month'));
+        /*  // For special Cookies
+            $response->headers->setCookie(
+                Cookie::create($cookie_name)
+                ->withValue($cookie_value)
+                ->withExpires(strtotime('+6 months'))
+                ->withSecure(true)
+                ->withHttpOnly(true)
+            );
+        */
+        $response->sendHeaders();
     }
-    protected function visitor($visitor_id) 
+    protected function visitor($visitor_id): void
     {
+        $this->set_cookie_variables('vst', $visitor_id, 30);
         $this->add_visitor($visitor_id);
     }
-    protected function add_visitor($visitor_id): bool
+    protected function add_visitor($visitor_id): void
     {
         $connection = new DatabaseAccess();
         $connection = $connection->connect('');
         $stmt = $connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
         $stmt->bind_param('s', $visitor_id);
         $stmt->execute();
-        set_cookie_variables('vst', $visitor_id, 30);
         unset($stmt, $connection, $visitor_id);
-        return false;
     }
 
     public function alright($page_state) 
     {
+        $uid = $path = '';
         if( $page_state == true ) {
             $uid = $_SESSION['uid'];
             return array(
@@ -129,33 +141,36 @@ class SigninValidation
                 'visit' => false
             );
         } else {
-            $page_name = trim(basename($_SERVER['PHP_SELF'], '.php')); // get the page name
+            $request = Request::createFromGlobals();
+            $path = $request->getPathInfo();
             $allowed_pages = array(
-                'index', 'article', 'people', 
+                '', '/', '/home', 
+                'article', 'people', 
                 'comments', 'help', 'username-policy', 
                 'terms', 'rules', 'privacy-policy', 
                 'help-articles', 'cookie-policy'
             );
-            $reception = in_array($page_name, $allowed_pages); //check to see if page is allowed to be viewed
+            $reception = in_array($path, $allowed_pages); //check to see if page is allowed to be viewed
         
             if( $reception && isset($_COOKIE['vst']) ) {
         
-                // He has a reception-id, let him in
                 $uid = $_SESSION['vst'] = $_COOKIE['vst'];
             } elseif( $reception && !isset($_COOKIE['vst']) ) {
         
-                // He doesn't have a reception-id, assign him one, and let him in
                 $visitor_id = 'visitor-' .crypt(rand(5000, 9999), random_int(5000, 9999));
-                visitor($visitor_id); // Save the data
+                $this->visitor($visitor_id); // Save the data, Create new visitor cookie
                 $uid = $_SESSION['vst'] = $visitor_id;
             } else {
-        
-                echo header('Location: ../out/aquamarine/signin.php'); // take him outside
+                
+                $uid = 'vst-intruder';
+                $this->add_visitor($uid);
+                echo header('Location: /'); // take him outside
+                // take the person outside
             }
-            unset($page_name, $allowed_pages, $reception, $_SESSION['uid']);
+            unset($allowed_pages, $reception, $_SESSION['uid']);
             return array(
                 'uid' => $uid, 
-                'visit' => true
+                'visit' => true,
             );
         }
     }

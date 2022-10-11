@@ -49,7 +49,7 @@ class DatabaseAccess
                 $connection = new mysqli($dbhost, $db_user_3, $db_pass_3, $db_name_3);
                 if ($connection->connect_error) die($connection->connect_error);
                 break;
-            case 'verbs':
+            case 'verb':
                 $connection = new mysqli($dbhost, $db_user_2, $db_pass_2, $db_name_2);
                 if ($connection->connect_error) die($connection->connect_error);
                 break;

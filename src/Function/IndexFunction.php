@@ -201,7 +201,7 @@ class IndexFunction
     public static function get_if_views($note_id, $viewer_id): bool
     {
         $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verbs');
+        $connection_verb = $connection_verb->connect('verb');
 
         $stmt = $connection_verb->prepare('SELECT DISTINCT(sid) FROM views WHERE pid=? AND uid=? ORDER BY sid DESC');
         $stmt->bind_param('ss', $note_id, $viewer_id);
@@ -220,7 +220,7 @@ class IndexFunction
     {
         # Call connection
         $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verbs');
+        $connection_verb = $connection_verb->connect('verb');
 
         $stmt = $connection_verb->prepare('SELECT sid FROM views WHERE pid = ?');
         $stmt->bind_param('s', $note_id);
@@ -365,7 +365,7 @@ class IndexFunction
         public static function small_menu_validations($pid, $viewer_uid): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $save_state = $like_state = 0;
 
             # SAVES
@@ -508,7 +508,7 @@ class IndexFunction
         public static function save_like_verb($table, $theUid, $thePosterUid, $thePid, $type, $state = 1): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $stmt = $connection_verb->prepare("SELECT sid FROM $table WHERE uid = ? AND puid = ? AND pid = ? AND state = ?");
             $stmt->bind_param('ssss', $theUid, $thePosterUid, $thePid, $state);
             $stmt->execute();
@@ -547,7 +547,7 @@ class IndexFunction
         public static function renoted($theUid, $thePosterUid, $thePid, $state = 1): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $stmt = $connection_verb->prepare('SELECT sid FROM renotes WHERE uid = ? AND puid = ? AND pid = ? AND state = ?');
             $stmt->bind_param('ssss', $theUid, $thePosterUid, $thePid, $state);
             $stmt->execute();
@@ -576,7 +576,7 @@ class IndexFunction
         public static function verb_number($thePid, $table, $state = 1): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $stmt = $connection_verb->prepare("SELECT pid, puid FROM $table WHERE pid = ? AND state = ?");
             $stmt->bind_param('ss', $thePid, $state);
             $stmt->execute();
@@ -601,7 +601,7 @@ class IndexFunction
         public static function note_views($id): string
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $stmt = $connection_verb->prepare('SELECT DISTINCT(uid) FROM views WHERE pid = ?');
             $stmt->bind_param('s', $id);
             $stmt->execute();
@@ -612,7 +612,7 @@ class IndexFunction
         public static function get_comment($comment_id): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
 
             $stmt = $connection_verb->prepare("SELECT comment, date FROM comments_list WHERE cid = ?");
             $stmt->bind_param("s", $comment_id);
@@ -656,7 +656,7 @@ class IndexFunction
         public static function get_comments_number($note_id, $reason = 'number', $comment_no = 200): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $stmt = $connection_verb->prepare("SELECT sid FROM comments WHERE pid = ?");
             $stmt->bind_param("s", $note_id);
             $stmt->execute();
@@ -681,7 +681,7 @@ class IndexFunction
         public static function last_read_note($uid): array
         {
             $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verbs');
+            $connection_verb = $connection_verb->connect('verb');
             $stmt = $connection_verb->prepare('SELECT pid FROM views WHERE uid = ? ORDER BY sid DESC LIMIT 1');
             $stmt->bind_param('s', $uid);
             $stmt->execute();

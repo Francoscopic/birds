@@ -2,6 +2,6 @@ controllers:
     resource: ../src/Controller/
     type: attribute
 
-# app_lucky_number:
-    # path: /lucky/number
-    # controller: App\Controller\LuckyController::number
+ajax_home_article_click:
+    path: /ajax/verb/home/article_click
+    controller: App\Verb\Home\ArticleClickHome::Article_Click

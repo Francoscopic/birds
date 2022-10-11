@@ -24,19 +24,19 @@ class HomeController extends AbstractController
         $uid = $login_state['uid'];
         $visitor_state = $login_state['visit'];
 
-        // Database Access
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
+        $canvas = array(
+            'notes' => array(),
+            'profile' => array(
+                'uid' => $uid,
+                'visitor_state' => $visitor_state,
+            ),
+            'misc' => array(),
+        );
 
-        // Work
-            $canvas = array(
-                'notes' => array(),
-                'profile' => array(
-                    'uid' => $uid,
-                    'visitor_state' => $visitor_state,
-                ),
-                'misc' => array(),
-            );
+        # Work
+            // Database Access
+            $connection_sur = new DatabaseAccess();
+            $connection_sur = $connection_sur->connect('sur');
             $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY sid DESC LIMIT 15");
             $stmt->execute();
             $get_result = $stmt->get_result();
@@ -69,7 +69,6 @@ class HomeController extends AbstractController
                 #
                 $article_url = $this->generateUrl('note_posts', array('post_id'=>$the_pid));
                 $profile_url = $this->generateUrl('note_profiles', array('user_id'=>$note_poster_uname));
-                $show_load_more = ($num_rows==15) ? true : false;
 
                 $canvas['notes'][] = [
                     'pid'          => $the_pid,
@@ -88,12 +87,13 @@ class HomeController extends AbstractController
                     'post_url'     => $article_url,
                     'profile_url'  => $profile_url,
                 ];
-                // */
             }
-            $canvas['misc'] = [
-                'load_more' => $show_load_more,
-            ];
-        // Work - END
+            $show_load_more = ($num_rows==15) ? true : false;
+        # Work - END
+
+        $canvas['misc'] = [
+            'load_more' => $show_load_more,
+        ];
 
         return $this->render('pages/in/index.html.twig', [
             'canvas' => $canvas,

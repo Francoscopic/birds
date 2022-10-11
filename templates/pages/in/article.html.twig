@@ -1,0 +1,17 @@
+
+{% extends 'pages/in/layout.html.twig' %}
+
+
+{# HEADERS #}
+    {% block title %}Article{% endblock %}
+    {% block robots %}false{% endblock %}
+    {% block description %}Notes helps you share, educate and inspire with writing. And do it in just 7 paragraphs. It's for the creators who write.{% endblock %}
+    {% block twitter_image %}{{ absolute_url('images/logo/logo-white-full.png') }}{% endblock %}
+    {% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}
+    {% block stylesheets %}
+        {#  #}
+    {% endblock %}
+    {% block darkmode_stylesheet %}
+        <link rel="stylesheet" href="{{ asset('stylesheets/lightmode.css') }}" watch="theme" >
+    {% endblock %}
+{# HEADERS - END #}
