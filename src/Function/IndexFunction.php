@@ -395,18 +395,17 @@ class IndexFunction
     #
 
     # Article
-        public static function GET_validate($get): array
-        { # Is GET request id valid?
+        public static function GET_validate($get): bool
+        { # Is article found
             $connection_sur = new DatabaseAccess();
             $connection_sur = $connection_sur->connect('sur');
+
             $stmt = $connection_sur->prepare('SELECT sid FROM big_sur WHERE pid = ?');
             $stmt->bind_param('s', $get);
             $stmt->execute();
             $result = $stmt->get_result();
-            if( $result->num_rows > 0 ) {
-                return array($get, 0);
-            }
-            return array('', 1);
+
+            return ( $result->num_rows > 0 ) ? true : false;
         }
         public static function GET_validate_people($get): array
         { # Is GET request name valid

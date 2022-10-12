@@ -18,7 +18,7 @@ class HomeController extends AbstractController
     #[Route('/', name: 'note_home')]
     public function corpus(Connection $connection): Response
     {
-        // Profile data
+        # Profile data
         $login = new SigninValidation();
         $login_state = $login->alright($login->page_state);
         $uid = $login_state['uid'];
@@ -34,9 +34,10 @@ class HomeController extends AbstractController
         );
 
         # Work
-            // Database Access
+            # Database Access
             $connection_sur = new DatabaseAccess();
             $connection_sur = $connection_sur->connect('sur');
+
             $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY sid DESC LIMIT 15");
             $stmt->execute();
             $get_result = $stmt->get_result();
@@ -101,21 +102,6 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/posts/{post_id}', name: 'note_posts')]
-    public function posts_show(string $post_id, Request $request): Response
-    {
-        $routeName = $request->attributes->get('_route');
-        $routeParameters = $request->attributes->get('_route_params');
-
-        // use this to get all the available attributes (not only routing ones):
-        $allAttributes = $request->attributes->all();
-
-        //
-        return $this->render('pages/in/article.html.twig', [
-            'canvas' => '',
-        ]);
-    }
-
     #[Route('/{user_id}', name: 'note_profiles')]
     public function profiles(string $user_id): Response
     {
@@ -129,7 +115,7 @@ class HomeController extends AbstractController
     #[Route('/about', name: 'note_about')]
     public function about(): Response
     {
-        //
+        // return $this->render('')
     }
 }
 
