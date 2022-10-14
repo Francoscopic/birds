@@ -3,7 +3,8 @@
 
 {% block content %}
     {% block header %}
-        {% if canvas.profile.visitor_state == true %}
+        {# {% if canvas.profile.visitor_state == true %} #}
+        {% if canvas.profile.visitor_state != true %}
             <div class="n-header n-header-visitor desktop mobile glsmpsm" id="n-header">
                 <div class="n-header-one">
                     <a href="{{ url('note_home') }}" class="a">
@@ -59,11 +60,13 @@
     {% endblock %}
 
     {% block block_small_menu %}
-        <div class="notes-small-menu-container" style="display:none">
+        <div class="notes-small-menu-container" style="display:none">            
             <a href="#" class="note-small-menu-container-close a">
                 <div class="glsmpsm men-cvr"></div>
             </a>
-            <div class="nts-host-menu"></div>
+            <div class="nts-host-menu">
+                
+            </div>
         </div>
     {% endblock %}
 

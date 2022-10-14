@@ -11,26 +11,15 @@ function article_click() {  // working
 
         function as() {
             !(function (en) {
-                $.post("/ajax/verb/home/article_click", { views: '1', note_id: en, viewer_id: '' }, function(){
+                $.post("/ajax/verb/home/article_click/", { views: '1', note_id: en, viewer_id: '' }, function(){
 
                 }).fail(function(t,e,n){
                     console.error(n)
-                });
+                })
             })(e.attr("pid"));
         }
     });
 }
-function auto_grow(t) {
-    (t.style.height = "50px"), (t.style.height = t.scrollHeight + "px");
-}
-function write_grow(t) {
-    (t.style.height = "70px"), (t.style.height = t.scrollHeight + "px");
-}
-function parag_grow(t) {
-    (t.style.height = "70px"), (t.style.height = `${t.scrollHeight - 15}px`);
-}
-
-
 
 function notes_small_menu() {   // Working
 
@@ -38,7 +27,7 @@ function notes_small_menu() {   // Working
         isUserAllowed = $(ellipsis).attr('visit'),
         close_exit = $('.note-small-menu-container-close'),
         small_menu_parent_container = $('.notes-small-menu-container'),
-        small_menu_container = $('.nts-host-menu');
+        small_menu = $('.nts-host-menu');
 
     function small_container(title, name, link, pid, save_state, like_state, unlike_state){
         var is_saved = is_done(save_state),
@@ -73,7 +62,7 @@ function notes_small_menu() {   // Working
                 </a>
             </div>
         </div>`;
-        small_menu_container.html(ele);
+        call_menu(ele);
         return true;
 
         function is_done(state) {
@@ -94,8 +83,12 @@ function notes_small_menu() {   // Working
                 </a>
             </p>
         </div>`;
-        small_menu_container.html(ele);
+        call_menu(ele);
         return true;
+    }
+    function call_menu(ele) {
+        small_menu.empty(),
+        small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
     }
     function tools_contractor(pid, save_ask, like_ask, unlike_ask) {
 
@@ -108,7 +101,7 @@ function notes_small_menu() {   // Working
             (ask==1 || ask==true) ? e(ia, "fas", "far") : e(ia, "far", "fas");
         }
         function s(t, e, other=null){
-            $.post("/ajax/verb/home/article_like",{thePid:t, theReason:e, other:other},function(){
+            $.post("/ajax/verb/home/article_like/",{thePid:t, theReason:e, other:other},function(){
                 // alert(data.message)
             }).fail(function(t, i, n){
                 console.error(n)
@@ -197,7 +190,7 @@ function notes_small_menu() {   // Working
                         </a>
                     </div>
                 </div>`;
-                small_menu_container.html(ele);
+                call_menu(ele);
                 return true;
             }
             function report_tools_response(t, ask) {
@@ -257,8 +250,6 @@ function notes_small_menu() {   // Working
 
         var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
             post_id      = $assistant.attr('pid'),
-            // poster_uid   = $assistant.attr('puid'),
-            // viewer_id    = $assistant.attr('uid'),
             article_link = $assistant.attr('link'),
             title        = $assistant.attr('title'),
             poster       = $assistant.attr('poster'),
@@ -276,8 +267,7 @@ function notes_small_menu() {   // Working
             small_menu_parent_container.fadeIn(), 
             tools_contractor(post_id, save_state, 
                 like_state, unlike_state)
-        ) 
-        : null;
+        ) : null;
     }),
 
     close_exit.on('click', function(e){
@@ -290,7 +280,9 @@ function notes_small_menu() {   // Working
 function notes_new_menu() {
     var t = $(".note-menu-open"),
         small_menu_parent_container = $('.notes-small-menu-container'),
-        small_menu_container = $('.nts-host-menu');
+        small_menu = $('.nts-host-menu'),
+        small_menu_container = $('.nts-host-menu-plate'),
+        secretary_loader = $('.nts-secretary');
 
     function menu_container(display, nam, unam, path, theme_arr) {
         var theme_state   = theme_arr[0],
@@ -370,20 +362,113 @@ function notes_new_menu() {
 
         note_light_mode();
     }
+    function get_menu(reason = 'menu') {
+
+        $.post('/ajax/universe/menu/', {reason:reason}, function(data){
+            alert(data.message);
+            /*
+            var menu = `
+            <nav id="menu-august-nav" class="menu-august-nav hdd">
+                <div class="menu-august-cover ft-sect">
+                    <div class="menu-august" give-trans-bck>
+                        <div class="menu-august-profile">
+                            <a href="${data.profile_page}">
+                                <div prof-img>
+                                    <img src="${data.display}" />
+                                </div>
+                                <div prof-text>
+                                    <h1>${data.name}</h1>
+                                    <p>@${data.username}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="menu-august" give-botm-space>
+                        <div class="menu-august-profile">
+                            <div class="menu-august-pages">
+                                <ul give-und>
+                                    <a href="/">
+                                        <li>Home</li>
+                                    </a>
+                                    <a href="${data.profile_page}">
+                                        <li>Profile</li>
+                                    </a>
+                                    <a href="${data.saved_page}">
+                                        <li>Saved</li>
+                                    </a>
+                                    <a href="${data.history_page}">
+                                        <li>History</li>
+                                    </a>
+                                    <a href="${data.change_page}">
+                                        <li>Settings</li>
+                                    </a>
+                                </ul>
+                                <ul give-un>
+                                    <a href="/support">
+                                        <li>Help & FAQ</li>
+                                    </a>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-august">
+                        <div class="menu-august-profile">
+                            <div class="menu-august-profile-mixt">
+                                <label class="note-color-mode">
+                                    <input type="checkbox" class="hd" name="color_mode" path="{path}" mode="{theme_state}" {theme_checked} />
+                                    <div>
+                                        <h1><i class="{theme_icon}"></i></h1>
+                                        <p>{theme_text}</p>
+                                    </div>
+                                </label>
+                                <a href="/user/signout">
+                                    <div>
+                                        <h1><i class="fa-solid fa-right-from-bracket"></i></h1>
+                                        <p>Log out</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>`;*/
+            // call_menu(menu)
+        }).fail(function(a,b,c){
+            console.error(c)
+        })
+    }
+    function call_loader() {
+        var ele = 
+        `<div class="nts-secretary">
+            <img src="/images/logo/loader.gif" alt="page loader" />
+        </div>`;
+        call_menu(ele)
+    }
+    function call_menu(ele) {
+        small_menu.empty(),
+        small_menu.html(ele)
+    }
 
     t.click(function (t) {
         t.preventDefault();
-        var $assistant = $('#page-assistant'),
-            uid = $assistant.attr('uid'),
-            path = $assistant.attr('path'),
-            display = `${get_image_parameters(path) + $assistant.attr('disp')}`;
-            the_name = $assistant.attr('nm'),
-            the_uname = $assistant.attr('unm'),
-            theme_arr = ($assistant.attr('thm_st_chk_icn_txt')).split('/');
+
+        call_loader();
+        small_menu_parent_container.fadeIn();
+        get_menu('menu');
+
+
+
+        // var $assistant = $('#page-assistant');
+            // // uid = $assistant.attr('uid'),
+            // path = $assistant.attr('path'),
+            // display = `${get_image_parameters(path) + $assistant.attr('disp')}`;
+            // the_name = $assistant.attr('nm'),
+            // the_uname = $assistant.attr('unm'),
+            // theme_arr = ($assistant.attr('thm_st_chk_icn_txt')).split('/');
             
-        menu_container(display, the_name, the_uname, path, theme_arr) == true ? 
-            (small_menu_parent_container.fadeIn(), tools_contractor()) : 
-            null;
+        // menu_container(display, the_name, the_uname, path, theme_arr) == true ? 
+            // (small_menu_parent_container.fadeIn(), tools_contractor()) : 
+            // null;
     })
 }
 
@@ -420,17 +505,6 @@ function note_light_mode() {
             console.error(n)
         });
     }
-}
-
-function get_random_string(len = 11) {
-
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-        str = '';
-    for (var i = 0; i < len; i++) {
-        str += chars.charAt(Math.floor(Math.random() * len));
-    }
-
-    return str;
 }
 
 $(document).ready(function () {

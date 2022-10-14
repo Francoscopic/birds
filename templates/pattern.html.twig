@@ -39,7 +39,8 @@
             {% endblock %}
     </head>
     <body>
-        <input type="hidden" id="page-assistant" uid="'. $uid .'" disp="'.$display.'" nm="'.$name.'" unm="'.$username.'" path="'.$__pageContent__['path'].'" thm_st_chk_icn_txt="'.$user_theme_state.'/'.$user_theme_checked.'/'.$theme_mode_icon.'/'.$theme_mode_text.'" />
+        {# <input type="hidden" id="page-assistant" disp="'.$display.'" nm="'.$name.'" unm="'.$username.'" path="'.$__pageContent__['path'].'" thm_st_chk_icn_txt="'.$user_theme_state.'/'.$user_theme_checked.'/'.$theme_mode_icon.'/'.$theme_mode_text.'" /> #}
+        <input type="hidden" id="page-assistant" />
         {% block body %}
             {% block content %}{% endblock %}
         {% endblock %}
