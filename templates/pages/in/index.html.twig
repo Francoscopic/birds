@@ -41,9 +41,9 @@
             {# Articles #}
             {% for board in canvas.notes %}
                 <div class="nts-host relative">
-                    <span id="page-assistant" class="hd" pid="{{ board.pid }}" puid="" uid="" read="" title="" poster="" save_state="" like_state="" unlike_state=""></span>
-                    <a href="{{ board.post_url }}" class="vw-anchor-pages nts-host-anchor a">
-                        <div class="nts-host-display lozad bck relative" data-background-image="{{ asset(board.cover) }}">
+                    <span id="page-assistant" class="hd" pid="{{board.pid}}" title="{{board.title}}" link="{{board.profile_url}}" poster="{{board.poster_name}}" save_state="{{board.save}}" like_state="{{board.like}}" unlike_state="{{board.unlike}}"></span>
+                    <a href="{{board.post_url}}" class="vw-anchor-pages nts-host-anchor a">
+                        <div class="nts-host-display lozad bck relative" data-background-image="{{- asset(board.cover) -}}">
                             {% if board.note_is_img == true %}
                                 <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
                             {% endif %}
@@ -59,11 +59,11 @@
                         </div>
                     </a>
                     <div class="nts-host-verb-author ft-sect">
-                        <a href="{{ board.profile_url }}" class="a">
+                        <a href="{{board.profile_url}}" class="a">
                             <p>{{ board.poster_name }}</p>
                         </a>
                         <a href="#" class="a">
-                            <button class="nts-show-menu no-bod" visit=""><i class="lg-i fa fa-ellipsis-v"></i></button>
+                            <button class="nts-show-menu no-bod" visit="{#{{canvas.profile.visitor_state}}#}"><i class="lg-i fa fa-ellipsis-v"></i></button>
                         </a>
                     </div>
                 </div>

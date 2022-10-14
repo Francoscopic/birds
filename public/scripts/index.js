@@ -1,18 +1,7 @@
 
-
-// import Cookies from '../../../scripts/plugins/cookies/api.js';
 import Cookies from './plugins/cookies/api.js';
 
-// GET Parameters
-    function get_image_parameters(path) {
-        return ($.trim(path) == 'base') ? 'people/community/profiles/' : '../../people/community/profiles/' 
-    }
-    function get_page_parameters(path) {
-        return (path == 'base') ? 'pages/in/' : ''
-    }
-// GET Parameters - END
-
-function article_click() {
+function article_click() {  // working
 
     var e = $(".vw-anchor-pages");
     $(e).on("click", function () {
@@ -41,7 +30,9 @@ function parag_grow(t) {
     (t.style.height = "70px"), (t.style.height = `${t.scrollHeight - 15}px`);
 }
 
-function notes_small_menu() {
+
+
+function notes_small_menu() {   // Working
 
     var ellipsis = $('.nts-show-menu'),
         isUserAllowed = $(ellipsis).attr('visit'),
@@ -49,12 +40,12 @@ function notes_small_menu() {
         small_menu_parent_container = $('.notes-small-menu-container'),
         small_menu_container = $('.nts-host-menu');
 
-    function small_container(title, name, link, pid, vid, save_state, like_state, unlike_state){
-        is_saved = is_done(save_state);
-        is_liked = is_done(like_state);
-        is_unliked = is_done(unlike_state);
+    function small_container(title, name, link, pid, save_state, like_state, unlike_state){
+        var is_saved = is_done(save_state),
+            is_liked = is_done(like_state),
+            is_unliked = is_done(unlike_state);
         const ele = `
-        <span id="small-menu-assistant" class="hd" pid="${pid}" uid="${vid}"></span>
+        <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
         <div class="nts-host-menu-post_details">
             <a class="a" href="${link}">
                 <h1>${title}</h1>
@@ -92,13 +83,13 @@ function notes_small_menu() {
     function small_container_visit(){
         const ele = `
         <div class="login_to_connect">
-            <div><img src="public/images/7.png" alt="Netintui Notes" /></div>
+            <div><img src="/images/support/7.png" alt="Netintui Notes" /></div>
             <p class="nt-ft-calib" message="">Log in to interact with the world on Notes.</p>
             <p class="nt-ft-robt" action="">
-                <a href="pages/out/aquamarine/signin.php" class="a">
+                <a href="/signin" class="a">
                     <button>Log in</button>
                 </a>
-                <a href="pages/out/aquamarine/signup.php" class="a">
+                <a href="/signup" class="a">
                     <button>Sign up</button>
                 </a>
             </p>
@@ -106,9 +97,9 @@ function notes_small_menu() {
         small_menu_container.html(ele);
         return true;
     }
-    function tools_contractor(pid, puid, vid, save_ask, like_ask, unlike_ask) {
+    function tools_contractor(pid, save_ask, like_ask, unlike_ask) {
 
-        function tools_response(t, ask){
+        function tools_response(t, ask) {
             var ia = $(t).find('i');
             
             function e(t, i, n){
@@ -116,9 +107,9 @@ function notes_small_menu() {
             }
             (ask==1 || ask==true) ? e(ia, "fas", "far") : e(ia, "far", "fas");
         }
-        function s(t, i, n, e){
-            $.post("pages/in/depends/profiles/article/verbs.php",{thePid:t, thePUid:i, theUid:n, theReason:e},function(){
-                // alert(data)
+        function s(t, e, other=null){
+            $.post("/ajax/verb/home/article_like",{thePid:t, theReason:e, other:other},function(){
+                // alert(data.message)
             }).fail(function(t, i, n){
                 console.error(n)
             })
@@ -131,7 +122,8 @@ function notes_small_menu() {
         var save_trigger = $('.save-this-note');
         $(save_trigger).on('click', function(e){
             e.preventDefault();
-            s(pid, puid, vid, 'save'),
+
+            s(pid, 'save'),
             tools_response(this, save_ask),
             save_ask = flip_value(save_ask) // change value
         });
@@ -139,7 +131,8 @@ function notes_small_menu() {
         var like_trigger = $('.like-this-note');
         $(like_trigger).on('click', function(e){
             e.preventDefault();
-            s(pid, puid, vid, 'like'),
+
+            s(pid, 'like'),
             tools_response(this, like_ask),
             like_ask = flip_value(like_ask) // change value
         });
@@ -147,7 +140,8 @@ function notes_small_menu() {
         var unlike_trigger = $('.unlike-this-note');
         $(unlike_trigger).on('click', function(e){
             e.preventDefault();
-            s(pid, puid, vid, 'unlike'),
+
+            s(pid, 'unlike'),
             tools_response(this, unlike_ask),
             unlike_ask = flip_value(unlike_ask) // change value
         });
@@ -157,7 +151,7 @@ function notes_small_menu() {
 
             function report_small_container() {
                 const ele = `
-                <span id="small-menu-assistant" class="hd" pid="${pid}" uid="${vid}"></span>
+                <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
                 <div class="nts-host-menu-post_details">
                     <a class="a">
                         <h1>Report image or title</h1>
@@ -227,7 +221,7 @@ function notes_small_menu() {
                 $(report_send).on('click', function(e){
                     e.preventDefault();
                     var selected_report = $('.small-report-issue input:checked').attr('value');
-                    (selected_report == '') ? null : (s(pid, selected_report, vid, 'report'),close_exit.click());
+                    (selected_report == '') ? null : (s(pid, 'report', selected_report),close_exit.click());
                 });
 
 
@@ -253,7 +247,7 @@ function notes_small_menu() {
         }
     }
 
-    ellipsis.on('click', function(e){
+    ellipsis.on('click', function(e) {
         e.preventDefault();
 
         if( isUserAllowed == true ) {
@@ -263,16 +257,27 @@ function notes_small_menu() {
 
         var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
             post_id      = $assistant.attr('pid'),
-            poster_uid   = $assistant.attr('puid'),
-            viewer_id    = $assistant.attr('uid'),
-            article_link = $assistant.attr('read'),
+            // poster_uid   = $assistant.attr('puid'),
+            // viewer_id    = $assistant.attr('uid'),
+            article_link = $assistant.attr('link'),
             title        = $assistant.attr('title'),
             poster       = $assistant.attr('poster'),
             save_state   = $assistant.attr('save_state'),
             like_state   = $assistant.attr('like_state'),
             unlike_state = $assistant.attr('unlike_state');
 
-        (small_container(title, poster, article_link, post_id, viewer_id, save_state, like_state, unlike_state) == true) ? (small_menu_parent_container.fadeIn(), tools_contractor(post_id, poster_uid, viewer_id, save_state, like_state, unlike_state)) : null;
+        (
+            small_container(
+                title, poster, article_link, post_id, 
+                save_state, like_state, unlike_state
+            ) == true
+        ) 
+        ? (
+            small_menu_parent_container.fadeIn(), 
+            tools_contractor(post_id, save_state, 
+                like_state, unlike_state)
+        ) 
+        : null;
     }),
 
     close_exit.on('click', function(e){
@@ -280,6 +285,8 @@ function notes_small_menu() {
         small_menu_parent_container.fadeOut();
     })
 }
+
+
 function notes_new_menu() {
     var t = $(".note-menu-open"),
         small_menu_parent_container = $('.notes-small-menu-container'),

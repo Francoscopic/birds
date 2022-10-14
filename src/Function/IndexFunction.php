@@ -133,7 +133,7 @@ class IndexFunction
     {
         # Make the Note have enough linebreak space for easy read.
         $order = array("\r\n", "\n", "\r", "\\r\\n", "\\n", "\\r");
-        $opt = "<br><br>";
+        $opt = "\n\n";
 
         $replace = str_replace($order, $opt, $note);
         return (stripslashes($replace));
@@ -286,8 +286,7 @@ class IndexFunction
     # Home
         public static function note_cover_article($file): string
         {
-            $dir = '../../people/community/notes/'.$file;
-            return file_exists($dir) ? $dir : 'not-found'; //show error if file does not exist
+            return $file;
         }
         public static function note_cover_extensions($cover, $exts): array
         {
@@ -300,7 +299,7 @@ class IndexFunction
             $num_each_exts = count($each_exts);
             for($i=1; $i<$num_each_exts; $i++) {
 
-                $path = note_cover_article($cover_name.'-'.($i-1).'.'.$each_exts[$i]);
+                $path = self::note_cover_article($cover_name.'-'.($i-1).'.'.$each_exts[$i]);
                 $images .= '<img src="'. $path .'" alt="" />';
             }
             return array(

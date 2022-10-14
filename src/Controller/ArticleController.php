@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use Doctrine\DBAL\Connection;
+// use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,11 +35,19 @@ class ArticleController extends AbstractController
 
         if($this->article_found === false ) {
             $this->article_message = 'We could not find your article';
-            // Show the report.
+            // Show the error report.
         }
         
         $canvas = array(
-            'notes' => array(),
+            'notes' => [
+                'article' => array(),
+                'poster' => array(),
+                'viewer' => array(),
+                'reaction' => array(),
+                'link' => array(),
+                'comment' => array(),
+                'note_more' => array(),
+            ],
             'profile' => array(
                 'uid' => $uid,
                 'visitor_state' => $visitor_state,
@@ -52,18 +60,29 @@ class ArticleController extends AbstractController
             # Details for the Note, itself: FUNCTION = GET_MY_NOTE()
                 $get_note_result_array = IndexFunction::get_my_note($post_id);
                 $uid_poster = $get_note_result_array['poster_id']; # uid
-                $pid_note = $get_note_result_array['post_id']; # pid
                 $note_title = stripslashes($get_note_result_array['title']); # title
-                $note_note = $get_note_result_array['note']; # note
+                $note_note = IndexFunction::cleanRead($get_note_result_array['note']); # note
+                $note_description = IndexFunction::ShowMore($note_note); # note
                 $note_cover = IndexFunction::note_cover_article($get_note_result_array['cover'], '../../');
                 $note_extensions = IndexFunction::note_cover_extensions($get_note_result_array['cover'], $get_note_result_array['extensions'])['images'];
-                $note_date = $get_note_result_array['date']; # date posted of article
-
-                $note_font = IndexFunction::note_font_family($get_note_result_array['font']);
-                $note_theme = $get_note_result_array['theme'];
+                $note_views = IndexFunction::note_views($post_id);
+                $note_date = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
 
                 $cover_width = IndexFunction::imgNomenclature($note_cover)['width'];
                 $cover_height = IndexFunction::imgNomenclature($note_cover)['height'];
+
+                $canvas['notes']['article'] = [
+                    'pid'          => $post_id,
+                    'title'        => $note_title,
+                    'body'         => $note_note,
+                    'description'  => $note_description,
+                    'cover'        => $note_cover,
+                    'cover_width'  => $cover_width,
+                    'cover_height' => $cover_height,
+                    'extensions'   => $note_extensions,
+                    'views'        => $note_views,
+                    'date'         => $note_date,
+                ];
             #
 
             # Details of the Noter, themselves: FUNCTION = GET_NOTE_POSTER()
@@ -72,6 +91,12 @@ class ArticleController extends AbstractController
                 $note_poster_name = $get_note_poster['name'];
                 $note_poster_username = $get_note_poster['username'];
                 $note_poster_display = $get_note_poster['display'];
+
+                $canvas['notes']['poster'] = [
+                    'name' => $note_poster_name,
+                    'username' => $note_poster_username,
+                    'display' => $note_poster_display,
+                ];
             #
 
             # Details of Viewer
@@ -79,43 +104,68 @@ class ArticleController extends AbstractController
                 $name = $viewer_array['name'];
                 $username = $viewer_array['username'];
                 $display = IndexFunction::note_cover($viewer_array['display'], 'profile', 'pages', 'small');
+                $note_posted = IndexFunction::get_number_of_notes($uid_poster); # Get the number of NOTES posted
+                $subscribe_followers = IndexFunction::subscribes($uid_poster, 'followers'); # Get the number of subscribers Author has
+
+                $canvas['notes']['viewer'] = [
+                    'name' => $name,
+                    'username' => $username,
+                    'display' => $display,
+                    'note_posted' => $note_posted,
+                    'subscribers' => $subscribe_followers,
+                ];
             #
 
             // Divide
 
-            # Save
-                $get_noted = IndexFunction::save_like_verb('saves', $uid, $uid_poster, $pid_note, 'save');
-                $save_icon = $get_noted['icon'];
-                $save_checked = $get_noted['check'];
-            #
-            # Like
-                $get_like = IndexFunction::save_like_verb('likes', $uid, $uid_poster, $pid_note, 'like');
-                $like_icon = $get_like['icon'];
-                $like_checked = $get_like['check'];
+            # VERBS
+                # Save
+                    $get_noted = IndexFunction::save_like_verb('saves', $uid, $uid_poster, $post_id, 'save');
+                    $save_icon = $get_noted['icon'];
+                    $save_checked = $get_noted['check'];
+                #
+                # Like
+                    $get_like = IndexFunction::save_like_verb('likes', $uid, $uid_poster, $post_id, 'like');
+                    $like_icon = $get_like['icon'];
+                    $like_checked = $get_like['check'];
+                #
+                # Liked Number
+                    $liked_number = IndexFunction::verb_number($post_id, 'likes')['number'];
+                #
+                # Subscribe
+                    # Get the subscribe state between the user and people
+                    $subscribe_state = IndexFunction::get_subscribe_state($uid_poster, $uid);
+                    $state_variables = IndexFunction::subscribe_state_variables($subscribe_state);
+                    $subs_text  = $state_variables['title'];
+                    $subs_state = $state_variables['state'];
+                #
+                # Comments
+                    // Let's get the number of comments
+                    $comment_number = IndexFunction::get_comments_number($post_id, 'number')[0];
+                #
 
-                $get_unlike = IndexFunction::save_like_verb('unlikes', $uid, $uid_poster, $pid_note, 'unlike');
-                $unlike_icon = $get_unlike['icon'];
-                $unlike_checked = $get_unlike['check'];
-            #
-            # Liked Number
-                $liked_number = IndexFunction::verb_number($pid_note, 'likes')['number'];
-            #
-            # Subscribe
-                # Get the subscribe state between the user and people
-                $subscribe_state = IndexFunction::get_subscribe_state($uid_poster, $uid);
-                $state_variables = IndexFunction::subscribe_state_variables($subscribe_state);
-                $subs_text  = $state_variables['title'];
-                $subs_state = $state_variables['state'];
+                $canvas['notes']['reaction'] = [
+                    'save_icon' => $save_icon,
+                    'save_checked' => $save_checked,
 
-                # Get the number of subscribers Author has
-                $subscribe_followers = IndexFunction::subscribes($uid_poster, 'followers');
+                    'like_icon' => $like_icon,
+                    'like_checked' => $like_checked,
+                    'like_number' => $liked_number,
 
-                # Get the number of NOTES posted
-                $note_posted = IndexFunction::get_number_of_notes($uid_poster);
+                    'subscribe_text' => $subs_text,
+                    'subscribe_state' => $subs_state,
+
+                    'comment_number' => $comment_number,
+                ];
             #
-            # Comments
-                // Let's get the number of comments
-                $comment_number = IndexFunction::get_comments_number($pid_note, 'number')[0];
+
+            // Divide
+            
+            # COMMENT
+                $canvas['notes']['comment'] = $this->article_block_comments($post_id);
+            #
+            # MORE 
+                $canvas['notes']['note_more'] =  $this->article_block_readmore($uid, $post_id);
             #
 
             // Divide 2
@@ -125,25 +175,14 @@ class ArticleController extends AbstractController
             $url_twitter  = 'https://twitter.com/intent/tweet?url=' . urlencode( $this->article_share_url($link, ['media'=>'twitter', 'text'=>$note_title]) );
             $url_linkedin = 'https://www.linkedin.com/shareArticle/?mini=true&url=' . urlencode( $this->article_share_url($link, ['media'=>'linkedin']) );
             $url_link     = $this->article_share_url($link, ['media'=>'link']);
-        # WORK - END
 
-        // $canvas['notes'][] = [
-        //     'pid'          => $the_pid,
-        //     'puid'         => $poster_uid,
-        //     'title'        => $note_title,
-        //     'paragraphs'   => $note_parags,
-        //     'cover'        => $note_cover,
-        //     'note_is_img'  => $note_state_is_image,
-        //     'date'         => $note_date,
-        //     'poster_name'  => $note_poster_name,
-        //     'poster_uname' => $note_poster_uname,
-        //     'if_view'      => $view_eye,
-        //     'save'         => $save_state,
-        //     'like'         => $like_state,
-        //     'unlike'       => $unlike_state,
-        //     'post_url'     => $article_url,
-        //     'profile_url'  => $profile_url,
-        // ];
+            $canvas['notes']['share'] = [
+                'facebook' => $url_facebook,
+                'twitter' => $url_twitter,
+                'linkedin' => $url_linkedin,
+                'web' => $url_link,
+            ];
+        # WORK - END
 
 
         return $this->render('pages/in/article.html.twig', [
@@ -151,10 +190,10 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    protected function article_block_a($pid, $pid_note) 
+    protected function article_block_comments($pid_note): array
     {
 
-        $content = '';
+        $content = array();
 
         # Database Access
         $connection_verb = new DatabaseAccess();
@@ -180,27 +219,26 @@ class ArticleController extends AbstractController
                 $comment_comment = $comments_row['comment'];
             #
 
-            $content .='
-            <li id="article-note-comment-park" class="nu-li ft-sect">
-                <a class="a" href="comments.php?wp='. $pid .'">
-                    <strong>'. $comment_poster .'</strong>
-                    <span>'. $comment_comment .'</span>
-                </a>
-            </li>';
+            $content[] = [
+                'pid'     => $pid_note,
+                'name'    => $comment_poster,
+                'comment' => $comment_comment,
+            ];
         }
         return $content;
     }
 
-    protected function article_block_b($uid)
+    protected function article_block_readmore($uid, $post_id)
     {
-
-        $content = '';
+        $content = array();
 
         # Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
+        $connection_sur = new DatabaseAccess();
+        $connection_sur = $connection_sur->connect('sur');
 
-        $stmt = $connection_verb->prepare("SELECT DISTINCT(pid) FROM views WHERE access=1 AND uid != ? ORDER BY sid DESC LIMIT 1, 10");
+        // $stmt = $connection_verb->prepare("SELECT DISTINCT(pid) FROM views WHERE access=1 AND uid = ? ORDER BY sid DESC LIMIT 1, 10");
+        $stmt = $connection_sur->prepare("SELECT pid FROM big_sur WHERE access = 1 AND pid != ? ORDER BY sid DESC LIMIT 10");
+        $stmt->bind_param("s", $post_id);
         $stmt->execute();
         $get_result = $stmt->get_result();
         while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) )
@@ -209,35 +247,28 @@ class ArticleController extends AbstractController
                 $the_pid = $get_rows['pid'];
             #
             # Instantiate acting variables
-                $my_note_row = get_this_note($the_pid);
+                $my_note_row = IndexFunction::get_this_note($the_pid);
                 $note_parags = $my_note_row['paragraphs'];
 
-                $get_note_result_array = get_my_note($the_pid);
+                $get_note_result_array = IndexFunction::get_my_note($the_pid);
                 $poster_uid = $get_note_result_array['poster_id']; # uid
-                $note_title = stripslashes($get_note_result_array['title']); # title
-                $note_cover = note_cover($get_note_result_array['cover'], 'notes');
+                $note_title = IndexFunction::ShowMore(stripslashes($get_note_result_array['title']), 14); # title
+                $note_cover = IndexFunction::note_cover($get_note_result_array['cover'], 'notes');
             #
-            $note_poster_name = get_me($poster_uid)['name'];
+            $note_poster_name = IndexFunction::get_me($poster_uid)['name'];
             # View details
-                $if_view  = get_if_views($the_pid, $uid);
+                $if_view  = IndexFunction::get_if_views($the_pid, $uid);
                 $view_eye = ($if_view == true) ? '' : '*';
             #
-            $content .= '
-            <div class="artHist">
-                <span id="page-assistant" class="hd" pid="'. $the_pid .'" uid="'. $uid .'"></span>
-                <a href="article.php?wp='. $the_pid .'" class="vw-anchor-pages artHist-a a">
-                    <div class="artHist-display lozad rad4 bck fwl" data-background-image="'. $note_cover .'">
 
-                    </div>
-                    <div class="artHist-title fwl">
-                        <div>
-                            <p>'. $note_poster_name .'</p>
-                            <h1 class="artHist-h1 trn3-color">'. $view_eye .' '. ShowMore($note_title, 14) .'</h1>
-                            <p>'. $note_parags .' paragraphs</p>
-                        </div>
-                    </div>
-                </a>
-            </div>';
+            $content[] = [
+                'pid'        => $the_pid,
+                'title'      => $note_title,
+                'cover'      => $note_cover,
+                'name'       => $note_poster_name,
+                'eye'        => $view_eye,
+                'paragraphs' => $note_parags,
+            ];
         }
         return $content;
     }

@@ -3,9 +3,9 @@
 
 
 {# HEADERS #}
-    {% block title %}Article{% endblock %}
+    {% block title %}{{- canvas.notes.article.title|escape -}}{% endblock %}
     {% block robots %}false{% endblock %}
-    {% block description %}Notes helps you share, educate and inspire with writing. And do it in just 7 paragraphs. It's for the creators who write.{% endblock %}
+    {% block description %}{{- canvas.notes.article.description|escape -}}{% endblock %}
     {% block twitter_image %}{{ absolute_url('images/logo/logo-white-full.png') }}{% endblock %}
     {% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}
     {% block stylesheets %}
@@ -18,49 +18,50 @@
 
 
 {% block page_contents %}
-    <h1>{{ canvas.profile.message }}</h1>
+    {# <h1>{{ canvas.notes.article.cover }}</h1> #}
 
-    {# <span id="page-assistant" class="hd" pid="{{}}" puid="{{}}" uid="{{}}" visit="{{}}" theme="{{}}"></span>
+    {# {#  #}
+    <span id="page-assistant" class="hd" pid="{{ canvas.notes.article.pid }}" visit="" theme=""></span>
 
     <div class="atc-title-cover">
         <ul class="atc-poster-title ul ft-sect clear-fix">
-            {{}}
+            
         </ul>
         <p class="atc-title-date ft-sect">
-            <strong>{{}} views</strong>
+            <strong>{{- canvas.notes.article.views }} views</strong>
             <span>|</span>
-            <strong>{{}}</strong>
+            <strong>{{- canvas.notes.article.date -}}</strong>
         </p>
-        <h1 class="atc-title-lead ft-menu"></h1>
+        <h1 class="atc-title-lead ft-menu">{{ canvas.notes.article.title }}</h1>
         <p class="atc-title-date ft-sect">
             <div class="nt-article-share nt-article-share-stay" article-share-stay>
-                <a href="" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+                <a href="{{ canvas.notes.share.facebook }}" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
                 target="_blank" class="sharer-facebook">
                     <li class="fa-brands fa-facebook-f"></li>
                 </a>
-                <a href="{{}}" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+                <a href="{{ canvas.notes.share.twitter }}" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
                 target="_blank" class="sharer-twitter">
                     <li class="fa-brands fa-twitter"></li>
                 </a>
-                <a href="{{}}" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+                <a href="{{ canvas.notes.share.linkedin }}" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
                 target="_blank" class="sharer-linkedin">
                     <li class="fa-brands fa-linkedin-in"></li>
                 </a>
-                <a id="share_link" data-copy-on-click="{{}}" class="sharer-copylink">
+                <a id="share_link" data-copy-on-click="{{ canvas.notes.share.web }}" class="sharer-copylink">
                     <li class="fa-solid fa-link"></li>
                 </a>
             </div>
         </p>
     </div>
 
-    <div class="atc-cover-bck bck lozad" id="atc-cover" width="{{}}" height="{{}}" data-background-image="{{}}">
+    <div class="atc-cover-bck bck lozad" id="atc-cover" width="{{ canvas.notes.article.cover_width }}" height="{{ canvas.notes.article.cover_height }}" data-background-image="{{ '/images/community/notes/' ~ canvas.notes.article.cover }}">
 
     </div>
 
     <div class="atc-content atc-width ft-sect">
-        <p class="first-paragraph">{{}}</p>
+        <p class="first-paragraph">{{ canvas.notes.article.body|nl2br }}</p>
         <span class="">
-            {{}}
+            {# {{ canvas.notes.article.extensions }} #}
         </span>
     </div>
 
@@ -68,28 +69,21 @@
         <ul class="nt-ul-none nt-lay-flex">
             <li class="">
                 <label action-like>
-                    <input type="checkbox" name="like" class="atc-note-like-input hd" {{}} />
-                    <p><i class="{{}}"></i></p>
+                    <input type="checkbox" name="like" class="atc-note-like-input hd" {{ canvas.notes.reaction.like_checked }} />
+                    <p><i class="{{ canvas.notes.reaction.like_icon }}"></i></p>
                     <p class="nt-ft-lato nt-txt-sm8"></p>
                 </label>
             </li>
             <li class="">
-                <label action-unlike>
-                    <input type="checkbox" name="unlike" class="atc-note-unlike-input hd" {{}} />
-                    <p><i class="{{}}" ></i></p>
-                    <p class="nt-ft-lato nt-txt-sm8">Dislike</p>
-                </label>
-            </li>
-            <li class="">
-                <a href="comments.php?wp={{}}" class="nt-a">
+                <a href="comments.php?wp={{ canvas.notes.article.pid }}" class="nt-a">
                     <p><i class="far fa-comment"></i></p>
-                    <p class="nt-ft-lato nt-txt-sm8">{{}}</p>
+                    <p class="nt-ft-lato nt-txt-sm8">{{ canvas.notes.reaction.comment_number }}</p>
                 </a>
             </li>
             <li class="">
                 <label action-save>
-                    <input type="checkbox" name="save" class="atc-note-save-input hd" {{}} />
-                    <p><i class="{{}}"></i></p>
+                    <input type="checkbox" name="save" class="atc-note-save-input hd" {{ canvas.notes.reaction.save_checked }} />
+                    <p><i class="{{ canvas.notes.reaction.save_icon }}"></i></p>
                     <p class="nt-ft-lato nt-txt-sm8">Save</p>
                 </label>
             </li>
@@ -99,22 +93,22 @@
     <section class="article-poster atc-width">
         <h2 about-section>About Writer</h2>
         <ul class="nt-ul-none nt-lay-flex" img-name>
-            <a href="people.php?up={{}}" class="nt-a">
-                <li class="nt-ui-bck nt-ui-rad50" style="background-image:url({{}})" img></li>
+            <a href="people.php?up={{ canvas.notes.poster.username }}" class="nt-a">
+                <li class="nt-ui-bck nt-ui-rad50 lozad" data-background-image="{{ '/images/community/profiles/' ~ canvas.notes.poster.display }}" img></li>
             </a>
             <li class="">
                 <ul class="nt-ul-none">
                     <li name>
-                        <a href="people.php?up={{}}" class="nt-a">{{}}</a>
+                        <a href="people.php?up={{ canvas.notes.poster.username }}" class="nt-a">{{ canvas.notes.poster.name }}</a>
                     </li>
                     <li numbers>
-                        <span><strong>{{}}</strong> <small>articles</small> ::</span>
-                        <span><strong>{{}}</strong> <small>followers</small></span>
+                        <span><strong>{{ canvas.notes.viewer.note_posted }}</strong> <small>articles</small> ::</span>
+                        <span><strong>{{ canvas.notes.viewer.subscribers }}</strong> <small>followers</small></span>
                     </li>
                     <li follow>
                         <label class="atc-note-subscribe" follow-button>
-                            <input type="checkbox" name="subscribe" class="atc-note-subscribe-input hd" {{}} />
-                            <p class="">{{}}</p>
+                            <input type="checkbox" name="subscribe" class="atc-note-subscribe-input hd" {{ canvas.notes.reaction.subscribe_state }} />
+                            <p class="">{{ canvas.notes.reaction.subscribe_text }}</p>
                         </label>
                     </li>
                 </ul>
@@ -125,11 +119,19 @@
     <div class="atc-comment atc-width">
         <p class="atc-comment-caveat rad2 ft-sect">Be frank and respectful. We have <a href="#">policies</a>, though.</p>
 
-        {{}}
+        {# {{}} #}
 
         <div class="atc-comment-thoughts">
             <ul id="comment_un_list" class="ul">
-                {{}}
+                {# {{}} #}
+                {% for comment in canvas.notes.comment %}
+                    <li id="article-note-comment-park" class="nu-li ft-sect">
+                        <a class="a" href="comments.php?wp={{-comment.pid-}}">
+                            <strong>{{- comment.name -}}</strong>
+                            <span>{{- comment.comment -}}</span>
+                        </a>
+                    </li>
+                {% endfor %}
                 <li class="nu-comment-li nu-li-last ft-sect"></li>
             </ul>
         </div>
@@ -137,9 +139,27 @@
 
     <div class="article-history atc-width">
         <h1 id="article-history-namer" class="ft-menu">Read More</h1>
-        {{}}
-    </div> #}
-{% endblock page_contents %} 
+        {# {{}} #}
+        {% for note in canvas.notes.note_more %}
+            <div class="artHist">
+                <span id="page-assistant" class="hd" pid="{{note.pid}}" uid=""></span>
+                <a href="/a/{{note.pid}}" class="vw-anchor-pages artHist-a a">
+                    <div class="artHist-display lozad rad4 bck fwl" data-background-image="{{note.cover}}">
+
+                    </div>
+                    <div class="artHist-title fwl">
+                        <div>
+                            <p>{{note.name}}</p>
+                            <h1 class="artHist-h1 trn3-color">{{- note.eye ~ ' ' ~ note.title -}}</h1>
+                            <p>{{note.paragraphs}} paragraphs</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div> 
+    {# # #}
+{% endblock page_contents %}
 
 
 

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use Doctrine\DBAL\Connection;
+// use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +16,7 @@ use App\Validation\SigninValidation;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'note_home')]
-    public function corpus(Connection $connection): Response
+    public function corpus(): Response
     {
         # Profile data
         $login = new SigninValidation();
@@ -114,6 +114,30 @@ class HomeController extends AbstractController
 
     #[Route('/about', name: 'note_about')]
     public function about(): Response
+    {
+        // return $this->render('')
+    }
+
+    #[Route('/signin', name: 'note_signin')]
+    public function signin(): Response
+    {
+        // return $this->render('')
+    }
+
+    #[Route('/signup', name: 'note_signup')]
+    public function signup(): Response
+    {
+        // return $this->render('')
+    }
+
+    #[Route('/support', name: 'note_support')]
+    public function support(): Response
+    {
+        // return $this->render('')
+    }
+
+    #[Route('/following', name: 'note_following')]
+    public function following(): Response
     {
         // return $this->render('')
     }

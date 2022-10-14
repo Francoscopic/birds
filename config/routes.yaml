@@ -5,3 +5,6 @@ controllers:
 ajax_home_article_click:
     path: /ajax/verb/home/article_click
     controller: App\Verb\Home\ArticleClickHome::Article_Click
+ajax_home_article_like:
+    path: /ajax/verb/home/article_like
+    controller: App\Verb\Home\ArticleLikeHome::verbs
