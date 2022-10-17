@@ -1,0 +1,231 @@
+
+
+/*#############
+### MODULES ###
+#############*/
+
+input, 
+button, 
+textarea {
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+}
+
+.bck {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-clip: border-box;
+}
+
+.trn3 {
+    -webkit-transition-duration: 0.3s;
+       -moz-transition-duration: 0.3s;
+         -o-transition-duration: 0.3s;
+            transition-duration: 0.3s;
+}
+.ind-trn3 {
+    -webkit-transition: all 3s ease-in;
+       -moz-transition: all 3s ease-in;
+         -o-transition: all 3s ease-in;
+            transition: all 3s ease-in;
+}
+
+.ft-head {
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+}
+.roman-times {
+    font-family: 'Times New Roman', calibri;
+}
+.open-sans {
+    font-family: 'Open Sans', calibri;
+}
+.calib,
+.calibri-l {
+    font-family: 'Calibri light', calibri, sans-serif;
+}
+
+.net-ul {
+    padding: 0;
+    list-style: none;
+}
+#no-fwl,
+.no-fwl {
+    float: none;
+}
+.fwl,
+.flw-lft {
+    float: left;
+}
+.fwr,
+.flw-rht {
+    float: right;
+}
+.relative {
+    position: relative;
+}
+
+
+.note-e {
+    color: dodgerblue;
+}
+.success,
+.note-t {
+    color: mediumseagreen;
+    font-weight: 500;
+}
+.error,
+.note-er,
+.note-s {
+    color: tomato;
+    font-weight: 500;
+}
+.note-er-cir {
+    background-color: tomato;
+    color: #f0f0f0;
+}
+.note-a {
+    color: rgb(30, 68, 255);
+}
+
+
+.rad2 {
+    -webkit-border-radius: 2px;
+       -moz-border-radius: 2px;
+         -o-border-radius: 2px;
+            border-radius: 2px;
+}
+
+.rad4 {
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+         -o-border-radius: 4px;
+            border-radius: 4px;
+}
+
+.rad20 {
+    -webkit-border-radius: 20px;
+       -moz-border-radius: 20px;
+         -o-border-radius: 20px;
+            border-radius: 20px;
+}
+
+.rad50 {
+    -webkit-border-radius: 50%;
+       -moz-border-radius: 50%;
+         -o-border-radius: 50%;
+            border-radius: 50%;
+}
+.opas6,
+.opas6:hover {
+    -webkit-opacity: 0.6;
+       -moz-opacity: 0.6;
+         -o-opacity: 0.6;
+            opacity: 0.6;
+}
+
+.bod1 {
+    -webkit-border: 1px solid #e9e9e9;
+       -moz-border: 1px solid #e9e9e9;
+         -o-border: 1px solid #e9e9e9;
+            border: 1px solid #e9e9e9;
+}
+.bod2 {
+    -webkit-border: 2px solid #e9e9e9;
+       -moz-border: 2px solid #e9e9e9;
+         -o-border: 2px solid #e9e9e9;
+            border: 2px solid #e9e9e9;
+}
+.trad2 {
+    -webkit-border-radius: 2px 0 0 2px;
+       -moz-border-radius: 2px 0 0 2px;
+         -o-border-radius: 2px 0 0 2px;
+            border-radius: 2px 0 0 2px;
+}
+.brad2 {
+    -webkit-border-radius: 0 2px 2px 0;
+       -moz-border-radius: 0 2px 2px 0;
+         -o-border-radius: 0 2px 2px 0;
+            border-radius: 0 2px 2px 0;
+}
+
+.sha1 {
+    -webkit-box-shadow: 0 2px 10px -1.5px #d0d0d0;
+       -moz-box-shadow: 0 2px 10px -1.5px #d0d0d0;
+         -o-box-shadow: 0 2px 10px -1.5px #d0d0d0;
+            box-shadow: 0 2px 10px -1.5px #d0d0d0;
+}
+
+.no-bod {
+    -webkit-border: none;
+       -moz-border: none;
+         -o-border: none;
+            border: none;
+}
+
+.nt-cc-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+.clear-fix {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+
+.hd {
+    display: none;
+}
+.a {
+    text-decoration: none;
+}
+.sm-i {
+    font-size: 0.8em;
+}
+
+
+
+/* MODULES - END */
+
+
+
+/* TEMPLATE */
+/* INFO-TEMPLATE-ONE */
+.nt-info-template-1 {
+    width: 100%;
+    margin: 20px 0;
+}
+.nt-info-template-1 h4 {
+    font-size: 1.2em;
+    font-weight: 600;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin: 0;
+}
+.nt-info-template-1 h4 img {
+    height: 15px;
+    width: auto;
+}
+.nt-info-template-1 h1 {
+    font-size: 3em;
+    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 15px 0;
+}
+.nt-info-template-1 p {
+    font-size: 1em;
+    font-weight: 400;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin: 0;
+}
+.nt-info-template-1 p img {
+    height: 100px;
+    width: 100px;
+}
+/* TEMPLATE - END */

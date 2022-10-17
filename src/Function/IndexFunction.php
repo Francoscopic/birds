@@ -3,7 +3,9 @@
 namespace App\Function;
 
 use App\Database\DatabaseAccess;
-use mysqli;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Request;
 
 class IndexFunction
 {
@@ -706,16 +708,15 @@ class IndexFunction
     #
 
     # Profile
-        public static function just_display($img): string
-        {
-            return explode('../', $img)[1];
-        }
-        public static function profile_user_figures($conn, $user_id): array
+        public static function profile_user_figures($user_id): array
         {
             # This function tends to get the user display image and cover image.
             # The key to finding everything is the session-user-id from *uid*
 
-            $stmt = $conn->prepare('SELECT uname,name,email,state,location,website,about,cover,display FROM user_sapphire WHERE uid=?');
+            $connection_sur = new DatabaseAccess();
+            $connection_sur = $connection_sur->connect('');
+
+            $stmt = $connection_sur->prepare('SELECT uname, name, email, state, location, website, about, cover, display FROM user_sapphire WHERE uid=?');
             $stmt->bind_param('s', $user_id);
             $stmt->execute();
 
@@ -734,7 +735,7 @@ class IndexFunction
             $cover = $figures_array['cover'];
             $display = $figures_array['display'];
 
-            unset($conn, $stmt, $get_figures_array, $figures_array, $user_id);
+            unset($connection_sur, $stmt, $get_figures_array, $figures_array, $user_id);
             # Send them to page
             return array(
                 'username'=>$username,
@@ -955,6 +956,96 @@ class IndexFunction
             }
             return array(
                 'action'=>1
+            );
+        }
+    #
+
+    # Misc
+        public static function image_file_paths($which): array
+        {
+            $file_path = '';
+            switch ($which) {
+                case 'note':
+                    $file_path = '/images/community/notes/';
+                    break;
+                case 'profile':
+                    $file_path = '/images/community/profiles/';
+                    break;
+                case 'logo':
+                    $file_path = '/images/logo/';
+                    break;
+                case 'support':
+                    $file_path = '/images/support/';
+                    break;
+                case 'users':
+                    $file_path = '/images/users/';
+                default:
+                    $file_path = '/images/misc/';
+                    break;
+            }
+            return array(
+                'message' => '',
+                'content' => $file_path,
+            );
+        }
+        public static function filter($str)
+        {
+            // convert case to lower
+            $str = strtolower($str);
+            // remove special chars
+            $str = preg_replace('/[^a-zA-Z0-9]/i', '', $str);
+            // remove white space from both ends
+            $str = trim($str);
+            return $str;
+        }
+        public static function randomKey($length)
+        {
+            $pool = array_merge(range(0,9), range('a','z'), range('A','Z'));
+            $key = "";
+            for($i = 0; $i<$length; $i++)
+            {
+                $key .= $pool[mt_rand(0, count($pool) - 1)];
+            }
+            unset($pool, $length);
+            return $key;
+        }
+        public function set_cookie_variables($cookie_name, $cookie_value, $cookie_time = '+6 months', $withSecure = true, $httpOnly = true)
+        {
+            $response = new Response();
+            $response->headers->setCookie(
+                Cookie::create($cookie_name)
+                ->withValue($cookie_value)
+                ->withExpires(strtotime($cookie_time))
+                ->withSecure($withSecure)
+                ->withHttpOnly($httpOnly)
+            );
+            $response->sendHeaders();
+            return true;
+            /* 
+                $response->headers->setCookie(new Cookie($cookie_name, $cookie_value, strtotime($cookie_time)));
+                setcookie('vst', 'haha', strtotime('+1 month'));
+            */
+        }
+    #
+
+    # Layout
+        public static function know_mode($state): array
+        {
+            $for_dark = (trim($state) === 'darkmode') ? 'bcg-e' : '';
+            $for_light = (trim($state) === 'lightmode') ? 'bcg-e' : '';
+            return array(
+                'dark'=>$for_dark, 
+                'light'=>$for_light
+            );
+        }
+
+        public static function light_mode_response($cur_state): array 
+        {
+            $state_icon = ($cur_state == 1) ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; // 1 is currently Dark, 0 is currently Light
+            $state_text = ($cur_state == 1) ? 'Light' : 'Dark';
+            return array(
+                'icon' => $state_icon, 
+                'text' => $state_text
             );
         }
     #

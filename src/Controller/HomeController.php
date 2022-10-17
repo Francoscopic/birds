@@ -27,10 +27,12 @@ class HomeController extends AbstractController
         $canvas = array(
             'notes' => array(),
             'profile' => array(
-                'uid' => $uid,
+                'username' => 'Joshua',
                 'visitor_state' => $visitor_state,
             ),
-            'misc' => array(),
+            'misc' => array(
+                'outside' => false,
+            ),
         );
 
         # Work
@@ -69,7 +71,7 @@ class HomeController extends AbstractController
                     $unlike_state = $small_menu_state['unlike'];
                 #
                 $article_url = $this->generateUrl('note_posts', array('post_id'=>$the_pid));
-                $profile_url = $this->generateUrl('note_profiles', array('user_id'=>$note_poster_uname));
+                $profile_url = $this->generateUrl('note_profile', array('user_name'=>$note_poster_uname));
 
                 $canvas['notes'][] = [
                     'pid'          => $the_pid,
@@ -102,44 +104,68 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/{user_id}', name: 'note_profiles')]
-    public function profiles(string $user_id): Response
+    #[Route('/{user_name}/', name: 'note_profile')]
+    public function profiles(string $user_name): Response
     {
         $contents = $this->renderView('pages/in/profiles.html.twig', [
-            'user_name' => $user_id,
+            'user_name' => $user_name,
         ]);
 
         return new Response($contents);
     }
 
-    #[Route('/about', name: 'note_about')]
+    #[Route('/about/', name: 'note_about')]
     public function about(): Response
     {
-        // return $this->render('')
+        return $this->render('');
     }
 
-    #[Route('/signin', name: 'note_signin')]
-    public function signin(): Response
+    #[Route('/support/forgot_password/', name: 'note_forgot_password')]
+    public function forgot_password(): Response
     {
-        // return $this->render('')
+        return $this->render('');
     }
 
-    #[Route('/signup', name: 'note_signup')]
+    #[Route('/signup/', name: 'note_signup')]
     public function signup(): Response
     {
-        // return $this->render('')
+        return $this->render('');
     }
 
-    #[Route('/support', name: 'note_support')]
+    #[Route('/{user_name}/signout/', name: 'note_signout')]
+    public function signout(): Response
+    {
+        return $this->render('');
+    }
+
+    #[Route('/support/', name: 'note_support')]
     public function support(): Response
     {
-        // return $this->render('')
+        return $this->render('');
     }
 
-    #[Route('/following', name: 'note_following')]
+    #[Route('/{user_name}/following/', name: 'note_following')]
     public function following(): Response
     {
-        // return $this->render('')
+        return $this->render('');
+    }
+
+    #[Route('/{user_name}/saved/', name: 'note_saved')]
+    public function saved(): Response
+    {
+        return $this->render('');
+    }
+
+    #[Route('/{user_name}/history/', name: 'note_history')]
+    public function history(): Response
+    {
+        return $this->render('');
+    }
+
+    #[Route('/{user_name}/change/', name: 'note_change')]
+    public function change(): Response
+    {
+        return $this->render('');
     }
 }
 

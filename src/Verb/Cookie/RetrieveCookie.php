@@ -14,7 +14,7 @@ class RetrieveCookie extends AbstractController
     {
         $uid = $this->cookie_user_id();
         return array(
-            'message' => '',
+            'message' => 'Data sent',
             'user_id' => $uid,
         );
     }

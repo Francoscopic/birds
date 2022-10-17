@@ -54,7 +54,7 @@ class ArticleLikeHome extends AbstractController
             ]);
         }
         return $this->json([
-            'message' => 'Something bad happened',
+            'message' => '[500]Something bad happened',
         ]);
     }
 

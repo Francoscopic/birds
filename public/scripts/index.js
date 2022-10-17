@@ -365,74 +365,8 @@ function notes_new_menu() {
     function get_menu(reason = 'menu') {
 
         $.post('/ajax/universe/menu/', {reason:reason}, function(data){
-            alert(data.message);
-            /*
-            var menu = `
-            <nav id="menu-august-nav" class="menu-august-nav hdd">
-                <div class="menu-august-cover ft-sect">
-                    <div class="menu-august" give-trans-bck>
-                        <div class="menu-august-profile">
-                            <a href="${data.profile_page}">
-                                <div prof-img>
-                                    <img src="${data.display}" />
-                                </div>
-                                <div prof-text>
-                                    <h1>${data.name}</h1>
-                                    <p>@${data.username}</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="menu-august" give-botm-space>
-                        <div class="menu-august-profile">
-                            <div class="menu-august-pages">
-                                <ul give-und>
-                                    <a href="/">
-                                        <li>Home</li>
-                                    </a>
-                                    <a href="${data.profile_page}">
-                                        <li>Profile</li>
-                                    </a>
-                                    <a href="${data.saved_page}">
-                                        <li>Saved</li>
-                                    </a>
-                                    <a href="${data.history_page}">
-                                        <li>History</li>
-                                    </a>
-                                    <a href="${data.change_page}">
-                                        <li>Settings</li>
-                                    </a>
-                                </ul>
-                                <ul give-un>
-                                    <a href="/support">
-                                        <li>Help & FAQ</li>
-                                    </a>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="menu-august">
-                        <div class="menu-august-profile">
-                            <div class="menu-august-profile-mixt">
-                                <label class="note-color-mode">
-                                    <input type="checkbox" class="hd" name="color_mode" path="{path}" mode="{theme_state}" {theme_checked} />
-                                    <div>
-                                        <h1><i class="{theme_icon}"></i></h1>
-                                        <p>{theme_text}</p>
-                                    </div>
-                                </label>
-                                <a href="/user/signout">
-                                    <div>
-                                        <h1><i class="fa-solid fa-right-from-bracket"></i></h1>
-                                        <p>Log out</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </nav>`;*/
-            // call_menu(menu)
+
+            call_menu(data.content);
         }).fail(function(a,b,c){
             console.error(c)
         })

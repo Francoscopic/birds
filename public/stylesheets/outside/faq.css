@@ -1,0 +1,90 @@
+
+
+.desktop {
+    width: 600px;
+    height: auto;
+}
+
+/*#########*/
+.exp-name {
+    font-size: 400%;
+    font-weight: 900;
+    color: dodgerblue;
+}
+.exp-descrip {
+    color: #909090;
+}
+
+/*#######*/
+.exp-notes {
+    margin-bottom: 50px;
+}
+.exp-notes h2 {
+    font-size: 200%;
+    font-weight: 700;
+    color: #000;
+}
+.exp-notes-subtexts,
+.exp-notes-subtexts ul {
+    list-style: none;
+}
+.subtexts-title {
+    font-size: 110%;
+    font-weight: 500;
+    color: dodgerblue;
+}
+.subtexts-ruler {
+    border-left: 2px solid dodgerblue;
+}
+.subtext-answer {
+    font-size: 100%;
+    font-weight: 300;
+    color: #404040;
+    line-height: 1.5rem;
+}
+.subtext-answer a {
+    font-weight: 500;
+}
+
+
+.abt-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+    background-color: #f0f0f0;
+}
+
+
+/*##########*/
+#get-started {
+    width: 150px;
+    height: 40px;
+    
+    color: dodgerblue;
+    border: 2px solid;
+    background: transparent;
+}
+
+/*#########*/
+
+#app-jumbotron {
+    width: 100%;
+    height: calc(100% * 0.4);
+    background-image: url(../../images/img4.jpg);
+}
+
+
+@media screen and (max-width: 960px)
+{
+    .desktop {
+        width: 560px; 
+    }
+}
+
+@media screen and (max-width: 600px)
+{
+    .mobile {
+        width: 300px;
+    }
+}

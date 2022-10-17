@@ -29,15 +29,19 @@
                         </a>
                     </div>
                     <div class="plain-right">
-                        <a href="#" class="note-menu-open" title="Show menu">
-                            <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
-                        </a>
-                        <a href="write.php" class="note-yours-prevent" title="Share something great">
-                            <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
-                        </a>
-                        <a href="{{ url('note_home') }}" title="From the community">
-                            <p><i class="fa-solid fa-house"></i><br><span>Home</span></p>
-                        </a>
+                        {% if canvas.misc.outside == true %}
+                            <p>Share. Educate. Inspire.</p>
+                        {% else %}
+                            <a href="#" class="note-menu-open" title="Show menu">
+                                <p><img src="/images/community/profiles/shk_166232670412194mOxp.jpg" alt="canvas.profile.username" /></p>
+                            </a>
+                            <a href="write.php" class="note-yours-prevent" title="Share something great">
+                                <p><i class="fa-regular fa-square-plus"></i></p>
+                            </a>
+                            <a href="{{ url('note_home') }}" title="From the community">
+                                <p><i class="fa-solid fa-house"></i></p>
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div><div class="n-header-height"></div>

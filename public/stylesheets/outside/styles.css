@@ -1,0 +1,343 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif&family=Playfair+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans+SC&display=swap');
+
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+
+    background-color: #fff;
+}
+
+/*Frontage */
+.nt-frontage {
+    width: 100%;
+}
+.nt-frontage-left,
+.nt-frontage-right {
+    width: 60%;
+    height: 100vh;
+
+    float: left;
+    position: relative;
+    background: url(../images/22.jpg);
+    background-color: rgba(0,0,0, 0.1);
+}
+.nt-frontage-right {
+    width: 40%;
+    background: none;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.nt-signin-frontage-right-center {
+    width: 100%;
+}
+
+.nt-frontage-right-div h3,
+.nt-frontage-left-div h3 {
+    font-size: 3em;
+    font-weight: 500;
+
+    color: #202020;
+    font-family: 'Lato', Impact, Haettenschweiler, 'Arial Narrow Bold', calibri, sans-serif;
+}
+.nt-frontage-left-div p {
+    font-size: 1em;
+    font-weight: 500;
+
+    color: #454545;
+    font-family: 'Open Sans', calibri;
+}
+.nt-logo-header {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+}
+.nt-logo-pointer {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+
+    font-size: 1.5em;
+    color: #fff;
+}
+.nt-logo-pointer > .pointer-down {
+    display: none;
+}
+.nt-logo-header > img {
+    height: 15px;
+    width: auto;
+}
+.ti-make-strong {
+    color: #000;
+    font-weight: 400;
+}
+.ti-see-anchor {
+    background-color: dodgerblue;
+    color: #f0f0f0;
+    padding: 2px 10px 4px 10px;
+
+    text-decoration: none;
+}
+
+
+.nt-frontage-right-div {
+    width: 300px;
+    height: auto;
+}
+
+.nt-signin-top {
+    width: 100%;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 6px;
+
+    border: 0.1px solid #e0e0e0;
+
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+         -o-border-radius: 4px;
+            border-radius: 4px;
+
+    -webkit-box-shadow: 0px 5px 20px 2px rgba(0,0,0, 0.1);
+       -moz-box-shadow: 0px 5px 20px 2px rgba(0,0,0, 0.1);
+         -o-box-shadow: 0px 5px 20px 2px rgba(0,0,0, 0.1);
+            box-shadow: 0px 5px 20px 2px rgba(0,0,0, 0.1);
+}
+.nt-signin-inevitable {
+    width: 80%;
+    height: 20px;
+    padding: 5px 0 2px 0;
+    margin: 0 0 0 16px;
+    text-align: left;
+    color: #404040;
+
+    font-weight: 500;
+}
+.nt-signin-inevitable span {
+    font-size: 0.9em;
+}
+.nt-signin-input {
+    width: calc(100% - (20px + 32px));
+    height: 30px;
+    color: #404040;
+    padding: 3px 10px;
+    border: 1px solid #e0e0e0;
+    margin-left: 15px;
+
+    background-color: inherit;
+    font-family: 'Open Sans', calibri;
+    font-weight: 400;
+
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+	  -webkit-tap-highlight-color: transparent !important;
+	  outline: none !important;
+}
+.nt-signin-input:focus {
+    border: 1px solid #b0b0b0;
+}
+.nt-signin-label {
+    font-size: 0.8em;
+    font-weight: 400;
+    color: #505050;
+
+    margin-left: 15px;
+    font-family: 'Open Sans', calibri;
+}
+#nt-signin-submit {
+    width: calc(100% - 30px);
+    height: 35px;
+    margin: 10px 0 0 15px;
+    border: 1px solid steelblue;
+
+    background-color: rgb(6, 130, 255);
+    color: #fff;
+    
+    font-size: 0.95em;
+    font-weight: 600;
+    font-family: 'Open Sans', calibri;
+}
+
+
+.nt-signin-excess {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    padding: 10px 0;
+
+    text-align: center;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+}
+.nt-signin-excess p {
+    margin: 0px 0 20px 0;
+    color: #505050;
+    font-size: 0.9em;
+    font-weight: 600;
+    font-family: 'calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+p.nt-signin-excess-condition-notice {
+    font-size: 0.65em;
+}
+.nt-signin-signup span {
+    color: dodgerblue;
+    font-weight: 600;
+    text-decoration: underline;
+}
+.nt-signin-excess legend {
+    margin: 0 auto;
+    padding: 0 20px;
+    font-size: 0.7em;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.nt-signup-affiliate {
+    width: calc(100% - 40px);
+    height: 35px;
+    border: none;
+
+    font-size: 0.8em;
+    font-weight: 600;
+
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+.nt-signup-affiliate img {
+    height: auto;
+    width: 1em;
+}
+.nt-signup-affiliate-google {
+    width: calc(100% - 42px);
+    border: 1px solid #e0e0e0;
+}
+.nt-signup-affiliate-notes {
+    background-color: dodgerblue;
+    color: #f5f5f5;
+}
+
+
+
+.nt-email-login {
+    width: 100%;
+    
+    border-bottom: 1px solid #909090;
+
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: row;
+}
+.nt-email-login > input {
+    width: calc(100% - (0px + 50px));
+    height: 35px;
+
+    font-size: 0.75em;
+    font-weight: 500;
+
+    border: none;
+    background: transparent;
+}
+.nt-email-login > button {
+    width: 50px;
+    height: 35px;
+    border: none;
+
+    font-size: 0.7em;
+    font-weight: 600;
+    
+    color: rgba(30, 144, 255, 0.3);
+    cursor: pointer;
+    background: transparent;
+}
+.nt-email-login-feedback {
+    height: 25px;
+    margin: 0 0 10px;
+    font-size: 0.9em;
+    font-family: 'Calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.nt-email-login-feedback img {
+    height: 100%;
+    width: auto;
+}
+.nt-signin-feedback-center {
+    text-align: center;
+}
+/* SIGN-IN */
+.nt-signin {
+    display: block;
+    border-bottom: none;
+}
+.nt-signin > input {
+    width: calc(100% - (2px + 20px));
+    height: 40px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 5px;
+
+    padding: 0 10px;
+    background-color: #f9f9f9;
+}
+.nt-signin > input:focus {
+    border: 1px solid #b0b0b0;
+}
+.nt-signin > button {
+    width: 100%;
+    height: 40px;
+
+    color: #f5f5f5;
+    background-color: dodgerblue;
+}
+
+
+
+/* CONFIRM */
+.nt-confirm-message {
+    font-size: 1.2em;
+    font-weight: normal;
+    color: #404040;
+}
+/* CONFIRM - END */
+
+
+@media screen and (max-width: 960px) {
+
+    .nt-frontage {
+        width: 100%;
+        height: 0%;
+    }
+    .nt-frontage-left,
+    .nt-frontage-right {
+        width: 100%;
+        height: 90vh;
+    }
+
+    .nt-frontage-left {
+        text-align: center;
+    }
+
+    .nt-logo-pointer {
+        color: #202020;
+        bottom: -50px;
+    }
+    .nt-logo-pointer > .pointer-down {
+        display: block;
+    }
+    .nt-logo-pointer > .pointer-right {
+        display: none;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+/*  */

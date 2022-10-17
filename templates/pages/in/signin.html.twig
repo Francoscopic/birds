@@ -1,0 +1,65 @@
+
+{% extends 'pages/in/layout.html.twig' %}
+
+
+{# HEADERS #}
+    {% block title %}Login{% endblock %}
+    {% block description %}Notes, from Netintui, is a platform to share great ideas in seven paragraphs or less. It's never been so simple to share great ideas, inspire and touch lives with writing.{% endblock %}
+    {# {% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %} #}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="/stylesheets/outside/functions.css">
+        <link rel="stylesheet" href="/stylesheets/outside/styles.css">
+    {% endblock %}
+    {% block darkmode_stylesheet %}{% endblock darkmode_stylesheet %}
+{# HEADERS - END #}
+
+
+{# CONTENT #}
+    {% block page_contents %}
+
+        {# <h1>"{{ canvas.profile.uid }}"</h1> #}
+
+        <div class="nt-frontage">
+
+            <div class="nt-frontage-right nt-signin-frontage-right-center">
+                <div class="nt-frontage-right-div">
+                    <div class="nt-info-template-1" style="text-align:center">
+                        <h1><br></h1>
+                        <h1>Sign In</h1>
+                    </div>
+                    <p class="nt-email-login-feedback signin-notify nt-signin-feedback-center"></p>
+                    <form class="nt-signin-form" method="post">
+                        <div class="nt-email-login nt-signin">
+                            <input type="email" name="email" placeholder="Email address" class="rad4" />
+                            <input type="password" name="password" placeholder="Password" class="rad4" />
+                            <button class="nt-email-login-action rad4">Log In</button>
+                            <br><br>
+                            <p class="nt-email-login-feedback nt-signin-feedback-center"><a href="/support/forgot_password/" class="a">Forgot password?</a></p>
+                        </div>
+                    </form>
+
+                    <fieldset class="nt-signin-excess">
+                        <legend>Or</legend>
+                        <p>
+                            <span>Join</span> the community
+                        </p>
+                        <a href="#" class="a">
+                            <button class="nt-signup-affiliate nt-signup-affiliate-google rad20"><i class=""><img src="{#images/google-icon.png#}" /></i> Sign up with Google</button>
+                        </a>
+                        <a href="signup.php" class="a">
+                            <button class="nt-signup-affiliate nt-signup-affiliate-notes rad20">Sign up with email</button>
+                        </a>
+                        <p class="nt-signin-excess-condition-notice">By signing up, you agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy,</a> including <a href="#">Cookie Use.</a></p>
+                    </fieldset>
+                </div>
+            </div>
+
+        </div>
+
+    {% endblock %}
+{# CONTENT - END #}
+
+
+{% block script_modules %}
+    <script src="/scripts/outside/signin.js"></script>
+{% endblock %}
