@@ -11,60 +11,79 @@ use App\Database\DatabaseAccess;
 use App\Function\IndexFunction;
 
 
-class SigninValidation 
+class SigninValidation
 {
     public $page_state;
-    private $session;
+    private $session_cell;
+    private $cookie_cell;
 
     public function __construct()
     {
+        $this->session_cell = new Session();
+        $this->session_cell->start();
+
+        $request = Request::createFromGlobals();
+
+        $this->cookie_cell  = $request->cookies;
+
         $this->page_state = $this->check_login();
-        $this->session = new Session();
-        $this->session->start();
     }
 
     protected function check_login(): bool
     {
-        if( isset($_SESSION['uid'], $_SESSION['sesh'], $_SESSION['isin'], $_COOKIE['cookie_user']) ) {
-    
-            // First, check is the session is set and continue further
-            // $user_id = trim($_SESSION['uid']);
-            // $sesh_id = trim($_SESSION['sesh']);
-            // $isLoggedIn = $_SESSION['isin'];
+        // if( isset($_SESSION['uid'], $_SESSION['sesh'], $_SESSION['isin'], $_COOKIE['cookie_user']) ) {
+        if(
+                $this->cookie_cell->has('cookie_user') &&
+                $this->session_cell->has('uid') &&
+                $this->session_cell->has('sesh') &&
+                $this->session_cell->has('isin')
+            )
+        {
 
-            $user_id    = $this->session->get('uid');
-            $sesh_id    = $this->session->get('sesh');
-            $isLoggedIn = $this->session->get('isin');
+            $user_id    = $this->session_cell->get('uid');
+            $sesh_id    = $this->session_cell->get('sesh');
+            $isLoggedIn = $this->session_cell->get('isin');
+
+            echo $user_id;
     
-            $validateSesh = validate_sesh_login($user_id, $isLoggedIn, $sesh_id);
+            $validateSesh = $this->validate_sesh_login($user_id, $isLoggedIn, $sesh_id);
     
             if($validateSesh === true) {
     
                 // Destroy varaiables
                 unset($user_id, $sesh_id, $isLoggedIn, $validateSesh);
-                $this->session->remove('vst');
+                $this->session_cell->remove('vst');
                 IndexFunction::set_cookie_variables('vst', '', '-7 months');
 
                 return true;
             }
             //clear memory
             unset($user_id, $sesh_id, $isLoggedIn, $validateSesh);
-            $this->session->remove('vst');
+            $this->session_cell->remove('vst');
 
             return false;
-        } else if( isset($_COOKIE['cookie_user'], $_COOKIE['cookie_sesh']) ) {
+        } else if( 
+                // isset($_COOKIE['cookie_user'], $_COOKIE['cookie_sesh']) 
+                $this->cookie_cell->has('cookie_user') &&
+                $this->cookie_cell->has('cookie_sesh')
+            ) 
+        {
     
             // If session is not set, then cookie might be set(if not expired).
             // Validate cookie sesh is same as saved sesh, then send them in.
-            $coo_sesh    = trim($_COOKIE['cookie_sesh']);
-            $coo_user_id = trim($_COOKIE['cookie_user']);
+
+            // $coo_sesh    = trim($_COOKIE['cookie_sesh']);
+            // $coo_user_id = trim($_COOKIE['cookie_user']);
+
+            $coo_sesh    = $this->cookie_cell->get('cookie_sesh');
+            $coo_user_id = $this->cookie_cell->get('cookie_user');
     
             $validateCoo = $this->validate_sesh_login($coo_user_id, $isLoggedIn = false, $coo_sesh);
     
             if($validateCoo === true) {
                 // clear memory
                 unset($coo_sesh, $coo_user_id, $validateCoo);
-                $this->session->remove('vst');
+                $this->session_cell->remove('vst');
                 IndexFunction::set_cookie_variables('vst', '', '-7 months');
 
                 return true;
