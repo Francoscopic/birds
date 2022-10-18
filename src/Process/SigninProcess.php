@@ -2,14 +2,13 @@
 
 namespace App\Process;
 
-// session_start();
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 use App\Database\DatabaseAccess;
 use App\Function\IndexFunction;
@@ -17,6 +16,7 @@ use App\Validation\SigninValidation;
 
 class SigninProcess extends AbstractController
 {
+    private $session;
     public function sign_in(Request $request): JsonResponse
     {
         // Procedure
@@ -25,6 +25,9 @@ class SigninProcess extends AbstractController
             # 3. Validate correct details. (check)
             # 4. Set environment ready
             # 5. Send in.
+
+        $session = new Session();
+        // $session->start();
 
         if( isset($request->request) ) {
         // if( isset($_POST['clt'], $_POST['psw']) ) {
@@ -36,50 +39,165 @@ class SigninProcess extends AbstractController
             $pass = $request->request->get('psw');
             $mySeshKey = round(microtime(true)) . IndexFunction::randomKey(rand(3, 10));
     
-            if($this->validate_user_input($user, $pass) === true) {
+            $one_ = $this->validate_user_input($user, $pass);
+            if($one_['handle'] === true) {
     
-                if($this->validate_details_exist($user) === true) {
+                $two_ = $this->validate_details_exist($user);
+                if($two_['handle'] === true) {
     
-                    $get = $this->validate_correct_details($user, $pass);
-                    if($get['handle'] == true) {
+                    $three_ = $this->validate_correct_details($user, $pass);
+                    if($three_['handle'] == true) {
     
-                        $uid = $get['uid'];
+                        $uid = $three_['uid'];
     
-                        $this->set_cookie_variables($uid, $mySeshKey);
+                        $four_ = $this->set_cookie_variables($uid, $mySeshKey);
                         if($this->update_session_key($uid, $mySeshKey) == true) {
     
                             # Create session
-                            $_SESSION['sesh'] = $mySeshKey;
-                            $_SESSION['uid']  = $uid;
-                            $_SESSION['isin'] = true;
+                            // $_SESSION['sesh'] = $mySeshKey;
+                            // $_SESSION['uid']  = $uid;
+                            // $_SESSION['isin'] = true;
+
+                            // set and get session attributes
+                            $session->set('sesh', $mySeshKey);
+                            $session->set('uid', $uid);
+                            $session->set('isin', true);
     
                             # Success
                             // echo 13;
                             return $this->json([
-                                'message' => 'I see you',
-                                'content' => 13,
+                                'message' => 'Login success',
+                                'status' => 40,
                             ]);
                         }
                     }
+                    return $this->json([
+                        'message' => $three_['message'],
+                        'status' => $three_['status'],
+                    ]);
                 }
+                return $this->json([
+                    'message' => $two_['message'],
+                    'status' => $two_['status'],
+                ]);
             }
-            unset($user, $pass);
+            return $this->json([
+                'message' => $one_['message'],
+                'status' => $one_['status'],
+            ]);
         }
         return $this->json([
             'message' => '[500] Something bad happened',
-            'content' => 500,
+            'status' => '500',
         ]);
     }
 
-    protected function echo_error($msg)
+    protected function validate_user_input($email, $pass): array 
     {
-        echo '<span class="error ft-sect"><strong>'.$msg.'</strong></span>';
-        unset($msg);
+        $valid_email = filter_var($email, FILTER_VALIDATE_EMAIL);
+        $handle = true;
+        $message = '';
+        $status = '10';
+        if( $email == '' && $pass == '' ) {
+
+            // $this->echo_error('Enter details');
+            $message = 'Enter details';
+            $handle = false;
+            $status = '11';
+        } elseif( !$valid_email ) {
+            
+            // $this->echo_error('Email incorrect');
+            $message = 'Email incorrect';
+            $handle = false;
+            $status = '12';
+        }
+        unset($valid_email, $email, $pass);
+        return array(
+            'message' => $message,
+            'handle'  => $handle,
+            'status'  => $status,
+        );
     }
-    protected function echo_success($msg)
+
+    protected function validate_details_exist($email): array 
     {
-        echo '<span class="success ft-sect"><strong>'.$msg.'</strong></span>';
-        unset($msg);
+        $message = $status = '20';
+        $handle = true;
+
+        # Database Access
+        $connection = new DatabaseAccess();
+        $connection = $connection->connect('');
+
+        $stmt = $connection->prepare("SELECT ud.confirmed, us.sid
+                                        FROM user_sapphire us INNER JOIN user_diamond ud
+                                        ON us.uid = ud.uid
+                                        WHERE us.email = ? OR us.uname = ?");
+        $stmt->bind_param("ss", $email, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->num_rows;
+        
+        if( $row != 1 || $row == 0 ) {
+            // echo '<span class="ft-sect"><strong>You don\'t seem to have an account. <br><a class="note-er a" href="/o/signup/">Create one today.</a></strong></span>';
+            $message = 'User Credentials Unavailable';
+            $status = '21';
+            $handle = false;
+        }
+        if($result->fetch_array(MYSQLI_ASSOC)['confirmed'] == 0) {
+            // echo '<span class="ft-sect"><strong>Please check mail to confirm account</strong></span>';
+            $message = 'Account Confirmation Required';
+            $status = '22';
+            $handle = false;
+        }
+        unset($stmt, $connection, $result, $row, $email);
+        return array(
+            'message' => $message,
+            'handle'  => $handle,
+            'status'  => $status,
+        );
+    }
+
+    protected function validate_correct_details($email, $pass): array 
+    {
+        $message = $status = '30';
+        $handle = true;
+
+        # Database Access
+        $connection = new DatabaseAccess();
+        $connection = $connection->connect('');
+
+        $stmt = $connection->prepare("SELECT ud.password, us.uid
+                                        FROM user_sapphire us, user_diamond ud
+                                        WHERE (us.email = ? AND ud.confirmed = 1) OR (us.uname=? AND ud.confirmed=1) LIMIT 1");
+        $stmt->bind_param("ss", $email, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_array(MYSQLI_ASSOC);
+        $hashed_pass = $row['password'];
+        $uid = $row['uid'];
+
+        if($this->validate_user_access($uid) != true) {
+            # Exceeded login trial
+            // echo 80;
+            $status = '31';
+            $handle = false;
+            $message = 'Account locked out. Please contact #Support';
+        } elseif ($this->validate_password($email, $pass) != true) {
+            # password incorrect
+            $this->update_login_passcount($uid);   # Do security.
+            $status = '32';
+            $handle = false;
+            $message = 'User Credentials Incomplete';
+        }
+
+        unset($stmt, $connection, $result, $row, $email, $pass, $hashed_pass);
+
+        return array(
+            'message' => $message,
+            'handle'  => $handle,
+            'status'  => $status,
+            'uid'     => $uid,
+        );
     }
 
     protected function validate_user_access($uid): bool
@@ -178,82 +296,7 @@ class SigninProcess extends AbstractController
         return password_verify($pass, $password) ? true : false;
     }
 
-    protected function validate_user_input($email, $pass): bool 
-    {
-        $valid_email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        $handle = true;
-        if( $email == '' && $pass == '' ) {
+    
 
-            $this->echo_error('Enter details');
-            $handle = false;
-        } elseif( !$valid_email ) {
-            
-            $this->echo_error('Email incorrect');
-            $handle = false;
-        }
-        unset($valid_email, $email, $pass);
-        return $handle;
-    }
-
-    protected function validate_details_exist($email): bool 
-    {
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare("SELECT ud.confirmed, us.sid
-                                        FROM user_sapphire us INNER JOIN user_diamond ud
-                                        ON us.uid = ud.uid
-                                        WHERE us.email = ? OR us.uname = ?");
-        $stmt->bind_param("ss", $email, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->num_rows;
-        $handle = true;
-        if( $row != 1 || $row == 0 ) {
-            echo '<span class="ft-sect"><strong>You don\'t seem to have an account. <br><a class="note-er a" href="/o/signup/">Create one today.</a></strong></span>';
-            unset($stmt, $connection, $row, $email);
-            return $handle = false;
-        }
-        if($result->fetch_array(MYSQLI_ASSOC)['confirmed'] == 0) {
-            echo '<span class="ft-sect"><strong>Please check mail to confirm account</strong></span>';
-            $handle = false;
-        }
-        unset($stmt, $connection, $result, $row, $email);
-        return $handle;
-    }
-
-    protected function validate_correct_details($email, $pass): array 
-    {
-        $handle = true;
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare("SELECT ud.password, us.uid
-                                        FROM user_sapphire us, user_diamond ud
-                                        WHERE (us.email = ? AND ud.confirmed = 1) OR (us.uname=? AND ud.confirmed=1) LIMIT 1");
-        $stmt->bind_param("ss", $email, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_array(MYSQLI_ASSOC);
-            $hashed_pass = $row['password'];
-            $uid = $row['uid'];
-            if($this->validate_user_access($uid) != true) {
-                # Exceeded login trial
-                echo 80;
-                $handle = false;
-            } elseif ($this->validate_password($email, $pass) != true) {
-                # password incorrect
-                $this->echo_error('Email/Password incorrect');
-                $this->update_login_passcount($uid);   # Do security.
-                $handle = false;
-            }
-        unset($stmt, $connection, $result, $row, $email, $pass, $hashed_pass);
-
-        return array(
-            'handle'=>$handle,
-            'uid'=>$uid
-        );
-    }
+    
 }

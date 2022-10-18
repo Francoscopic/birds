@@ -12,8 +12,7 @@ function signIn() {
 
     // Check GET SERVER Variable
     const travel_agent = $('#travel_agent'),
-        travel_page = travel_agent.attr('page'),
-        travel_id = travel_agent.attr('tid');
+        travel_page = travel_agent.attr('page');
 
 
     $(button).on('click', function(e) {      
@@ -27,31 +26,13 @@ function signIn() {
 
         if(the_email != "" && the_pass != "") {
             
-            // $.ajax({
-            //     type: 'post',
-            //     url: '/processor/signin/login/',
-            //     // dataType: 'json',
-            //     data: {
-            //         clt: the_email,
-            //         psw: the_pass
-            //     },
-            //     cache: false,
-            //     success: function(data) {
-            //         sign_in_marshal(data.content);
-            //         // alert(data)
-            //     },
-            //     error: function(_jqXhr, _textStatus, errorThrown) {
-                    
-            //     }
-            // });
             $.post('/processor/signin/login/', {clt:the_email, psw:the_pass}, function(data){
 
-                // sign_in_marshal(data.content);
-                alert(data.message)
+                sign_in_marshal(data);
+                // alert(data.message)
             }).fail(function(_jqXhr, _textStatus, errorThrown){
                 console.error(_jqXhr.responseText);
             })
-
         } else {
             happening(loaderArrow, false, '1');
             show_feedback('Enter details');
@@ -59,8 +40,9 @@ function signIn() {
     });
 
     function sign_in_marshal(the_data) {
-        var data = $.trim(the_data);
-        if ($.trim(data) === '13') {
+        var data = $.trim(the_data.status);
+        // if ($.trim(data) === '13') {
+        if ($.trim(data) === '40') {
             login();
             happening(loaderArrow, false, '1');
         }
@@ -70,7 +52,7 @@ function signIn() {
         }
         else {
             happening(loaderArrow, false, '1');
-            show_feedback(data);
+            show_feedback(the_data.message);
         }
     }
 
@@ -80,24 +62,24 @@ function signIn() {
     }
 
     function show_feedback(msg, state = 'error') {
-        notice.html(`<span class="${state} calib">${msg}</span>`);
+        notice.html(`<span class="${state} calib"><strong>${msg}</strong></span>`);
     }
 
     function goToSomewhere(travelPage) {
         setTimeout( $(location).attr('href', travelPage), 1000);
     }
 
-    function travel_func(travel_page, travel_id) {
-        if(travel_page == false) {
+    function travel_func(travel_page) {
+        if(travel_page == undefined) {
             goToSomewhere('/'); // index.php
         } else {
-            goToSomewhere(`/${travel_page}`); // where the user was
+            goToSomewhere(`${travel_page}`); // where the user was
         }
     }
 
     function login() {
         show_feedback('Welcome to Notes', 'success');
-        travel_func(travel_page, travel_id);
+        travel_func(travel_page);
     }
 }
 

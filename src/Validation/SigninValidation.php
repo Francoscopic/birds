@@ -5,6 +5,7 @@ namespace App\Validation;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 use App\Database\DatabaseAccess;
 use App\Function\IndexFunction;
@@ -13,10 +14,13 @@ use App\Function\IndexFunction;
 class SigninValidation 
 {
     public $page_state;
+    private $session;
 
     public function __construct()
     {
         $this->page_state = $this->check_login();
+        $this->session = new Session();
+        $this->session->start();
     }
 
     protected function check_login(): bool
@@ -24,41 +28,54 @@ class SigninValidation
         if( isset($_SESSION['uid'], $_SESSION['sesh'], $_SESSION['isin'], $_COOKIE['cookie_user']) ) {
     
             // First, check is the session is set and continue further
-            $user_id = trim($_SESSION['uid']);
-            $sesh_id = trim($_SESSION['sesh']);
-            $isLoggedIn = $_SESSION['isin'];
+            // $user_id = trim($_SESSION['uid']);
+            // $sesh_id = trim($_SESSION['sesh']);
+            // $isLoggedIn = $_SESSION['isin'];
+
+            $user_id    = $this->session->get('uid');
+            $sesh_id    = $this->session->get('sesh');
+            $isLoggedIn = $this->session->get('isin');
     
             $validateSesh = validate_sesh_login($user_id, $isLoggedIn, $sesh_id);
     
             if($validateSesh === true) {
     
                 // Destroy varaiables
-                unset($user_id, $sesh_id, $isLoggedIn, $validateSesh, $_SESSION['vst']); //clear memory
-                set_cookie_variables('vst', '', 40);
+                unset($user_id, $sesh_id, $isLoggedIn, $validateSesh);
+                $this->session->remove('vst');
+                IndexFunction::set_cookie_variables('vst', '', '-7 months');
+
                 return true;
             }
-            unset($user_id, $sesh_id, $isLoggedIn, $validateSesh, $_SESSION['vst']); //clear memory
+            //clear memory
+            unset($user_id, $sesh_id, $isLoggedIn, $validateSesh);
+            $this->session->remove('vst');
+
             return false;
         } else if( isset($_COOKIE['cookie_user'], $_COOKIE['cookie_sesh']) ) {
     
             // If session is not set, then cookie might be set(if not expired).
             // Validate cookie sesh is same as saved sesh, then send them in.
-            $coo_sesh = trim($_COOKIE['cookie_sesh']);
+            $coo_sesh    = trim($_COOKIE['cookie_sesh']);
             $coo_user_id = trim($_COOKIE['cookie_user']);
     
-            $validateCoo = validate_sesh_login($coo_user_id, $isLoggedIn = false, $coo_sesh);
+            $validateCoo = $this->validate_sesh_login($coo_user_id, $isLoggedIn = false, $coo_sesh);
     
             if($validateCoo === true) {
-    
-                unset($coo_sesh, $coo_user_id, $validateCoo, $_SESSION['vst']); //clear memory
-                set_cookie_variables('vst', '', 40);
+                // clear memory
+                unset($coo_sesh, $coo_user_id, $validateCoo);
+                $this->session->remove('vst');
+                IndexFunction::set_cookie_variables('vst', '', '-7 months');
+
                 return true;
             }
-            unset($coo_sesh, $coo_user_id, $validateCoo, $_SESSION['vst']); //clear memory
+            //clear memory
+            unset($coo_sesh, $coo_user_id, $validateCoo); 
+            $this->session->remove('vst');
             return false;
         } else {
             // Just take the person to the signin page. No session is set.
-            unset($_SESSION['vst']); //clear memory
+            $this->session->remove('vst');
             return false;
         }
     }
@@ -67,6 +84,7 @@ class SigninValidation
     {
         $connection = new DatabaseAccess();
         $connection = $connection->connect('');
+
         $stmt=$connection->prepare("SELECT seshkey FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY sid DESC LIMIT 1");
         $stmt->bind_param('ss', $userId, $sessionId);
         $stmt->execute();
@@ -89,7 +107,8 @@ class SigninValidation
         } else if($isSignedIn != true && $sessionId == $savedSesh) {
 
             // Create the lost session_id as saved session_id
-            $_SESSION['uid'] = $userId;
+            // $_SESSION['uid'] = $userId;
+            $this->session->set('uid', $userId);
             
             unset($stmt, $connection, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return true;
@@ -100,25 +119,9 @@ class SigninValidation
         }
     }
 
-    protected function set_cookie_variables($cookie_name, $cookie_value, $cookie_time)
-    {
-        $response = new Response();
-        $response->headers->setCookie(new Cookie($cookie_name, $cookie_value, strtotime('+6 months')));
-        // setcookie('vst', 'haha', strtotime('+1 month'));
-        /*  // For special Cookies
-            $response->headers->setCookie(
-                Cookie::create($cookie_name)
-                ->withValue($cookie_value)
-                ->withExpires(strtotime('+6 months'))
-                ->withSecure(true)
-                ->withHttpOnly(true)
-            );
-        */
-        $response->sendHeaders();
-    }
     protected function visitor($visitor_id): void
     {
-        $this->set_cookie_variables('vst', $visitor_id, 30);
+        IndexFunction::set_cookie_variables('vst', $visitor_id, '+6 months');
         $this->add_visitor($visitor_id);
     }
     protected function add_visitor($visitor_id): void

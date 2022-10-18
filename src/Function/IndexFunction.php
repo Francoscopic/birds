@@ -1009,7 +1009,7 @@ class IndexFunction
             unset($pool, $length);
             return $key;
         }
-        public function set_cookie_variables($cookie_name, $cookie_value, $cookie_time = '+6 months', $withSecure = true, $httpOnly = true)
+        public static function set_cookie_variables($cookie_name, $cookie_value, $cookie_time = '+6 months', $withSecure = true, $httpOnly = true)
         {
             $response = new Response();
             $response->headers->setCookie(

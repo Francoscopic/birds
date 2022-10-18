@@ -94,9 +94,7 @@ class HomeController extends AbstractController
             $show_load_more = ($num_rows==15) ? true : false;
         # Work - END
 
-        $canvas['misc'] = [
-            'load_more' => $show_load_more,
-        ];
+        $canvas['misc']['load_more'] = $show_load_more;
 
         return $this->render('pages/in/index.html.twig', [
             'canvas' => $canvas,
