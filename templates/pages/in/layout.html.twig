@@ -3,8 +3,7 @@
 
 {% block content %}
     {% block header %}
-        {# {% if canvas.profile.visitor_state == true %} #}
-        {% if canvas.profile.visitor_state != true %}
+        {% if canvas.profile.visitor_state == true %}
             <div class="n-header n-header-visitor desktop mobile glsmpsm" id="n-header">
                 <div class="n-header-one">
                     <a href="{{ url('note_home') }}" class="a">

@@ -1,3 +1,6 @@
+import Cookies from './plugins/cookies/api.js';
+
+alert(Cookies.get('cookie_user'));
 
 function signIn() {
         

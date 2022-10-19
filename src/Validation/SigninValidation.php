@@ -16,22 +16,22 @@ class SigninValidation
     public $page_state;
     private $session_cell;
     private $cookie_cell;
+    private $request;
 
     public function __construct()
     {
         $this->session_cell = new Session();
         $this->session_cell->start();
 
-        $request = Request::createFromGlobals();
+        $this->request = Request::createFromGlobals();
 
-        $this->cookie_cell  = $request->cookies;
+        $this->cookie_cell  = $this->request->cookies;
 
-        $this->page_state = $this->check_login();
+        $this->page_state = $this->check_login(); // start the process
     }
 
     protected function check_login(): bool
     {
-        // if( isset($_SESSION['uid'], $_SESSION['sesh'], $_SESSION['isin'], $_COOKIE['cookie_user']) ) {
         if(
                 $this->cookie_cell->has('cookie_user') &&
                 $this->session_cell->has('uid') &&
@@ -110,7 +110,6 @@ class SigninValidation
         $checkSeshKey=$stmt->get_result();
         $seshrow = $checkSeshKey->fetch_array(MYSQLI_ASSOC);
 
-        // if($seshrow == 0) {
         if($checkSeshKey->num_rows == 0 || $seshrow == 0) {
             return false;
         }
@@ -127,7 +126,7 @@ class SigninValidation
 
             // Create the lost session_id as saved session_id
             // $_SESSION['uid'] = $userId;
-            $this->session->set('uid', $userId);
+            $this->session_cell->set('uid', $userId);
             
             unset($stmt, $connection, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return true;
@@ -147,6 +146,7 @@ class SigninValidation
     {
         $connection = new DatabaseAccess();
         $connection = $connection->connect('');
+
         $stmt = $connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
         $stmt->bind_param('s', $visitor_id);
         $stmt->execute();
@@ -157,14 +157,16 @@ class SigninValidation
     {
         $uid = $path = '';
         if( $page_state == true ) {
-            $uid = $_SESSION['uid'];
+            // $uid = $_SESSION['uid'];
+            $uid = $this->session_cell->get('uid');
             return array(
+                'message' => '[User] Logged in',
                 'uid' => $uid,
                 'visit' => false
             );
         } else {
-            $request = Request::createFromGlobals();
-            $path = $request->getPathInfo();
+
+            $path = $this->request->getPathInfo();
             $allowed_pages = array(
                 '', '/', '/home', 
                 'article', 'people', 
@@ -174,14 +176,17 @@ class SigninValidation
             );
             $reception = in_array($path, $allowed_pages); //check to see if page is allowed to be viewed
         
-            if( $reception && isset($_COOKIE['vst']) ) {
+            if( $reception && $this->cookie_cell->has('vst') ) {
         
-                $uid = $_SESSION['vst'] = $_COOKIE['vst'];
-            } elseif( $reception && !isset($_COOKIE['vst']) ) {
+                // $uid = $_SESSION['vst'] = $_COOKIE['vst'];
+                $uid = $this->cookie_cell->get('vst');
+            } elseif( $reception && !$this->cookie_cell->has('vst') ) {
         
                 $visitor_id = 'visitor-' .crypt(rand(5000, 9999), random_int(5000, 9999));
+
                 $this->visitor($visitor_id); // Save the data, Create new visitor cookie
-                $uid = $_SESSION['vst'] = $visitor_id;
+                $this->session_cell->set('vst', $visitor_id);
+                $uid = $visitor_id;
             } else {
                 
                 $uid = 'vst-intruder';
@@ -191,9 +196,15 @@ class SigninValidation
             }
             unset($allowed_pages, $reception, $_SESSION['uid']);
             return array(
+                'message' => '[Visitor] Limited access',
                 'uid' => $uid, 
                 'visit' => true,
             );
         }
+        return array(
+            'message' => '[Visitor] Something horrible happened',
+            'uid' => $uid, 
+            'visit' => true,
+        );
     }
 }
