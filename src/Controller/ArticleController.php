@@ -28,6 +28,11 @@ class ArticleController extends AbstractController
         $login_state = $login->alright($login->page_state);
         $uid = $login_state['uid'];
         $visitor_state = $login_state['visit'];
+        $intruder_state = $login_state['intruder'];
+
+        if( $intruder_state == true ) {
+            $this->redirectToRoute('note_home');
+        }
 
         $link = $this->generateUrl('note_posts', ['post_id'=>$post_id], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -53,7 +58,9 @@ class ArticleController extends AbstractController
                 'visitor_state' => $visitor_state,
                 'message' => $this->article_message,
             ),
-            'misc' => array(),
+            'misc' => array(
+                'outside' => false,
+            ),
         );
 
         # WORK

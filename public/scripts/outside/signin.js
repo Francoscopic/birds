@@ -1,6 +1,4 @@
-import Cookies from './plugins/cookies/api.js';
 
-alert(Cookies.get('cookie_user'));
 
 function signIn() {
         
@@ -11,11 +9,8 @@ function signIn() {
         loader = $('.signin-notify');
 
     var act_email = $('.nt-signin > input[type="email"]'),
-        act_pass = $('.nt-signin > input[type="password"]');
-
-    // Check GET SERVER Variable
-    const travel_agent = $('#travel_agent'),
-        travel_page = travel_agent.attr('page');
+        act_pass = $('.nt-signin > input[type="password"]'),
+        travel_page;
 
 
     $(button).on('click', function(e) {      
@@ -32,7 +27,6 @@ function signIn() {
             $.post('/processor/signin/login/', {clt:the_email, psw:the_pass}, function(data){
 
                 sign_in_marshal(data);
-                // alert(data.message)
             }).fail(function(_jqXhr, _textStatus, errorThrown){
                 console.error(_jqXhr.responseText);
             })
@@ -44,16 +38,10 @@ function signIn() {
 
     function sign_in_marshal(the_data) {
         var data = $.trim(the_data.status);
-        // if ($.trim(data) === '13') {
         if ($.trim(data) === '40') {
             login();
             happening(loaderArrow, false, '1');
-        }
-        else if ($.trim(data) === '80') {
-            happening(loaderArrow, false, '1');
-            notice.html(`<span class="error calib">Account locked out. <br><a class="a" href="/support/forgot_password/">Recover</a></span>`);
-        }
-        else {
+        } else {
             happening(loaderArrow, false, '1');
             show_feedback(the_data.message);
         }
@@ -73,7 +61,7 @@ function signIn() {
     }
 
     function travel_func(travel_page) {
-        if(travel_page == undefined) {
+        if(travel_page == undefined || travel_page == null) {
             goToSomewhere('/'); // index.php
         } else {
             goToSomewhere(`${travel_page}`); // where the user was

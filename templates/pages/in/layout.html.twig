@@ -1,22 +1,30 @@
 
 {% extends 'pattern.html.twig' %}
 
+{%
+    set note_head_logo = '/images/logo/notes.png'
+%}
+
 {% block content %}
     {% block header %}
         {% if canvas.profile.visitor_state == true %}
             <div class="n-header n-header-visitor desktop mobile glsmpsm" id="n-header">
                 <div class="n-header-one">
                     <a href="{{ url('note_home') }}" class="a">
-                        <p><img src="{{ asset('images/logo/notes.png') }}" /><br><span>(Beta)</span></p>
+                        <p><img src="{{ asset(note_head_logo) }}" /><br><span>(Beta)</span></p>
                     </a>
                 </div>
                 <div class="n-header-two reception-header">
-                    <a href="sign_up.php" class="a">
-                        <button class="reception-header-signup rad20 trn3-color">Sign up</button>
-                    </a>
-                    <a href="log_in.php" class="a">
-                        <button class="reception-header-signin rad20 trn3-color">Log in</button>
-                    </a>
+                    {% if canvas.misc.outside == true %}
+                            <button>Share. Educate. Inspire.</button>
+                    {% else %}
+                        <a href="{{ url('note_signup') }}" class="a">
+                            <button class="reception-header-signup rad20 trn3-color">Sign up</button>
+                        </a>
+                        <a href="{{ url('note_signin') }}" class="a">
+                            <button class="reception-header-signin rad20 trn3-color">Log in</button>
+                        </a>
+                    {% endif %}
                 </div>
             </div><div class="n-header-height n-header-height-visitor"></div>
         {% else %}
@@ -24,23 +32,19 @@
                 <div class="plain">
                     <div class="plain-left">
                         <a href="{{ url('note_home') }}">
-                            <p><img src="{{ asset('images/logo/notes.png') }}" alt="Notes" /><br><span>(Beta)</span></p>
+                            <p><img src="{{ asset(note_head_logo) }}" alt="Notes" /><br><span>(Beta)</span></p>
                         </a>
                     </div>
                     <div class="plain-right">
-                        {% if canvas.misc.outside == true %}
-                            <p>Share. Educate. Inspire.</p>
-                        {% else %}
-                            <a href="#" class="note-menu-open" title="Show menu">
-                                <p><img src="/images/community/profiles/shk_166232670412194mOxp.jpg" alt="canvas.profile.username" /></p>
-                            </a>
-                            <a href="write.php" class="note-yours-prevent" title="Share something great">
-                                <p><i class="fa-regular fa-square-plus"></i></p>
-                            </a>
-                            <a href="{{ url('note_home') }}" title="From the community">
-                                <p><i class="fa-solid fa-house"></i></p>
-                            </a>
-                        {% endif %}
+                        <a href="#" class="note-menu-open" title="Show menu">
+                            <p><img src="/images/community/profiles/shk_166232670412194mOxp.jpg" alt="canvas.profile.username" /></p>
+                        </a>
+                        <a href="#" class="note-yours-prevent" title="Share something great">
+                            <p><i class="fa-regular fa-square-plus"></i></p>
+                        </a>
+                        <a href="{{ url('note_home') }}" title="From the community">
+                            <p><i class="fa-solid fa-house"></i></p>
+                        </a>
                     </div>
                 </div>
             </div><div class="n-header-height"></div>
@@ -50,7 +54,7 @@
                         <a href="#" class="note-menu-open" title="Show menu">
                             <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
                         </a>
-                        <a href="write.php" class="note-yours-prevent" title="Share something great">
+                        <a href="#" class="note-yours-prevent" title="Share something great">
                             <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
                         </a>
                         <a href="{{ url('note_home') }}" title="From the community">

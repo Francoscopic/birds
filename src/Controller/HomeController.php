@@ -23,6 +23,11 @@ class HomeController extends AbstractController
         $login_state = $login->alright($login->page_state);
         $uid = $login_state['uid'];
         $visitor_state = $login_state['visit'];
+        $intruder_state = $login_state['intruder'];
+
+        if( $intruder_state == true ) {
+            $this->redirectToRoute('note_home');
+        }
 
         $canvas = array(
             'notes' => array(),
@@ -98,7 +103,6 @@ class HomeController extends AbstractController
 
         return $this->render('pages/in/index.html.twig', [
             'canvas' => $canvas,
-            // 'canvas_debug' => var_dump($canvas),
         ]);
     }
 
@@ -126,12 +130,6 @@ class HomeController extends AbstractController
 
     #[Route('/signup/', name: 'note_signup')]
     public function signup(): Response
-    {
-        return $this->render('');
-    }
-
-    #[Route('/{user_name}/signout/', name: 'note_signout')]
-    public function signout(): Response
     {
         return $this->render('');
     }

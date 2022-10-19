@@ -2,7 +2,6 @@
 
 namespace App\Validation;
 
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -43,8 +42,6 @@ class SigninValidation
             $user_id    = $this->session_cell->get('uid');
             $sesh_id    = $this->session_cell->get('sesh');
             $isLoggedIn = $this->session_cell->get('isin');
-
-            echo $user_id;
     
             $validateSesh = $this->validate_sesh_login($user_id, $isLoggedIn, $sesh_id);
     
@@ -59,21 +56,17 @@ class SigninValidation
             }
             //clear memory
             unset($user_id, $sesh_id, $isLoggedIn, $validateSesh);
-            $this->session_cell->remove('vst');
+            // $this->session_cell->remove('vst');
 
             return false;
         } else if( 
-                // isset($_COOKIE['cookie_user'], $_COOKIE['cookie_sesh']) 
                 $this->cookie_cell->has('cookie_user') &&
                 $this->cookie_cell->has('cookie_sesh')
-            ) 
+            )
         {
     
             // If session is not set, then cookie might be set(if not expired).
             // Validate cookie sesh is same as saved sesh, then send them in.
-
-            // $coo_sesh    = trim($_COOKIE['cookie_sesh']);
-            // $coo_user_id = trim($_COOKIE['cookie_user']);
 
             $coo_sesh    = $this->cookie_cell->get('cookie_sesh');
             $coo_user_id = $this->cookie_cell->get('cookie_user');
@@ -83,8 +76,8 @@ class SigninValidation
             if($validateCoo === true) {
                 // clear memory
                 unset($coo_sesh, $coo_user_id, $validateCoo);
-                $this->session_cell->remove('vst');
-                IndexFunction::set_cookie_variables('vst', '', '-7 months');
+                $this->session_cell->remove('vst'); // if it exists
+                IndexFunction::set_cookie_variables('vst', '', '-7 months'); // delete visitor, if it exists
 
                 return true;
             }
@@ -94,7 +87,9 @@ class SigninValidation
             return false;
         } else {
             // Just take the person to the signin page. No session is set.
-            $this->session->remove('vst');
+            $this->session_cell->remove('vst'); // if it exists
+            // and I assume Cookie: VST would be available
+
             return false;
         }
     }
@@ -156,13 +151,17 @@ class SigninValidation
     public function alright($page_state) 
     {
         $uid = $path = '';
+        $intruder = false;
+
         if( $page_state == true ) {
-            // $uid = $_SESSION['uid'];
-            $uid = $this->session_cell->get('uid');
+            // $uid = $this->session_cell->get('uid');
+            $uid = $this->cookie_cell->get('cookie_user');
+            $intruder = false;
             return array(
                 'message' => '[User] Logged in',
                 'uid' => $uid,
-                'visit' => false
+                'visit' => false,
+                'intruder' => $intruder,
             );
         } else {
 
@@ -178,8 +177,9 @@ class SigninValidation
         
             if( $reception && $this->cookie_cell->has('vst') ) {
         
-                // $uid = $_SESSION['vst'] = $_COOKIE['vst'];
+                $this->session_cell->set('vst', $this->cookie_cell->get('vst'));
                 $uid = $this->cookie_cell->get('vst');
+                $intruder = false;
             } elseif( $reception && !$this->cookie_cell->has('vst') ) {
         
                 $visitor_id = 'visitor-' .crypt(rand(5000, 9999), random_int(5000, 9999));
@@ -187,11 +187,12 @@ class SigninValidation
                 $this->visitor($visitor_id); // Save the data, Create new visitor cookie
                 $this->session_cell->set('vst', $visitor_id);
                 $uid = $visitor_id;
+                $intruder = false;
             } else {
                 
-                $uid = 'vst-intruder';
+                $uid = 'vst-north-' . IndexFunction::randomKey(5);
                 $this->add_visitor($uid);
-                echo header('Location: /'); // take him outside
+                $intruder = true;
                 // take the person outside
             }
             unset($allowed_pages, $reception, $_SESSION['uid']);
@@ -199,12 +200,14 @@ class SigninValidation
                 'message' => '[Visitor] Limited access',
                 'uid' => $uid, 
                 'visit' => true,
+                'intruder' => $intruder,
             );
         }
         return array(
             'message' => '[Visitor] Something horrible happened',
-            'uid' => $uid, 
+            'uid' => $uid,
             'visit' => true,
+            'intruder' => $intruder,
         );
     }
 }

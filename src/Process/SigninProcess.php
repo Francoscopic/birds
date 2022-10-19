@@ -54,17 +54,11 @@ class SigninProcess extends AbstractController
                         if($this->update_session_key($uid, $mySeshKey) == true) {
     
                             # Create session
-                            // $_SESSION['sesh'] = $mySeshKey;
-                            // $_SESSION['uid']  = $uid;
-                            // $_SESSION['isin'] = true;
-
-                            // set and get session attributes
                             $session->set('sesh', $mySeshKey);
                             $session->set('uid', $uid);
                             $session->set('isin', true);
     
                             # Success
-                            // echo 13;
                             return $this->json([
                                 'message' => 'Login success',
                                 'status' => 40,
@@ -256,7 +250,6 @@ class SigninProcess extends AbstractController
             $stmt->execute();
         } else {
             # Weird error
-            echo_error('Weird things happen! Retry.');
             $handle = false;
         }
         unset($stmt, $connection, $uid, $mySeshKey);
@@ -295,8 +288,4 @@ class SigninProcess extends AbstractController
         unset($stmt, $connection, $result, $row);
         return password_verify($pass, $password) ? true : false;
     }
-
-    
-
-    
 }

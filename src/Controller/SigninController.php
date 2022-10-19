@@ -19,17 +19,11 @@ class SigninController extends AbstractController
     #[Route('/o/signin/', name: 'note_signin')]
     public function signin(): Response
     {
-        # Profile data
-        $login = new SigninValidation();
-        $login_state = $login->alright($login->page_state);
-        $uid = $login_state['uid'];
-        $visitor_state = $login_state['visit'];
-
         $canvas = array(
             'notes' => array(),
             'profile' => array(
-                'username' => 'Joshua',
-                'visitor_state' => $visitor_state,
+                'username' => 'signin-visitor',
+                'visitor_state' => true,
             ),
             'misc' => array(
                 'outside' => true,
