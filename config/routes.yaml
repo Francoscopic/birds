@@ -15,6 +15,9 @@ ajax_home_universe_menu:
 ajax_home_infinite_scroll:
     path: /ajax/universe/infinite_scroll/
     controller: App\Verb\Home\InfiniteHome::more
+ajax_home_theme_color_update:
+    path: /ajax/universe/theme_update/
+    controller: App\Verb\Home\ThemeUpdateHome::update
 
 # SIGN-IN
 ajax_signin_login:

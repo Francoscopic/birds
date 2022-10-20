@@ -36,9 +36,6 @@ class SignoutController extends AbstractController
         // kill session
         $this->session_cell->clear();
 
-        $cookie_user = 'cookie_user';
-        $cookie_sesh = 'cookie_sesh';
-
         // kill cookie
         if(
             IndexFunction::set_cookie_variables('cookie_user', '', '-7 months') &&

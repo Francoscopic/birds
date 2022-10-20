@@ -1,5 +1,5 @@
 
-import Cookies from '../../../public/scripts/cookies/api.js';
+import Cookies from '/scripts/plugins/cookies/api.js';
 
 var page_assistant = $("span#page-assistant"),
     puid = page_assistant.attr("puid"), //poster uid

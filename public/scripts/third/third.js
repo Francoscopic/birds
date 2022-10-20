@@ -1,5 +1,5 @@
 
-import Cookies from '../../../scripts/plugins/cookies/api.js';
+import Cookies from '/scripts/plugins/cookies/api.js';
 
 // Help & FAQ
 function open_drop_down() {

@@ -3,16 +3,12 @@
 
 
 {# HEADERS #}
-    {% block title %}Home{% endblock %}
-    {% block robots %}false{% endblock %}
-    {% block description %}Notes helps you share, educate and inspire with writing. And do it in just 7 paragraphs. It's for the creators who write.{% endblock %}
-    {% block twitter_image %}{{ absolute_url('images/logo/logo-white-full.png') }}{% endblock %}
-    {% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}
-    {% block stylesheets %}
-        {#  #}
-    {% endblock %}
     {% block darkmode_stylesheet %}
-        <link rel="stylesheet" href="{{ asset('stylesheets/lightmode.css') }}" watch="theme" >
+        {% if canvas.misc.theme_state == true %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+        {% else %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/lightmode.css') }}" watch="theme" />
+        {% endif %}
     {% endblock %}
 {# HEADERS - END #}
 
@@ -20,10 +16,8 @@
 {# CONTENT #}
     {% block page_contents %}
 
-        {# <h1>"{{ canvas.profile.uid }}"</h1> #}
-        {# <h1>"{{ canvas.misc.page }}"</h1> #}
+        {# <h1>"{{ canvas.misc.theme_logo }}"</h1> #}
 
-        {# {#  #}
         {% if canvas.profile.visitor_state == true %}
             <div class="nts-host-jumbotron relative">
                 <div class="nts-host-jumbotron-opacity"></div>
@@ -63,7 +57,7 @@
                             <p>{{ board.poster_name }}</p>
                         </a>
                         <a href="#" class="a">
-                            <button class="nts-show-menu no-bod" visit="{#{{canvas.profile.visitor_state}}#}"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                            <button class="nts-show-menu no-bod" visit="{{canvas.profile.visitor_state}}"><i class="lg-i fa fa-ellipsis-v"></i></button>
                         </a>
                     </div>
                 </div>
@@ -74,7 +68,6 @@
                 <button class="infinite-home nt-infinitescroll nt-ui-rad20">Find more <i class="fa fa-chevron-right"></i></button>
             </div>
         {% endif %}
-        {#  #}
 
     {% endblock %}
 {# CONTENT - END #}

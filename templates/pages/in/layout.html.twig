@@ -5,6 +5,10 @@
     set note_head_logo = '/images/logo/notes.png'
 %}
 
+{% block title %}{{canvas.headers.title|escape}}{% endblock %}
+{% block robots %}{{canvas.headers.robot}}{% endblock %}
+{% block description %}{{canvas.headers.description|escape}}{% endblock %}
+
 {% block content %}
     {% block header %}
         {% if canvas.profile.visitor_state == true %}
@@ -32,7 +36,7 @@
                 <div class="plain">
                     <div class="plain-left">
                         <a href="{{ url('note_home') }}">
-                            <p><img src="{{ asset(note_head_logo) }}" alt="Notes" /><br><span>(Beta)</span></p>
+                            <p><img src="{{ asset(canvas.misc.theme_logo) }}" alt="Notes" /><br><span>(Beta)</span></p>
                         </a>
                     </div>
                     <div class="plain-right">

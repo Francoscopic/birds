@@ -8,12 +8,12 @@
             <meta name="author" content="Netintui Ent. Ajegunle, Lagos" />
             <meta name="application-name" content="Netintui Notes" />
             <meta name="keywords" content="Netintui,Notes,Creativity,Business,Money,Ideas,Innovation,News,Blog,Blogging,Design,Productivity,Passion,Tesla,Apple" />
-            <meta name="robots" content="{% block robots %}{{ true }}{% endblock %}" />
+            <meta name="robots" content="{% block robots %}{{true}}{% endblock %}" />
             <meta name="description" content="{% block description %}{% endblock %}" />
 
         {# BEAUTY #}
             <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:image" content="{% block twitter_image %}{{ absolute_url('images/logo/logo-white-full.png') }}{% endblock %}" />
+            <meta name="twitter:image" content="{% block twitter_image %}{{- absolute_url('images/logo/logo-white-full.png') -}}{% endblock %}" />
             <meta name="twitter:site" content="@netintui" />
             <meta name="twitter:description" content="{{ block('description') }}" />
             <meta name="twitter:title" content="{% block title %}{% endblock %}" />
@@ -23,7 +23,7 @@
             <meta property="og:title" content="{{ block('title') }}" />
             <meta property="og:image" content="{{ block('twitter_image') }}" />
             <meta property="og:description" content="{{ block('description') }}" />
-            <meta property="og:url" content="{% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}" />
+            <meta property="og:url" content="{% block page_url %}{{- absolute_url(app.request.uri) -}}{% endblock %}" />
 
         {# TITLE #}
             <title>{{ block('title') }} :: Netintui Notes</title>
@@ -35,11 +35,10 @@
             <link href="{{ asset('stylesheets/notes_v2.css') }}" rel="stylesheet" />
             {% block stylesheets %}{% endblock %}
             {% block darkmode_stylesheet %}
-                <link href="{{ asset('stylesheets/darkmode.css') }}" rel="stylesheet" watch="theme" />
+                <link href="{{ asset('stylesheets/lightmode.css') }}" rel="stylesheet" watch="theme" />
             {% endblock %}
     </head>
     <body>
-        {# <input type="hidden" id="page-assistant" disp="'.$display.'" nm="'.$name.'" unm="'.$username.'" path="'.$__pageContent__['path'].'" thm_st_chk_icn_txt="'.$user_theme_state.'/'.$user_theme_checked.'/'.$theme_mode_icon.'/'.$theme_mode_text.'" /> #}
         <input type="hidden" id="page-assistant" />
         {% block body %}
             {% block content %}{% endblock %}

@@ -27,6 +27,13 @@ class SigninController extends AbstractController
             ),
             'misc' => array(
                 'outside' => true,
+                'theme_state' => '',
+                'theme_logo' => '',
+            ),
+            'headers' => array(
+                'title' => 'Login',
+                'robot' => false,
+                'description' => 'Notes, from Netintui, is a platform to share great ideas in seven paragraphs or less. It\'s never been so simple to share great ideas, inspire and touch lives with writing.',
             ),
         );
 

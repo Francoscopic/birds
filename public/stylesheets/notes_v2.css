@@ -1210,7 +1210,6 @@ div.profile-user-navigation .profile-tab-active {
 .nts-secretary {
     width: 50px;
     height: 50px;
-    /* display: none; */
     z-index: 9;
 
     position: absolute;

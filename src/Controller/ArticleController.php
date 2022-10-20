@@ -30,36 +30,44 @@ class ArticleController extends AbstractController
         $visitor_state = $login_state['visit'];
         $intruder_state = $login_state['intruder'];
 
+        // data
+        $link = $this->generateUrl('note_posts', ['post_id'=>$post_id], UrlGeneratorInterface::ABSOLUTE_URL);
+        $this->article_found = $this->article_validate_post_id($post_id);
+        $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
+
         if( $intruder_state == true ) {
             $this->redirectToRoute('note_home');
         }
 
-        $link = $this->generateUrl('note_posts', ['post_id'=>$post_id], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $this->article_found = $this->article_validate_post_id($post_id);
-
         if($this->article_found === false ) {
             $this->article_message = 'We could not find your article';
             // Show the error report.
+            $this->redirectToRoute('note_home'); // redirect, for now
         }
         
         $canvas = array(
             'notes' => [
-                'article' => array(),
-                'poster' => array(),
-                'viewer' => array(),
-                'reaction' => array(),
-                'link' => array(),
-                'comment' => array(),
+                'article'   => array(),
+                'poster'    => array(),
+                'viewer'    => array(),
+                'reaction'  => array(),
+                'link'      => array(),
+                'comment'   => array(),
                 'note_more' => array(),
             ],
             'profile' => array(
-                'uid' => $uid,
                 'visitor_state' => $visitor_state,
-                'message' => $this->article_message,
+                'message'       => $this->article_message,
             ),
             'misc' => array(
-                'outside' => false,
+                'outside'     => false,
+                'theme_state' => $theme_data['state'],
+                'theme_logo'  => $theme_data['logo'],
+            ),
+            'headers' => array(
+                'title'       => 'Home',
+                'robot'       => false,
+                'description' => '',
             ),
         );
 
@@ -100,9 +108,9 @@ class ArticleController extends AbstractController
                 $note_poster_display = $get_note_poster['display'];
 
                 $canvas['notes']['poster'] = [
-                    'name' => $note_poster_name,
+                    'name'     => $note_poster_name,
                     'username' => $note_poster_username,
-                    'display' => $note_poster_display,
+                    'display'  => $note_poster_display,
                 ];
             #
 
@@ -115,9 +123,9 @@ class ArticleController extends AbstractController
                 $subscribe_followers = IndexFunction::subscribes($uid_poster, 'followers'); # Get the number of subscribers Author has
 
                 $canvas['notes']['viewer'] = [
-                    'name' => $name,
-                    'username' => $username,
-                    'display' => $display,
+                    'name'        => $name,
+                    'username'    => $username,
+                    'display'     => $display,
                     'note_posted' => $note_posted,
                     'subscribers' => $subscribe_followers,
                 ];
@@ -152,17 +160,17 @@ class ArticleController extends AbstractController
                 #
 
                 $canvas['notes']['reaction'] = [
-                    'save_icon' => $save_icon,
-                    'save_checked' => $save_checked,
+                    'save_icon'       => $save_icon,
+                    'save_checked'    => $save_checked,
 
-                    'like_icon' => $like_icon,
-                    'like_checked' => $like_checked,
-                    'like_number' => $liked_number,
+                    'like_icon'       => $like_icon,
+                    'like_checked'    => $like_checked,
+                    'like_number'     => $liked_number,
 
-                    'subscribe_text' => $subs_text,
+                    'subscribe_text'  => $subs_text,
                     'subscribe_state' => $subs_state,
 
-                    'comment_number' => $comment_number,
+                    'comment_number'  => $comment_number,
                 ];
             #
 

@@ -3,16 +3,17 @@
 
 
 {# HEADERS #}
-    {% block title %}{{- canvas.notes.article.title|escape -}}{% endblock %}
-    {% block robots %}false{% endblock %}
     {% block description %}{{- canvas.notes.article.description|escape -}}{% endblock %}
-    {% block twitter_image %}{{ absolute_url('images/logo/logo-white-full.png') }}{% endblock %}
-    {% block page_url %}{{ absolute_url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}{% endblock %}
+    {% block twitter_image %}{{ absolute_url('/images/logo/' ~ canvas.notes.article.cover) }}{% endblock %}
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('stylesheets/notes_article.css') }}" >
     {% endblock %}
     {% block darkmode_stylesheet %}
-        <link rel="stylesheet" href="{{ asset('stylesheets/lightmode.css') }}" watch="theme" >
+        {% if canvas.misc.theme_state == true %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+        {% else %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/lightmode.css') }}" watch="theme" />
+        {% endif %}
     {% endblock %}
 {# HEADERS - END #}
 
@@ -20,8 +21,7 @@
 {% block page_contents %}
     {# <h1>{{ canvas.notes.article.cover }}</h1> #}
 
-    {# {#  #}
-    <span id="page-assistant" class="hd" pid="{{ canvas.notes.article.pid }}" visit="" theme=""></span>
+    <span id="page-assistant" class="hd" pid="{{ canvas.notes.article.pid }}" visit=""></span>
 
     <div class="atc-title-cover">
         <ul class="atc-poster-title ul ft-sect clear-fix">
@@ -158,7 +158,6 @@
             </div>
         {% endfor %}
     </div> 
-    {# # #}
 {% endblock page_contents %}
 
 

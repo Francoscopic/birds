@@ -29,6 +29,9 @@ class HomeController extends AbstractController
             // $this->redirectToRoute('note_signin');
         }
 
+        // data
+        $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
+
         $canvas = array(
             'notes' => array(),
             'profile' => array(
@@ -37,6 +40,13 @@ class HomeController extends AbstractController
             ),
             'misc' => array(
                 'outside' => false,
+                'theme_state' => $theme_data['state'],
+                'theme_logo' => $theme_data['logo'],
+            ),
+            'headers' => array(
+                'title' => 'Home',
+                'robot' => false,
+                'description' => 'Notes helps you share, educate and inspire with writing. And do it in just 7 paragraphs. It\'s for the creators who write.',
             ),
         );
 

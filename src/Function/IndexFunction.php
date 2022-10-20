@@ -25,10 +25,18 @@ class IndexFunction
         );
     }
 
-    public static function get_user_state($user_id): array
+    public static function get_user_state($user_id, $visit_state = false): array
     {
         $connection = new DatabaseAccess();
         $connection = $connection->connect('');
+
+        if( $visit_state == true ) {
+            return array(
+                'state' => 0,
+                'logo'  => self::get_path('images').'/logo/notes.png',
+            );
+        }
+        
         $stmt = $connection->prepare('SELECT state FROM user_sapphire WHERE uid = ?');
         $stmt->bind_param('s', $user_id);
         $stmt->execute();
@@ -38,10 +46,12 @@ class IndexFunction
             $state_array = $get_state_array->fetch_array(MYSQLI_ASSOC);
         # Instantiate the variables
         $state = $state_array['state']; // Dark or Light
+        $theme_logo = ($state == true) ? self::get_path('images').'/logo/notes-white.png' : self::get_path('images').'/logo/notes.png';
 
         unset($stmt, $connection, $get_state_array, $state_array, $user_id);
         return array(
-            'state'=>$state
+            'state'=>$state,
+            'logo' => $theme_logo,
         );
     }
 
