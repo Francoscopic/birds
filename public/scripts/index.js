@@ -404,29 +404,6 @@ function note_light_mode() { // working
 
 $(document).ready(function () {
 
-    (function () {
-        var e = $("#note-display-dark"),
-            n = $("#note-display-light"),
-            i = $("#page-assistant").attr("uid"),
-            o = $("#note-display-dark-about"),
-            c = $("#note-display-light-about"),
-            l = $(".note-menu-close"),
-            a = $("#display-request-level").attr("level");
-        function s(t) {
-            r(t, "2" == a ? "" : "pages/in/");
-        }
-        function r(t, e = "") {
-            $.post(`${e}depends/includes/index_changes.php`, { state: t, uid: i }, function () {}).fail(function (t, e, n) {
-                // console.error(n);
-            });
-        }
-        e.on("click", function () {
-            o.attr("class", "bcg-e trn3-color"), c.attr("class", ""), t(), l.click(), s("dark");
-        }),
-        n.on("click", function () {
-            c.attr("class", "bcg-e trn3-color"), o.attr("class", ""), t(), l.click(), s("light");
-        });
-    })(),
     notes_new_menu(),
     article_click(),
     $.nt_small_menu(),
