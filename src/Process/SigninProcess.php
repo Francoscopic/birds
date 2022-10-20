@@ -6,17 +6,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 use App\Database\DatabaseAccess;
 use App\Function\IndexFunction;
-use App\Validation\SigninValidation;
 
 class SigninProcess extends AbstractController
 {
     private $session;
+    private $connection;
+
     public function sign_in(Request $request): JsonResponse
     {
         // Procedure
@@ -26,14 +25,14 @@ class SigninProcess extends AbstractController
             # 4. Set environment ready
             # 5. Send in.
 
-        $session = new Session();
+        $this->session = new Session();
         // $session->start();
 
+        # Database Access
+        $this->connection = new DatabaseAccess();
+        $this->connection = $this->connection->connect('');
+
         if( isset($request->request) ) {
-        // if( isset($_POST['clt'], $_POST['psw']) ) {
-    
-            // $user = trim($_POST['clt']);
-            // $pass = $_POST['psw'];
 
             $user = $request->request->get('clt');
             $pass = $request->request->get('psw');
@@ -54,9 +53,9 @@ class SigninProcess extends AbstractController
                         if($this->update_session_key($uid, $mySeshKey) == true) {
     
                             # Create session
-                            $session->set('sesh', $mySeshKey);
-                            $session->set('uid', $uid);
-                            $session->set('isin', true);
+                            $this->session->set('sesh', $mySeshKey);
+                            $this->session->set('uid', $uid);
+                            $this->session->set('isin', true);
     
                             # Success
                             return $this->json([
@@ -64,6 +63,10 @@ class SigninProcess extends AbstractController
                                 'status' => 40,
                             ]);
                         }
+                        return $this->json([
+                            'message' => '[500] Bite refused you access. Refresh page',
+                            'status' => $four_,
+                        ]);
                     }
                     return $this->json([
                         'message' => $three_['message'],
@@ -94,13 +97,11 @@ class SigninProcess extends AbstractController
         $status = '10';
         if( $email == '' && $pass == '' ) {
 
-            // $this->echo_error('Enter details');
             $message = 'Enter details';
             $handle = false;
             $status = '11';
         } elseif( !$valid_email ) {
             
-            // $this->echo_error('Email incorrect');
             $message = 'Email incorrect';
             $handle = false;
             $status = '12';
@@ -118,11 +119,7 @@ class SigninProcess extends AbstractController
         $message = $status = '20';
         $handle = true;
 
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare("SELECT ud.confirmed, us.sid
+        $stmt = $this->connection->prepare("SELECT ud.confirmed, us.sid
                                         FROM user_sapphire us INNER JOIN user_diamond ud
                                         ON us.uid = ud.uid
                                         WHERE us.email = ? OR us.uname = ?");
@@ -132,18 +129,33 @@ class SigninProcess extends AbstractController
         $row = $result->num_rows;
         
         if( $row != 1 || $row == 0 ) {
-            // echo '<span class="ft-sect"><strong>You don\'t seem to have an account. <br><a class="note-er a" href="/o/signup/">Create one today.</a></strong></span>';
+            // no account found
             $message = 'User Credentials Unavailable';
             $status = '21';
             $handle = false;
+
+            unset($stmt, $result, $row, $email);
+            return array(
+                'message' => $message,
+                'handle'  => $handle,
+                'status'  => $status,
+            );
         }
         if($result->fetch_array(MYSQLI_ASSOC)['confirmed'] == 0) {
-            // echo '<span class="ft-sect"><strong>Please check mail to confirm account</strong></span>';
+            // account confirmation required
             $message = 'Account Confirmation Required';
             $status = '22';
             $handle = false;
+
+            unset($stmt, $result, $row, $email);
+            return array(
+                'message' => $message,
+                'handle'  => $handle,
+                'status'  => $status,
+            );
         }
-        unset($stmt, $connection, $result, $row, $email);
+
+        unset($stmt, $result, $row, $email);
         return array(
             'message' => $message,
             'handle'  => $handle,
@@ -156,11 +168,7 @@ class SigninProcess extends AbstractController
         $message = $status = '30';
         $handle = true;
 
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare("SELECT ud.password, us.uid
+        $stmt = $this->connection->prepare("SELECT ud.password, us.uid
                                         FROM user_sapphire us, user_diamond ud
                                         WHERE (us.email = ? AND ud.confirmed = 1) OR (us.uname=? AND ud.confirmed=1) LIMIT 1");
         $stmt->bind_param("ss", $email, $email);
@@ -172,7 +180,6 @@ class SigninProcess extends AbstractController
 
         if($this->validate_user_access($uid) != true) {
             # Exceeded login trial
-            // echo 80;
             $status = '31';
             $handle = false;
             $message = 'Account locked out. Please contact #Support';
@@ -184,8 +191,7 @@ class SigninProcess extends AbstractController
             $message = 'User Credentials Incomplete';
         }
 
-        unset($stmt, $connection, $result, $row, $email, $pass, $hashed_pass);
-
+        unset($stmt, $result, $row, $email, $pass, $hashed_pass);
         return array(
             'message' => $message,
             'handle'  => $handle,
@@ -197,11 +203,8 @@ class SigninProcess extends AbstractController
     protected function validate_user_access($uid): bool
     {
         $handle = true;
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
 
-        $stmt = $connection->prepare("SELECT uid, passcount FROM user_secure WHERE uid = ?");
+        $stmt = $this->connection->prepare("SELECT uid, passcount FROM user_secure WHERE uid = ?");
         $stmt->bind_param("s", $uid);
         $stmt->execute();
         $secure = $stmt->get_result();
@@ -209,7 +212,7 @@ class SigninProcess extends AbstractController
         $passcount = $secure_row['passcount'];
         $handle = ($passcount >= 5) ? false : true;
 
-        unset($stmt, $connection, $uid, $secure, $secure_row, $passcount);
+        unset($stmt, $uid, $secure, $secure_row, $passcount);
         return $handle;
     }
 
@@ -224,10 +227,11 @@ class SigninProcess extends AbstractController
         $visitor_cookie = IndexFunction::set_cookie_variables('vst', '', '-7 months');
 
         if( $uid_cookie==true && $sesh_cookie==true && $visitor_cookie==true ) {
-            unset($_SESSION['vst']); // kill the visitor session
+            // kill the visitor session
+            $this->session->remove('vst');
             $handle = true;
         } else {
-            echo_error('Server error. Retry');
+            // Unknown error
             $handle = false;
         }
         unset($cookieName, $cookieSesh, $uid, $mySeshKey, $uid_cookie, $sesh_cookie, $visitor_cookie);
@@ -237,44 +241,33 @@ class SigninProcess extends AbstractController
     protected function update_session_key($uid, $mySeshKey): bool
     {
         $handle = true;
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
 
-        $stmt = $connection->prepare("INSERT INTO user_onyx (uid, seshkey) VALUES(?, ?)");
+        $stmt = $this->connection->prepare("INSERT INTO user_onyx (uid, seshkey) VALUES(?, ?)");
         $stmt->bind_param("ss", $uid, $mySeshKey);
         if( $stmt->execute() ) {
             # Update passcount to '0'
-            $stmt = $connection->prepare("UPDATE user_secure SET passcount = 0 WHERE uid = ?");
+            $stmt = $this->connection->prepare("UPDATE user_secure SET passcount = 0 WHERE uid = ?");
             $stmt->bind_param("s", $uid);
             $stmt->execute();
         } else {
             # Weird error
             $handle = false;
         }
-        unset($stmt, $connection, $uid, $mySeshKey);
+        unset($stmt, $uid, $mySeshKey);
         return $handle;
     }
 
     protected function update_login_passcount($uid)
     {
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare("UPDATE user_secure SET passcount = passcount + 1 WHERE uid = ?");
+        $stmt = $this->connection->prepare("UPDATE user_secure SET passcount = passcount + 1 WHERE uid = ?");
         $stmt->bind_param("s", $uid);
         $stmt->execute();
-        unset($stmt, $connection, $uid);
+        unset($stmt, $uid);
     }
 
     protected function validate_password($email, $pass): bool 
     {
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare("SELECT ud.password, ud.uid
+        $stmt = $this->connection->prepare("SELECT ud.password, ud.uid
                                         FROM user_diamond ud
                                         INNER JOIN user_sapphire us
                                         ON ud.uid=us.uid
@@ -285,7 +278,7 @@ class SigninProcess extends AbstractController
         $row = $result->fetch_array(MYSQLI_ASSOC);
         $password = $row['password'];
 
-        unset($stmt, $connection, $result, $row);
-        return password_verify($pass, $password) ? true : false;
+        unset($stmt, $result, $row);
+        return password_verify($pass, $password);
     }
 }

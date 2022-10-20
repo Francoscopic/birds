@@ -16,14 +16,17 @@ class SigninValidation
     private $session_cell;
     private $cookie_cell;
     private $request;
+    private $connection;
 
     public function __construct()
     {
+        $this->connection = new DatabaseAccess();
+        $this->connection = $this->connection->connect('');
+
         $this->session_cell = new Session();
-        $this->session_cell->start();
+        // $this->session_cell->start();
 
         $this->request = Request::createFromGlobals();
-
         $this->cookie_cell  = $this->request->cookies;
 
         $this->page_state = $this->check_login(); // start the process
@@ -38,7 +41,6 @@ class SigninValidation
                 $this->session_cell->has('isin')
             )
         {
-
             $user_id    = $this->session_cell->get('uid');
             $sesh_id    = $this->session_cell->get('sesh');
             $isLoggedIn = $this->session_cell->get('isin');
@@ -83,23 +85,19 @@ class SigninValidation
             }
             //clear memory
             unset($coo_sesh, $coo_user_id, $validateCoo); 
-            $this->session->remove('vst');
+            $this->session_cell->remove('vst');
             return false;
         } else {
             // Just take the person to the signin page. No session is set.
             $this->session_cell->remove('vst'); // if it exists
             // and I assume Cookie: VST would be available
-
             return false;
         }
     }
 
     protected function validate_sesh_login($userId, $isSignedIn, $sessionId): bool
     {
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt=$connection->prepare("SELECT seshkey FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY sid DESC LIMIT 1");
+        $stmt=$this->connection->prepare("SELECT seshkey FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY sid DESC LIMIT 1");
         $stmt->bind_param('ss', $userId, $sessionId);
         $stmt->execute();
         $checkSeshKey=$stmt->get_result();
@@ -115,7 +113,7 @@ class SigninValidation
 
             // Check if user has been logged in already from signin.php page -from Aquamarine folder
             // echo 'Give them access with their *uid*';
-            unset($stmt, $connection, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
+            unset($stmt, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return true;
         } else if($isSignedIn != true && $sessionId == $savedSesh) {
 
@@ -123,11 +121,11 @@ class SigninValidation
             // $_SESSION['uid'] = $userId;
             $this->session_cell->set('uid', $userId);
             
-            unset($stmt, $connection, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
+            unset($stmt, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return true;
         } else {
             // Just take the person to the signin page. Login is not *true*
-            unset($stmt, $connection, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
+            unset($stmt, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return false;
         }
     }
@@ -139,13 +137,10 @@ class SigninValidation
     }
     protected function add_visitor($visitor_id): void
     {
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt = $connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
+        $stmt = $this->connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
         $stmt->bind_param('s', $visitor_id);
         $stmt->execute();
-        unset($stmt, $connection, $visitor_id);
+        unset($stmt, $visitor_id);
     }
 
     public function alright($page_state) 

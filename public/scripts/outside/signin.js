@@ -13,7 +13,7 @@ function signIn() {
         travel_page;
 
 
-    $(button).on('click', function(e) {      
+    $(button).on('click', function(e) {     
         
         e.preventDefault();
 

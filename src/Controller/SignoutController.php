@@ -8,11 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use App\Database\DatabaseAccess;
 use App\Function\IndexFunction;
-use App\Validation\SigninValidation;
 
 class SignoutController extends AbstractController
 {
