@@ -21,7 +21,6 @@ class UniverseHome extends AbstractController
     {
         $get_cookie = new RetrieveCookie();
         $uid = $get_cookie->get_netintui_user_id()['user_id'];
-        $uid = '16545143453939uA'; // remove this
 
         $content = $this->get_content($uid)['content'];
 

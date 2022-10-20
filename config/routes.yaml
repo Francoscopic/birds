@@ -12,6 +12,9 @@ ajax_home_article_like:
 ajax_home_universe_menu:
     path: /ajax/universe/menu/
     controller: App\Verb\Home\UniverseHome::menu
+ajax_home_infinite_scroll:
+    path: /ajax/universe/infinite_scroll/
+    controller: App\Verb\Home\InfiniteHome::more
 
 # SIGN-IN
 ajax_signin_login:

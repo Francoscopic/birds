@@ -43,13 +43,10 @@ function growProfile(){
         e.preventDefault()
     })
 }
-growProfile();
 
-
-function infinite_home() {
-
+function infinite_home() // working
+{
     var trigger = $('.infinite-home'),
-        uid = $("#page-assistant").attr("uid"),
         position = 15;
 
     $(trigger).on('click', function(e){
@@ -60,24 +57,59 @@ function infinite_home() {
     });
 
     function request_more() {
-        $.post('pages/in/depends/grow/grow.php', {grow_home:'home', uid:uid, start:position}, function(data){
+        $.post('/ajax/universe/infinite_scroll/', {grow_home:'home', uid:'', start:position}, function(data){
 
-            ($.trim(data).length < 10) ? trigger_empty_content(trigger) : serve_more_content(data);
+            ((data.content.notes).length < 1) ? trigger_empty_content(trigger) : serve_more_content(data.content.notes, data);
         }).fail(function(o, e, n){
             trigger_response(trigger, 'Error. Please, retry', false, '1'),
-            console.error(n)
+            console.error(o.reponseText);
         }),
         position += 15;
     }
-    function serve_more_content(content) {
+    function serve_more_content(content, content_parent) {
         var container = $('.nts-host-parent');
-        container.append(content);
+        var more_content = '',
+            iterator;
+
+        for (let i = 0; i < content.length; i++) {
+            iterator = content[i];
+            const if_img = iterator.note_is_img ? '<div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>' : '';
+            more_content += `
+            <div class="nts-host relative">
+                <span id="page-assistant" class="hd" pid="${iterator.pid}" read="${iterator.post_url}" title="${iterator.title}" poster="${iterator.poster_name}" save_state="${iterator.save}" like_state="${iterator.like}" unlike_state="${iterator.unlike}"></span>
+                <a href="${iterator.post_url}" class="vw-anchor-pages nts-host-anchor a">
+                    <div class="nts-host-display lozad bck relative" data-background-image="${iterator.cover}">
+                        ${if_img}
+                        <div class="nts-host-display-filter"></div>
+                    </div>
+                    <div class="nts-host-verb ft-sect">
+                        <p>
+                            <strong title="Paragraphs">${iterator.paragraphs}</strong><span class=""> paragraphs</span>
+                        </p>
+                    </div>
+                    <div id="nts-host-title" class="nts-host-title">
+                        <p class="trn3-color">${iterator.if_view, iterator.title}</p>
+                    </div>
+                </a>
+                <div class="nts-host-verb-author ft-sect">
+                    <a href="${iterator.profile_url}" class="a">
+                        <p>${iterator.poster_name}</p>
+                    </a>
+                    <a href="#" class="a">
+                        <button class="nts-show-menu no-bod" visit="${content_parent.content.profile.visitor_state}"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        container.append(more_content);
         trigger_response(trigger, 'Find more <i class="fa fa-chevron-right"></i>', false, '1'); //react back
+
         //other necessary actions
         lozad().observe(),
-        article_click_home(), notes_small_menu()
+        $.nt_small_menu()
     }
-    function trigger_response(trig, trigText='<i>loading...</i>', trigState=true, trigOpas='.5') {
+    function trigger_response(trig, trigText='<img src="/images/logo/loader.gif" at="loader" width="15" height="15" />', trigState=true, trigOpas='.7') {
 
         $(trig).attr('disabled',trigState).css('opacity',trigOpas),
         $(trig).html(`${trigText}`);
@@ -88,4 +120,6 @@ function infinite_home() {
         $(trig).addClass('nt-infinitescroll-inactive').text(msg);
     }
 }
-infinite_home();
+
+infinite_home(),
+growProfile()

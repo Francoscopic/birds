@@ -1,5 +1,5 @@
 
-import Cookies from './plugins/cookies/api.js';
+import Cookies from '/scripts/plugins/cookies/api.js';
 
 function article_click() {  // working
 
@@ -21,18 +21,13 @@ function article_click() {  // working
     });
 }
 
-function notes_small_menu() {   // Working
+$.nt_small_menu = function () // working
+{
 
-    var ellipsis = $('.nts-show-menu'),
-        isUserAllowed = $(ellipsis).attr('visit'),
-        close_exit = $('.note-small-menu-container-close'),
-        small_menu_parent_container = $('.notes-small-menu-container'),
-        small_menu = $('.nts-host-menu');
+    var ellipsis = $('.nts-show-menu'), isUserAllowed = $(ellipsis).attr('visit'), close_exit = $('.note-small-menu-container-close'), small_menu_parent_container = $('.notes-small-menu-container'), small_menu = $('.nts-host-menu');
 
-    function small_container(title, name, link, pid, save_state, like_state, unlike_state){
-        var is_saved = is_done(save_state),
-            is_liked = is_done(like_state),
-            is_unliked = is_done(unlike_state);
+    function small_container(title, name, link, pid, save_state, like_state, unlike_state) {
+        var is_saved = is_done(save_state), is_liked = is_done(like_state), is_unliked = is_done(unlike_state);
         const ele = `
         <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
         <div class="nts-host-menu-post_details">
@@ -69,7 +64,7 @@ function notes_small_menu() {   // Working
             return (state == 1) ? 'fas' : 'far';
         }
     }
-    function small_container_visit(){
+    function small_container_visit() {
         const ele = `
         <div class="login_to_connect">
             <div><img src="/images/support/7.png" alt="Netintui Notes" /></div>
@@ -88,24 +83,24 @@ function notes_small_menu() {   // Working
     }
     function call_menu(ele) {
         small_menu.empty(),
-        small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
+            small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
     }
     function tools_contractor(pid, save_ask, like_ask, unlike_ask) {
 
         function tools_response(t, ask) {
             var ia = $(t).find('i');
-            
-            function e(t, i, n){
+
+            function e(t, i, n) {
                 $(t).removeClass(i).addClass(n);
             }
-            (ask==1 || ask==true) ? e(ia, "fas", "far") : e(ia, "far", "fas");
+            (ask == 1 || ask == true) ? e(ia, "fas", "far") : e(ia, "far", "fas");
         }
-        function s(t, e, other=null){
-            $.post("/ajax/verb/home/article_like/",{thePid:t, theReason:e, other:other},function(){
+        function s(t, e, other = null) {
+            $.post("/ajax/verb/home/article_like/", { thePid: t, theReason: e, other: other }, function () {
                 // alert(data.message)
-            }).fail(function(t, i, n){
-                console.error(n)
-            })
+            }).fail(function (t, i, n) {
+                console.error(n);
+            });
         }
         function flip_value(the_value) {
             return (the_value == 1) ? 0 : 1;
@@ -113,30 +108,30 @@ function notes_small_menu() {   // Working
 
         // SAVE
         var save_trigger = $('.save-this-note');
-        $(save_trigger).on('click', function(e){
+        $(save_trigger).on('click', function (e) {
             e.preventDefault();
 
             s(pid, 'save'),
-            tools_response(this, save_ask),
-            save_ask = flip_value(save_ask) // change value
+                tools_response(this, save_ask),
+                save_ask = flip_value(save_ask); // change value
         });
         // LIKE
         var like_trigger = $('.like-this-note');
-        $(like_trigger).on('click', function(e){
+        $(like_trigger).on('click', function (e) {
             e.preventDefault();
 
             s(pid, 'like'),
-            tools_response(this, like_ask),
-            like_ask = flip_value(like_ask) // change value
+                tools_response(this, like_ask),
+                like_ask = flip_value(like_ask); // change value
         });
         // UN-LIKE
         var unlike_trigger = $('.unlike-this-note');
-        $(unlike_trigger).on('click', function(e){
+        $(unlike_trigger).on('click', function (e) {
             e.preventDefault();
 
             s(pid, 'unlike'),
-            tools_response(this, unlike_ask),
-            unlike_ask = flip_value(unlike_ask) // change value
+                tools_response(this, unlike_ask),
+                unlike_ask = flip_value(unlike_ask); // change value
         });
         // REPORT
         report_contractor();
@@ -195,7 +190,7 @@ function notes_small_menu() {   // Working
             }
             function report_tools_response(t, ask) {
                 var ia = $(t).find('i');
-                
+
                 function e(t, i, n) {
                     $(t).removeClass(i).addClass(n);
                 }
@@ -205,29 +200,26 @@ function notes_small_menu() {   // Working
 
                 // cancel
                 var report_cancel = $('.small-report-cancel');
-                $(report_cancel).on('click', function(e){
+                $(report_cancel).on('click', function (e) {
                     e.preventDefault();
                     close_exit.click();
                 });
                 // send
                 var report_send = $('.small-report-send');
-                $(report_send).on('click', function(e){
+                $(report_send).on('click', function (e) {
                     e.preventDefault();
                     var selected_report = $('.small-report-issue input:checked').attr('value');
-                    (selected_report == '') ? null : (s(pid, 'report', selected_report),close_exit.click());
+                    (selected_report == '') ? null : (s(pid, 'report', selected_report), close_exit.click());
                 });
 
 
                 // select issue
                 var report_selector = $('.small-report-issue input');
-                $(report_selector).on('click', function(){
+                $(report_selector).on('click', function () {
 
-                    var this_checkbox   = $(this).is(':checked'),
-                        others_checkbox = $(report_selector).not(this).is(':checked'),
-                        this_i          = $(this).siblings('p'),
-                        others_i        = $(report_selector).siblings('p');
+                    var this_checkbox = $(this).is(':checked'), others_checkbox = $(report_selector).not(this).is(':checked'), this_i = $(this).siblings('p'), others_i = $(report_selector).siblings('p');
                     report_tools_response(others_i, others_checkbox),
-                    report_tools_response(this_i, this_checkbox);
+                        report_tools_response(this_i, this_checkbox);
                 });
             }
 
@@ -235,54 +227,45 @@ function notes_small_menu() {   // Working
             var report_trigger = $('.report-this-note');
             $(report_trigger).on('click', function (e) {
                 e.preventDefault();
-                (report_small_container() == true) ? (small_menu_parent_container.fadeIn(),report_actions()) : null;
+                (report_small_container() == true) ? (small_menu_parent_container.fadeIn(), report_actions()) : null;
             });
         }
     }
 
-    ellipsis.on('click', function(e) {
+    ellipsis.on('click', function (e) {
         e.preventDefault();
 
-        if( isUserAllowed == true ) {
+        if (isUserAllowed == true) {
             (small_container_visit() == true) ? small_menu_parent_container.fadeIn() : null;
             return;
         }
 
-        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
-            post_id      = $assistant.attr('pid'),
-            article_link = $assistant.attr('link'),
-            title        = $assistant.attr('title'),
-            poster       = $assistant.attr('poster'),
-            save_state   = $assistant.attr('save_state'),
-            like_state   = $assistant.attr('like_state'),
-            unlike_state = $assistant.attr('unlike_state');
+        var $assistant = $(this).parents('.nts-host').children('#page-assistant'), post_id = $assistant.attr('pid'), article_link = $assistant.attr('link'), title = $assistant.attr('title'), poster = $assistant.attr('poster'), save_state = $assistant.attr('save_state'), like_state = $assistant.attr('like_state'), unlike_state = $assistant.attr('unlike_state');
 
         (
             small_container(
-                title, poster, article_link, post_id, 
+                title, poster, article_link, post_id,
                 save_state, like_state, unlike_state
             ) == true
-        ) 
-        ? (
-            small_menu_parent_container.fadeIn(), 
-            tools_contractor(post_id, save_state, 
-                like_state, unlike_state)
-        ) : null;
+        )
+            ? (
+                small_menu_parent_container.fadeIn(),
+                tools_contractor(post_id, save_state,
+                    like_state, unlike_state)
+            ) : null;
     }),
 
-    close_exit.on('click', function(e){
+    close_exit.on('click', function (e) {
         e.preventDefault();
         small_menu_parent_container.fadeOut();
-    })
+    });
 }
 
-
-function notes_new_menu() {
+function notes_new_menu() { // Working
     var t = $(".note-menu-open"),
         small_menu_parent_container = $('.notes-small-menu-container'),
         small_menu = $('.nts-host-menu'),
-        small_menu_container = $('.nts-host-menu-plate'),
-        secretary_loader = $('.nts-secretary');
+        small_menu_container = $('.nts-host-menu-plate');
 
     function menu_container(display, nam, unam, path, theme_arr) {
         var theme_state   = theme_arr[0],
@@ -406,6 +389,7 @@ function notes_new_menu() {
     })
 }
 
+
 function note_light_mode() {
 
     var trigger = $('.note-color-mode').children('input'),
@@ -468,7 +452,7 @@ $(document).ready(function () {
     })(),
     notes_new_menu(),
     article_click(),
-    notes_small_menu(),
+    $.nt_small_menu(),
     note_light_mode(),
     lozad().observe();
 });

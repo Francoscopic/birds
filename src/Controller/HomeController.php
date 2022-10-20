@@ -26,13 +26,13 @@ class HomeController extends AbstractController
         $intruder_state = $login_state['intruder'];
 
         if( $intruder_state == true ) {
-            $this->redirectToRoute('note_home');
+            // $this->redirectToRoute('note_signin');
         }
 
         $canvas = array(
             'notes' => array(),
             'profile' => array(
-                'username' => 'Joshua',
+                'username' => '',
                 'visitor_state' => $visitor_state,
             ),
             'misc' => array(
@@ -80,7 +80,6 @@ class HomeController extends AbstractController
 
                 $canvas['notes'][] = [
                     'pid'          => $the_pid,
-                    'puid'         => $poster_uid,
                     'title'        => $note_title,
                     'paragraphs'   => $note_parags,
                     'cover'        => $note_cover,
