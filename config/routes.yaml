@@ -3,9 +3,6 @@ controllers:
     type: attribute
 
 # HOME
-ajax_home_article_click:
-    path: /ajax/verb/home/article_click/
-    controller: App\Verb\Home\ArticleClickHome::Article_Click
 ajax_home_article_like:
     path: /ajax/verb/home/article_like/
     controller: App\Verb\Home\ArticleLikeHome::verbs
@@ -23,4 +20,12 @@ ajax_home_theme_color_update:
 ajax_signin_login:
     path: /processor/signin/login/
     controller: App\Process\SigninProcess::sign_in
+
+# ARTICLE
+ajax_article_save_views:
+    path: /ajax/verb/article/views/
+    controller: App\Verb\Home\ArticleViewsHome::views
+ajax_article_save_shares:
+    path: /ajax/verb/article/share/
+    controller: App\Verb\Home\ArticleViewsHome::views
 

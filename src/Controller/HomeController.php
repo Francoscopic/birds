@@ -131,6 +131,12 @@ class HomeController extends AbstractController
         return $this->render('');
     }
 
+    #[Route('/c/{post_id}/', name: 'note_comment')]
+    public function comment(): Response
+    {
+        return $this->render('');
+    }
+
     #[Route('/support/forgot_password/', name: 'note_forgot_password')]
     public function forgot_password(): Response
     {

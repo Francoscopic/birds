@@ -215,7 +215,8 @@ class IndexFunction
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $stmt = $connection_verb->prepare('SELECT DISTINCT(sid) FROM views WHERE pid=? AND uid=? ORDER BY sid DESC');
+        // $stmt = $connection_verb->prepare('SELECT DISTINCT(sid) FROM views WHERE pid=? AND uid=? ORDER BY sid DESC');
+        $stmt = $connection_verb->prepare('SELECT DISTINCT(visit_id) FROM visits WHERE post_id=? AND user_id=?');
         $stmt->bind_param('ss', $note_id, $viewer_id);
         $stmt->execute();
         $get_result = $stmt->get_result();
@@ -596,28 +597,28 @@ class IndexFunction
             # if rows is zero.
             if( $getResult->num_rows === 0 ) {
                 # Return number of NOTES
-                $number = '&Oslash;';
+                $number = 'Like';
                 unset($connection_verb, $stmt, $getResult, $thePid, $table, $state);
                 return array(
-                    'number'=>$number
+                    'number' => $number
                 );
             }
             unset($connection_verb, $stmt, $getResult, $thePid, $table, $state);
             # Return handler: false = NOT NOTED
             return array(
-                'number'=>$number
+                'number' => $number . ' likes',
             );
         }
-        public static function note_views($id): string
+        public static function note_views($id)
         {
             $connection_verb = new DatabaseAccess();
             $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare('SELECT DISTINCT(uid) FROM views WHERE pid = ?');
+            $stmt = $connection_verb->prepare('SELECT DISTINCT(user_id) FROM visits WHERE post_id = ?');
             $stmt->bind_param('s', $id);
             $stmt->execute();
             $ans = ($stmt->get_result())->num_rows;
             unset($connection_verb, $stmt, $id);
-            return $ans === 0 ? 'No' : $ans;
+            return $ans === 0 ? null : $ans;
         }
         public static function get_comment($comment_id): array
         {
@@ -667,6 +668,7 @@ class IndexFunction
         {
             $connection_verb = new DatabaseAccess();
             $connection_verb = $connection_verb->connect('verb');
+            
             $stmt = $connection_verb->prepare("SELECT sid FROM comments WHERE pid = ?");
             $stmt->bind_param("s", $note_id);
             $stmt->execute();
@@ -682,7 +684,7 @@ class IndexFunction
                 return array('');
             } elseif( $rows_number === 0 ) {
                 unset($connection_verb, $stmt);
-                return array('No');
+                return array('Comment');
             } else {
                 unset($connection_verb, $stmt);
                 return array($rows_number);

@@ -1,26 +1,6 @@
 
 import Cookies from '/scripts/plugins/cookies/api.js';
 
-function article_click() {  // working
-
-    var e = $(".vw-anchor-pages");
-    $(e).on("click", function () {
-
-        var e = $(this).siblings("#page-assistant");
-        as();
-
-        function as() {
-            !(function (en) {
-                $.post("/ajax/verb/home/article_click/", { views: '1', note_id: en, viewer_id: '' }, function(){
-
-                }).fail(function(t,e,n){
-                    console.error(n)
-                })
-            })(e.attr("pid"));
-        }
-    });
-}
-
 $.nt_small_menu = function () // working
 {
 
@@ -405,7 +385,6 @@ function note_light_mode() { // working
 $(document).ready(function () {
 
     notes_new_menu(),
-    article_click(),
     $.nt_small_menu(),
     note_light_mode(),
     lozad().observe();

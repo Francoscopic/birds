@@ -19,10 +19,9 @@ class ArticleController extends AbstractController
     protected bool $article_found = false;
     protected string $article_message = 'Found article';
 
-    #[Route('/a/{post_id}', name: 'note_posts')]
+    #[Route('/a/{post_id}/', name: 'note_posts')]
     public function article_start(string $post_id, Request $request): Response
     {
-
         // Profile data
         $login = new SigninValidation();
         $login_state = $login->alright($login->page_state);
@@ -80,11 +79,13 @@ class ArticleController extends AbstractController
                 $note_description = IndexFunction::ShowMore($note_note); # note
                 $note_cover = IndexFunction::note_cover_article($get_note_result_array['cover'], '../../');
                 $note_extensions = IndexFunction::note_cover_extensions($get_note_result_array['cover'], $get_note_result_array['extensions'])['images'];
-                $note_views = IndexFunction::note_views($post_id);
+                $note_views = IndexFunction::note_views($post_id) ?? 'No';
                 $note_date = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
 
                 $cover_width = IndexFunction::imgNomenclature($note_cover)['width'];
                 $cover_height = IndexFunction::imgNomenclature($note_cover)['height'];
+
+                $comment_url = $this->generateUrl('note_comment', array('post_id'=>$post_id));
 
                 $canvas['notes']['article'] = [
                     'pid'          => $post_id,
@@ -97,6 +98,7 @@ class ArticleController extends AbstractController
                     'extensions'   => $note_extensions,
                     'views'        => $note_views,
                     'date'         => $note_date,
+                    'comment_url'  => $comment_url,
                 ];
             #
 
@@ -185,17 +187,16 @@ class ArticleController extends AbstractController
 
             // Divide 2
 
-            $encode_url   = urlencode($link);
-            $url_facebook = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode( $this->article_share_url($link, ['media'=>'facebook', 't'=>$note_title]) );
-            $url_twitter  = 'https://twitter.com/intent/tweet?url=' . urlencode( $this->article_share_url($link, ['media'=>'twitter', 'text'=>$note_title]) );
+            $url_facebook = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode( $this->article_share_url($link, ['media'=>'facebook']) );
+            $url_twitter  = 'https://twitter.com/intent/tweet?url=' . urlencode( $this->article_share_url($link, ['media'=>'twitter']) );
             $url_linkedin = 'https://www.linkedin.com/shareArticle/?mini=true&url=' . urlencode( $this->article_share_url($link, ['media'=>'linkedin']) );
             $url_link     = $this->article_share_url($link, ['media'=>'link']);
 
             $canvas['notes']['share'] = [
                 'facebook' => $url_facebook,
-                'twitter' => $url_twitter,
+                'twitter'  => $url_twitter,
                 'linkedin' => $url_linkedin,
-                'web' => $url_link,
+                'web'      => $url_link,
             ];
         # WORK - END
 
@@ -275,6 +276,7 @@ class ArticleController extends AbstractController
                 $if_view  = IndexFunction::get_if_views($the_pid, $uid);
                 $view_eye = ($if_view == true) ? '' : '*';
             #
+            $article_url = $this->generateUrl('note_posts', array('post_id'=>$the_pid));
 
             $content[] = [
                 'pid'        => $the_pid,
@@ -283,6 +285,7 @@ class ArticleController extends AbstractController
                 'name'       => $note_poster_name,
                 'eye'        => $view_eye,
                 'paragraphs' => $note_parags,
+                'post_url'   => $article_url,
             ];
         }
         return $content;
@@ -290,8 +293,9 @@ class ArticleController extends AbstractController
 
     protected function article_share_url($url, array $params) 
     {
+        $url .= '?';
         foreach($params as $key => $value) {
-            $url .= '&'.$key.'='.$value;
+            $url .= $key.'='.$value.'&';
         }
         return $url;
     }

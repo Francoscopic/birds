@@ -1,10 +1,10 @@
 
 import Cookies from '/scripts/plugins/cookies/api.js';
 
-var page_assistant = $("span#page-assistant"),
-    puid = page_assistant.attr("puid"), //poster uid
-    pid  = page_assistant.attr("pid"), //post id
-    uid  = page_assistant.attr("uid"); //viewer id 
+const page_assistant = $("span#page-assistant"),
+    pid  = page_assistant.attr("pid"); //post id
+    // puid = page_assistant.attr("puid"), //poster uid
+    // uid  = page_assistant.attr("uid"); //viewer id 
 var uid_user = Cookies.get('cookie_user'),
     uid_visitor = Cookies.get('vst');
 
@@ -16,13 +16,13 @@ var uid_user = Cookies.get('cookie_user'),
     function small_container_visit(){
         const ele = `
         <div class="login_to_connect">
-            <div><img src="../../public/images/7.png" alt="Netintui Notes" /></div>
+            <div><img src="/images/support/7.png" alt="Netintui Notes" /></div>
             <p class="nt-ft-calib" message="">Log in to interact with the world on Notes.</p>
             <p class="nt-ft-robt" action="">
-                <a href="../out/aquamarine/signin.php?pg=article&pid=${pid}" class="a">
+                <a href="/o/signin/?pg=article&pid=${pid}" class="a">
                     <button>Log in</button>
                 </a>
-                <a href="../out/aquamarine/signup.php?pg=article&pid=${pid}" class="a">
+                <a href="/o/signout/?pg=article&pid=${pid}" class="a">
                     <button>Sign up</button>
                 </a>
             </p>
@@ -192,15 +192,15 @@ function share_comment(){
 
 
 // Monitor where users are sharing articles to: Facebook, Twitter, LinkedIn, or link-copy
-function monitor_out_share() {
+function monitor_out_share() { // working
 
     const $trigger_facebook = $('.sharer-facebook'),
-        $trigger_twitter = $('.sharer-twitter'),
-        $trigger_linkedin = $('.sharer-linkedin'),
-        $trigger_copylink = $('.sharer-copylink');
+        $trigger_twitter    = $('.sharer-twitter'),
+        $trigger_linkedin   = $('.sharer-linkedin'),
+        $trigger_copylink   = $('.sharer-copylink');
 
-    function take_action(t, i, n){
-        $.post("depends/profiles/article/verbs.php", {outshare_pid:t, outshare_uid:i, outshare_media:n, outShare:''},function(){
+    function take_action(t, n){
+        $.post("/ajax/verb/article/share/", {outshare_pid:t, outshare_media:n, outShare:''},function(){
             
         }).fail(function(t, i, n){
             console.error(n)
@@ -208,40 +208,16 @@ function monitor_out_share() {
     }
 
     $($trigger_facebook).on("click", function(){
-
-        if( isUserAllowed == true ) {
-            // if user is visitor
-            take_action(pid, uid_visitor, 'facebook');
-            return
-        }
-        take_action(pid, uid_user, 'facebook');
+        take_action(pid, 'facebook');
     }),
     $($trigger_twitter).on("click", function(){
-
-        if( isUserAllowed == true ) {
-            // if user is visitor
-            take_action(pid, uid_visitor, 'twitter');
-            return
-        }
-        take_action(pid, uid_user, 'twitter');
+        take_action(pid, 'twitter');
     }),
     $($trigger_linkedin).on("click", function(){
-
-        if( isUserAllowed == true ) {
-            // if user is visitor
-            take_action(pid, uid_visitor, 'linkedin');
-            return
-        }
-        take_action(pid, uid_user, 'linkedin');
+        take_action(pid, 'linkedin');
     }),
     $($trigger_copylink).on("click", function(){
-
-        if( isUserAllowed == true ) {
-            // if user is visitor
-            take_action(pid, uid_visitor, 'link');
-            return
-        }
-        take_action(pid, uid_user, 'link');
+        take_action(pid, 'link');
     })
 
     click_to_copy_link();
@@ -256,28 +232,20 @@ function monitor_out_share() {
         })
     }
 }
-function monitor_in_share() {
+function monitor_in_share() { // working
 
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
     });
-    function take_action(t, i, n){
-        $.post("depends/profiles/article/verbs.php", {inshare_pid:t, inshare_uid:i, inshare_media:n, inShare:''},function(){
-
+    function take_action(t, n){
+        $.post("/ajax/verb/article/views/", {inshare_pid:t, inshare_media:n, inShare:''},function(){
         }).fail(function(t, i, n){
             console.error(n)
         })
     }
 
-    const $trigger_pid = params.wp,
-        $trigger_media = params.media;
-    if( isUserAllowed == true ) {
-        // if user is visitor
-        take_action($trigger_pid, uid_visitor, $trigger_media);
-        return
-    }
-    take_action($trigger_pid, uid_user, $trigger_media);
-    return
+    const $trigger_media = params.media || 'inhouse';
+    take_action(pid, $trigger_media);
 }
 
 $(document).ready(() => {

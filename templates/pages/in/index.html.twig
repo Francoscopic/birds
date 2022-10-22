@@ -36,7 +36,7 @@
             {% for board in canvas.notes %}
                 <div class="nts-host relative">
                     <span id="page-assistant" class="hd" pid="{{board.pid}}" title="{{board.title}}" link="{{board.profile_url}}" poster="{{board.poster_name}}" save_state="{{board.save}}" like_state="{{board.like}}" unlike_state="{{board.unlike}}"></span>
-                    <a href="{{board.post_url}}" class="vw-anchor-pages nts-host-anchor a">
+                    <a href="{{board.post_url}}" class="nts-host-anchor a">
                         <div class="nts-host-display lozad bck relative" data-background-image="{{- asset(board.cover) -}}">
                             {% if board.note_is_img == true %}
                                 <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>

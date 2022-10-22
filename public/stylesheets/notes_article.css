@@ -234,6 +234,10 @@
     width: calc(var(--std-margin) * 3); /* 60px */
     text-align: center;
 }
+.article-action li p[icon-everytime] {
+    font-size: 1.2rem;
+    padding-bottom: 0.5rem;
+}
 .article-action label,
 .article-action a {
     color: var(--text-header-color);

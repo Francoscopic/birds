@@ -65,25 +65,26 @@
         </span>
     </div>
 
+    {# Actions #}
     <section class="article-action">
         <ul class="nt-ul-none nt-lay-flex">
             <li class="">
                 <label action-like>
                     <input type="checkbox" name="like" class="atc-note-like-input hd" {{ canvas.notes.reaction.like_checked }} />
-                    <p><i class="{{ canvas.notes.reaction.like_icon }}"></i></p>
-                    <p class="nt-ft-lato nt-txt-sm8"></p>
+                    <p icon-everytime><i class="{{ canvas.notes.reaction.like_icon }}"></i></p>
+                    <p class="nt-ft-lato nt-txt-sm8">{{ canvas.notes.reaction.like_number }}</p>
                 </label>
             </li>
             <li class="">
-                <a href="comments.php?wp={{ canvas.notes.article.pid }}" class="nt-a">
-                    <p><i class="far fa-comment"></i></p>
+                <a href="{{ canvas.notes.article.comment_url }}" class="nt-a">
+                    <p icon-everytime><i class="far fa-comment"></i></p>
                     <p class="nt-ft-lato nt-txt-sm8">{{ canvas.notes.reaction.comment_number }}</p>
                 </a>
             </li>
             <li class="">
                 <label action-save>
                     <input type="checkbox" name="save" class="atc-note-save-input hd" {{ canvas.notes.reaction.save_checked }} />
-                    <p><i class="{{ canvas.notes.reaction.save_icon }}"></i></p>
+                    <p icon-everytime><i class="{{ canvas.notes.reaction.save_icon }}"></i></p>
                     <p class="nt-ft-lato nt-txt-sm8">Save</p>
                 </label>
             </li>
@@ -143,7 +144,7 @@
         {% for note in canvas.notes.note_more %}
             <div class="artHist">
                 <span id="page-assistant" class="hd" pid="{{note.pid}}" uid=""></span>
-                <a href="/a/{{note.pid}}" class="vw-anchor-pages artHist-a a">
+                <a href="{{note.post_url}}" class="artHist-a a">
                     <div class="artHist-display lozad rad4 bck fwl" data-background-image="{{note.cover}}">
 
                     </div>
@@ -163,7 +164,7 @@
 
 
 {% block script_modules %}
-    <script type="module" type="text/javascript" src="{{  asset('scripts/index.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('scripts/article/copy_on_click.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('scripts/article/article_verbs.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/copy_on_click.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/article_verbs.js')}}"></script>
 {% endblock %}

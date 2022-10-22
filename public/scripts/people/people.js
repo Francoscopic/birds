@@ -23,20 +23,6 @@ function growPeople() {
                         ? (a("msg", 'Oops. No more notes. <a href="pages/write.php">Share</a> yours today.'), c())
                         : (s.append(o),
                           lozad().observe(),
-                          (function () {
-                              const o = "1",
-                                  e = $(".vw-anchor-pages");
-                              $(e).on("click", function () {
-                                  var e = $(this).siblings("#page-assistant"),
-                                      n = e.attr("pid"),
-                                      t = e.attr("muid");
-                                  !(function (e, n) {
-                                      $.post("depends/profiles/article/verbs.php", { views: o, note_id: e, viewer_id: n }, function () {}).fail(function (o, e, n) {
-                                          console.error(n);
-                                      });
-                                  })(n, t);
-                              });
-                          })(),
                           c());
                 }).fail(function (o, e, n) {
                     console.error(n);

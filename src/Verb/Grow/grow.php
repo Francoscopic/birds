@@ -7,21 +7,6 @@ grow();
 
 function grow() {
 
-    if( isset($_POST['grow_home']) ) {
-
-        $which_home = $_POST['grow_home'];
-
-        if( $which_home === 'home' ) {
-            grow_home();    // Index page
-            // echo 'Working';
-        }
-        if( $which_home === 'community' ) {
-            // grow_community();   // Community page
-        }
-
-        unset($which_home);
-    }
-
     if( isset($_POST['grow_people']) ) {
         grow_people();  // People page
     }
@@ -39,85 +24,6 @@ function grow() {
 
         unset($which);
     }
-}
-
-function grow_home() {
-
-    global $connection_sur;
-
-        $uid = $_POST['uid'];
-        $current_position = $_POST['start'];
-
-        $stmt = $connection_sur->prepare("SELECT sid, uid, pid FROM big_sur WHERE uid NOT IN 
-                                            (SELECT publisher FROM mute WHERE customer = '$uid' AND state = 1) 
-                                            AND access = 1 
-                                            ORDER BY sid DESC LIMIT $current_position, 15");
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) )
-        {
-
-            # Get post and my details
-                $the_pid = $get_rows['pid'];
-                $poster_uid = $get_rows['uid'];
-            #
-
-            # Instantiate acting variables
-                $my_note_row = get_this_note($the_pid);
-                $note_title  = stripslashes($my_note_row['title']);
-                $note_parags = $my_note_row['paragraphs'];
-                $note_cover  = note_cover($my_note_row['cover'], 'notes', 'home');
-                $note_state_article_or_image = ($my_note_row['state'] == 'art') ? 'hd' : '';
-                $note_date   = timeAgo($my_note_row['date']);
-            #
-
-            $get_me            = get_me($poster_uid);
-            $note_poster_name  = $get_me['name'];
-            $note_poster_uname = $get_me['username'];
-
-            # Get me view details
-                $if_view = get_if_views($the_pid, $uid);
-                $view_eye = ($if_view === true) ? '' : '*';
-            #
-
-            # Get small_menu details
-                $small_menu_state = small_menu_validations($the_pid, $uid);
-                $save_state = $small_menu_state['save'];
-                $like_state = $small_menu_state['like'];
-                $unlike_state = $small_menu_state['unlike'];
-            #
-    ?>
-                <div class="nts-host relative">
-                    <span id="page-assistant" class="hd" pid="<?php echo $the_pid ?>" puid="<?php echo $poster_uid ?>" uid="<?php echo $uid ?>" read="<?php echo PageRoutes('base', '?wp='. $the_pid)['article'] ?>" title="<?php echo $note_title ?>" poster="<?php echo $note_poster_name ?>" save_state="<?php echo $save_state ?>" like_state="<?php echo $like_state ?>" unlike_state="<?php echo $unlike_state ?>"></span>
-                    <a href="<?php echo PageRoutes('base', '?wp='. $the_pid)['article'] ?>" class="vw-anchor nts-host-anchor a">
-                        <div class="nts-host-display lozad bck relative" data-background-image="<?php echo $note_cover ?>">
-                            <div class="nts-host-display-type nt-ui-rad4 ft-sect <?php echo $note_state_article_or_image ?>"><span>photo</span></div>
-                            <div class="nts-host-display-filter"></div>
-                        </div>
-                        <div class="nts-host-verb ft-sect">
-                            <p>
-                                <strong title="Paragraphs"><?php echo $note_parags ?></strong><span class=""> paragraphs</span>
-                            </p>
-                        </div>
-                        <div id="nts-host-title" class="nts-host-title">
-                            <p class="trn3-color"><?php echo $view_eye ?><?php echo ShowMore($note_title, 14) ?></p>
-                        </div>
-                    </a>
-                    <div class="nts-host-verb-author ft-sect">
-                        <a href="<?php echo PageRoutes('base', '?up='. $note_poster_uname)['people'] ?>" class="a">
-                            <p><?php echo $note_poster_name ?></p>
-                        </a>
-                        <a href="#" class="a">
-                            <button class="nts-show-menu no-bod" visit="<?php echo $visitor_state ?>"><i class="lg-i fa fa-ellipsis-v"></i></button>
-                        </a>
-                    </div>
-                </div>
-    <?php
-            }
-            unset($connection_sur, $uid, $current_position, $stmt, $get_result, $get_rows);
-            unset($the_pid, $poster_uid, $my_note_row, $note_title, $note_parags, $note_cover, $note_date, $note_poster_name, $note_poster_uname, $if_view, $view_eye);
-    #
 }
 
 function grow_people() {
@@ -195,7 +101,7 @@ function grow_people_profile($db, $conn, $page) {
     ?>
             <div class="nts-host">
                 <span id="page-assistant" class="hd" pid="<?php echo $the_pid ?>" uid="<?php echo $uid ?>" muid="<?php echo $muid ?>"></span>
-                <a href="article.php?wp=<?php echo $the_pid ?>" class="vw-anchor-pages nts-host-anchor a">
+                <a href="article.php?wp=<?php echo $the_pid ?>" class="nts-host-anchor a">
                     <div class="nts-host-banner relative">
                         <div class="nts-host-display lozad rad2 bck" data-background-image="<?php echo $note_cover ?>">
                         </div>
