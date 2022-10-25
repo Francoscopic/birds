@@ -24,27 +24,27 @@ class ArticleLikeHome extends AbstractController
         if( isset( $_POST['thePid'], $_POST['theReason'] ) )
         {
             $pid    = $_POST['thePid'];
-            $puid   = self::get_poster_uid($pid)['data']; // poster-user_id
+            $puid   = IndexFunction::get_poster_uid($pid)['data']; // poster-user_id
             $uid    = $viewer_id;
             $reason = $_POST['theReason'];
     
-            if( trim($reason) == 'save' ) 
+            if( trim($reason) == 'save' )
             {
                 $this->note($pid, $puid, $uid);
             }
-            if( trim($reason) == 'like' ) 
+            if( trim($reason) == 'like' )
             {
                 $this->like($pid, $puid, $uid);
             }
-            if( trim($reason == 'unlike') ) 
+            if( trim($reason == 'unlike') )
             {
                 $this->unlike($pid, $puid, $uid);
             }
-            if( trim($reason == 'share') ) 
+            if( trim($reason == 'share') )
             {
                 // Coming soon
             }
-            if( trim($reason) == 'report' ) 
+            if( trim($reason) == 'report' )
             {
                 // Here PUID is => report data.
                 $this->report($pid, $uid, $_POST['other']);
@@ -215,24 +215,5 @@ class ArticleLikeHome extends AbstractController
         $stmt->bind_param('ssss', $thePid, $theUid, $thisID, $theReportData_asPUid);
         $stmt->execute();
         unset($connection_verb, $stmt, $thisID, $thePid, $theReportData_asPUid, $theUid);
-    }
-
-    protected function get_poster_uid($post_id): array
-    {
-        // Database Access
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        $stmt = $connection_sur->prepare('SELECT uid FROM big_sur WHERE pid = ?');
-        $stmt->bind_param('s', $post_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_array(MYSQLI_ASSOC);
-        $poster_uid = $row['uid'];
-
-        return array(
-            'data' => $poster_uid,
-            'message' => '',
-        );
     }
 }

@@ -326,12 +326,11 @@ class IndexFunction
                 uid: user ID,
                 file: link to file,
                 type: "notes" or "profile",
-                page: "pages" or "home"
             */
             $test_default = self::def_cover_display($file, $path);
             if($test_default == false) {
-                $dir_a = self::get_path($path) . '/community/notes/shk_' . $file;
-                $dir_b = self::get_path($path) . '/community/profiles/' . self::get_size($size) . $file;
+                $dir_a = self::image_file_paths('note')['content'] . $file;
+                $dir_b = self::image_file_paths('profile')['content'] . self::get_size($size) . $file;
 
                 $dir = ($typ == 'notes') ? $dir_a : $dir_b; # Find which folder: notes/profile
 
@@ -350,8 +349,8 @@ class IndexFunction
         public static function def_cover_display($file, $path)
         {
             $disp_name = explode('.', $file)[0];
-            if($disp_name == 'display') return self::get_path($path).'/users/display.jpg';
-            if($disp_name == 'cover') return self::get_path($path).'/users/cover.jpg';
+            if($disp_name == 'display') return self::image_file_paths('user')['content'] . 'display.jpg';
+            if($disp_name == 'cover') return self::image_file_paths('user')['content'] . 'cover.jpg';
             return false;
         }
         public static function get_path($page): string
@@ -444,7 +443,7 @@ class IndexFunction
             $connection_sur = new DatabaseAccess();
             $connection_sur = $connection_sur->connect('sur');
 
-            $stmt = $connection_sur->prepare('SELECT bs.uid, bs.font, bs.theme, bsl.title,
+            $stmt = $connection_sur->prepare('SELECT bs.uid, bsl.title,
                                                     bsl.note, bsl.cover, bsl.cover_extension, bsl.date
                                                     FROM big_sur bs INNER JOIN big_sur_list bsl
                                                     ON bs.pid = bsl.pid
@@ -457,28 +456,26 @@ class IndexFunction
             $result_array = $get_result->fetch_array(MYSQLI_ASSOC);
 
             // Instantiate the variables
-            $title   = $result_array['title'];
-            $note    = $result_array['note'];
-            $cover   = $result_array['cover'];
+            $title      = $result_array['title'];
+            $note       = $result_array['note'];
+            $cover      = self::image_file_paths('note')['content'] . self::get_size('small') . $result_array['cover'];
+            $cover_lg   = self::image_file_paths('note')['content'] . $result_array['cover'];
             $extensions = $result_array['cover_extension'];
-            $date    = $result_array['date'];
+            $date       = $result_array['date'];
 
             $note_poster_id = $result_array['uid'];
-            $note_font = $result_array['font'];
-            $note_theme = $result_array['theme'];
 
             unset($connection_sur, $stmt, $get_result, $result_array);
             // Send them to page
             return array(
-                'poster_id'=>$note_poster_id,
-                'post_id'=>$thePid,
-                'title'=>$title,
-                'note'=>$note,
-                'cover'=>$cover,
-                'extensions'=>$extensions,
-                'date'=>$date,
-                'font'=>$note_font,
-                'theme'=>$note_theme
+                'poster_id'  => $note_poster_id,
+                'post_id'    => $thePid,
+                'title'      => $title,
+                'note'       => $note,
+                'cover'      => $cover,
+                'cover_full' => $cover_lg,
+                'extensions' => $extensions,
+                'date'       => $date,
             );
         }
         public static function get_note_poster($theUid): array
@@ -498,22 +495,40 @@ class IndexFunction
             $stmt->execute();
 
             // Get data
-            $get_result = $stmt->get_result();
+            $get_result   = $stmt->get_result();
             $result_array = $get_result->fetch_array(MYSQLI_ASSOC);
 
             // Instantiate variables
-            $name = $result_array['name'];
+            $name      = $result_array['name'];
             $user_name = strtolower($result_array['uname']);
-            $display = $result_array['display'];
+            $display   = self::image_file_paths('profile')['content'] . self::get_size('small') . $result_array['display'];
 
             // Kill variables
             unset($stmt, $connection, $result_array, $get_result, $theUid);
 
             // Return variables
             return array(
-                'name'=>$name,
-                'username'=>$user_name,
-                'display'=>$display
+                'name'     => $name,
+                'username' => $user_name,
+                'display'  => $display
+            );
+        }
+        public static function get_poster_uid($post_id): array
+        {
+            // Database Access
+            $connection_sur = new DatabaseAccess();
+            $connection_sur = $connection_sur->connect('sur');
+
+            $stmt = $connection_sur->prepare('SELECT uid FROM big_sur WHERE pid = ?');
+            $stmt->bind_param('s', $post_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_array(MYSQLI_ASSOC);
+            $poster_uid = $row['uid'];
+
+            return array(
+                'data' => $poster_uid,
+                'message' => '',
             );
         }
         public static function save_like_verb($table, $theUid, $thePosterUid, $thePid, $type, $state = 1): array
@@ -989,7 +1004,7 @@ class IndexFunction
                 case 'support':
                     $file_path = '/images/support/';
                     break;
-                case 'users':
+                case 'user':
                     $file_path = '/images/users/';
                 default:
                     $file_path = '/images/misc/';

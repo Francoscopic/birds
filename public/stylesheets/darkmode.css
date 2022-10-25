@@ -346,11 +346,13 @@ body, html {
         color: var(--text-dark-color);
     }
 
-    .atc-note-subscribe-input:not(:checked) + p,
     .atc-note-save-input:not(:checked) + p,
     .atc-note-unlike-input:not(:checked) + p,
     .atc-note-like-input:not(:checked) + p {
         color: var(--text-dark-subheader-color);
+    }
+    .atc-note-subscribe-input:not(:checked) + p {
+        color: var(--nt-color-1);
     }
     .article-action label,
     .article-action a {

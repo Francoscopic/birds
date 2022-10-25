@@ -73,19 +73,19 @@ class ArticleController extends AbstractController
         # WORK
             # Details for the Note, itself: FUNCTION = GET_MY_NOTE()
                 $get_note_result_array = IndexFunction::get_my_note($post_id);
-                $uid_poster = $get_note_result_array['poster_id']; # uid
-                $note_title = stripslashes($get_note_result_array['title']); # title
-                $note_note = IndexFunction::cleanRead($get_note_result_array['note']); # note
-                $note_description = IndexFunction::ShowMore($note_note); # note
-                $note_cover = IndexFunction::note_cover_article($get_note_result_array['cover'], '../../');
-                $note_extensions = IndexFunction::note_cover_extensions($get_note_result_array['cover'], $get_note_result_array['extensions'])['images'];
-                $note_views = IndexFunction::note_views($post_id) ?? 'No';
-                $note_date = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
+                $uid_poster            = $get_note_result_array['poster_id']; # uid
+                $note_title            = stripslashes($get_note_result_array['title']); # title
+                $note_note             = IndexFunction::cleanRead($get_note_result_array['note']); # note
+                $note_description      = IndexFunction::ShowMore($note_note); # note
+                $note_cover            = $get_note_result_array['cover_full'];
+                $note_extensions       = IndexFunction::note_cover_extensions($get_note_result_array['cover'], $get_note_result_array['extensions'])['images'];
+                $note_views            = IndexFunction::note_views($post_id) ?? 'No';
+                $note_date             = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
 
-                $cover_width = IndexFunction::imgNomenclature($note_cover)['width'];
-                $cover_height = IndexFunction::imgNomenclature($note_cover)['height'];
+                $cover_width           = IndexFunction::imgNomenclature($note_cover)['width'];
+                $cover_height          = IndexFunction::imgNomenclature($note_cover)['height'];
 
-                $comment_url = $this->generateUrl('note_comment', array('post_id'=>$post_id));
+                $comment_url           = $this->generateUrl('note_comment', array('post_id'=>$post_id));
 
                 $canvas['notes']['article'] = [
                     'pid'          => $post_id,
@@ -105,23 +105,25 @@ class ArticleController extends AbstractController
             # Details of the Noter, themselves: FUNCTION = GET_NOTE_POSTER()
                 $get_note_poster = IndexFunction::get_note_poster($uid_poster);
 
-                $note_poster_name = $get_note_poster['name'];
-                $note_poster_username = $get_note_poster['username'];
-                $note_poster_display = $get_note_poster['display'];
+                $note_poster_name                 = $get_note_poster['name'];
+                $note_poster_username             = $get_note_poster['username'];
+                $note_poster_display              = $get_note_poster['display'];
+                $note_poster_username_profile_url = $this->generateUrl('note_profile', array('user_name'=>$note_poster_username));
 
                 $canvas['notes']['poster'] = [
-                    'name'     => $note_poster_name,
-                    'username' => $note_poster_username,
-                    'display'  => $note_poster_display,
+                    'name'        => $note_poster_name,
+                    'username'    => $note_poster_username,
+                    'display'     => $note_poster_display,
+                    'profile_url' => $note_poster_username_profile_url,
                 ];
             #
 
             # Details of Viewer
-                $viewer_array = ($visitor_state == true) ? IndexFunction::get_note_poster(false) : IndexFunction::get_note_poster($uid);
-                $name = $viewer_array['name'];
-                $username = $viewer_array['username'];
-                $display = IndexFunction::note_cover($viewer_array['display'], 'profile', 'pages', 'small');
-                $note_posted = IndexFunction::get_number_of_notes($uid_poster); # Get the number of NOTES posted
+                $viewer_array        = ($visitor_state == true) ? IndexFunction::get_note_poster(false) : IndexFunction::get_note_poster($uid);
+                $name                = $viewer_array['name'];
+                $username            = $viewer_array['username'];
+                $display             = $viewer_array['display'];
+                $note_posted         = IndexFunction::get_number_of_notes($uid_poster); # Get the number of NOTES posted
                 $subscribe_followers = IndexFunction::subscribes($uid_poster, 'followers'); # Get the number of subscribers Author has
 
                 $canvas['notes']['viewer'] = [
@@ -269,7 +271,7 @@ class ArticleController extends AbstractController
                 $get_note_result_array = IndexFunction::get_my_note($the_pid);
                 $poster_uid = $get_note_result_array['poster_id']; # uid
                 $note_title = IndexFunction::ShowMore(stripslashes($get_note_result_array['title']), 14); # title
-                $note_cover = IndexFunction::note_cover($get_note_result_array['cover'], 'notes');
+                $note_cover = $get_note_result_array['cover'];
             #
             $note_poster_name = IndexFunction::get_me($poster_uid)['name'];
             # View details
@@ -291,7 +293,7 @@ class ArticleController extends AbstractController
         return $content;
     }
 
-    protected function article_share_url($url, array $params) 
+    protected function article_share_url($url, array $params)
     {
         $url .= '?';
         foreach($params as $key => $value) {

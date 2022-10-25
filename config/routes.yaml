@@ -28,4 +28,10 @@ ajax_article_save_views:
 ajax_article_save_shares:
     path: /ajax/verb/article/share/
     controller: App\Verb\Home\ArticleViewsHome::views
+ajax_article_verbs:
+    path: /ajax/verb/article/verbs/
+    controller: App\Verb\Home\ArticleLikeHome::verbs
+ajax_article_follows:
+    path: /ajax/verb/article/follows/
+    controller: App\Verb\Home\ArticleFollowHome::verbs
 

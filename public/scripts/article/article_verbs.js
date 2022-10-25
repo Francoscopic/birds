@@ -3,10 +3,6 @@ import Cookies from '/scripts/plugins/cookies/api.js';
 
 const page_assistant = $("span#page-assistant"),
     pid  = page_assistant.attr("pid"); //post id
-    // puid = page_assistant.attr("puid"), //poster uid
-    // uid  = page_assistant.attr("uid"); //viewer id 
-var uid_user = Cookies.get('cookie_user'),
-    uid_visitor = Cookies.get('vst');
 
 // VISITOR
     var close_exit = $('.note-small-menu-container-close'),
@@ -32,11 +28,11 @@ var uid_user = Cookies.get('cookie_user'),
     }
 // VISITOR - END
 
-function article_verbs(){
+function article_verbs(){ // working
     
     const nt_like = $(".article-action label[action-like]").children('input'),
         nt_unlike = $(".article-action label[action-unlike]").children('input'),
-        nt_save = $(".article-action label[action-save]").children('input'),
+        nt_save   = $(".article-action label[action-save]").children('input'),
         nt_follow = $("label.atc-note-subscribe[follow-button]").children('input');
 
     function e(t){
@@ -50,11 +46,11 @@ function article_verbs(){
         $(t).is(":checked") ? e(n, "far", "fas") : e(n, "fas", "far");
     }
     
-    function s(t, i, n, e){
-        $.post("depends/profiles/article/verbs.php",{thePid:t, thePUid:i, theUid:n, theReason:e},function(){
-
+    function s(t, e){
+        $.post("/ajax/verb/article/verbs/",{thePid:t, theReason:e},function(){
+            
         }).fail(function(t, i, n){
-            // console.error(n)
+            console.error(n)
         })
     }
     $(nt_like).on("click", function(){
@@ -64,8 +60,8 @@ function article_verbs(){
             return;
         }
         e(this),
-        s(pid, puid, uid, "like");
-        $(nt_unlike).is(":checked") ? (nt_unlike.prop('checked', false), e(nt_unlike), s(pid, puid, uid, 'unlike')) : null;
+        s(pid, "like");
+        $(nt_unlike).is(":checked") ? (nt_unlike.prop('checked', false), e(nt_unlike), s(pid, 'unlike')) : null;
     }),
     $(nt_unlike).on("click", function(){
         // Check if user is allowed to interact with community
@@ -74,8 +70,8 @@ function article_verbs(){
             return;
         }
         e(this),
-        s(pid, puid, uid, "unlike");
-        $(nt_like).is(":checked") ? (nt_like.prop('checked', false), e(nt_like), s(pid, puid, uid, 'like')) : null;
+        s(pid, "unlike");
+        $(nt_like).is(":checked") ? (nt_like.prop('checked', false), e(nt_like), s(pid, 'like')) : null;
     }),
     $(nt_save).on("click", function(){
         // Check if user is allowed to interact with community
@@ -84,7 +80,7 @@ function article_verbs(){
             return;
         }
         e(this);
-        s(pid, puid, uid, "note");
+        s(pid, "save");
     }),
     $(nt_follow).on("click", function(){
 
@@ -94,26 +90,22 @@ function article_verbs(){
             return;
         }
 
-        // continue
-        var t, i;
         function responseText(t){
             var i = $(t).siblings('p');
-            function ct(c, t){
+            function ct(c, t, cl='follow_state'){
                 $(c).text(t)
             }
             $(t).is(":checked") ? ct(i, "SUBSCRIBED") : ct(i, "SUBSCRIBE");
         }
         function sn(a, b){
-            $.post("depends/profiles/people/verbs.php",{publisher_uid:a, customer_uid:b}, function(){
-
+            $.post("/ajax/verb/article/follows/",{thePid:a, theReason:b}, function(){
+                
             }).fail(function(t, i, n){
-                // console.error(n)
+                console.error(n)
             })
         }
         responseText(this);
-        t = puid,
-        i = uid,
-        sn(t, i)
+        sn(pid, 'follow')
     }),
     close_exit.on('click', function(e){
         e.preventDefault();
@@ -121,33 +113,7 @@ function article_verbs(){
     })
 }
 
-function subscribe(){
-    const t = $("#subscribe-anc"),
-        i = $("#unsubscribe-anc");
-        
-        function n(t, i, n, e){
-            t.html(`<li id="" style="color:${n}" class="nao-option-li rad50 calib" title="${e}">\n <span class=""><i class="${i}"></i> <span class="nao-option-li-text"> ${e}</span></span></li>`)
-        }
-        function e(t, i){
-            $.post("depends/profiles/people/verbs.php",{publisher_uid:t,customer_uid:i},function(){
-
-            }).fail(function(t, i, n){
-                console.error(n)
-            })
-        }
-        t.on("click", function(i){
-            n(t, "sm-i fas fa-bell", "#505050", "SUBSCRIBED"),
-            e(puid, uid),
-            i.preventDefault()
-        }),
-        i.on("click", function(t){
-            n(i, "sm-i far fa-bell", "dodgerblue", "SUBSCRIBE"),
-            e(puid, uid),
-            t.preventDefault()
-        })
-}
-
-function comment_grow(t){
+$.comment_grow = function comment_grow(t){
     t.style.height = "8px",
     t.style.height = t.scrollHeight+"px"
 }
@@ -175,23 +141,30 @@ function share_comment(){
             $("#comment_un_list").prepend(`<li id="article-note-comment-park" class="nu-li ft-sect">\n <a class="a" href="comments.php?wp=${e}">\n                                <strong>${i}</strong>\n                                <span>${n}</span>\n                            </a> \n                        </li>`),
             c(t, !1, 1)
         }
+        function comment_grow(t){
+            t.style.height = "8px",
+            t.style.height = t.scrollHeight+"px"
+        }
         
-        t.on("keyup",function(i){
-            var o = $.trim($(this).val());
-            "13" == (i.keyCode ? i.keyCode : i.which) && "" != o && (c(n), c(t), r(e, s, a, o), i.preventDefault()),
-            o.length > 0 ? c(n, !1, 1) : c(n)
-        }),
-        n.on("click",function(i){
-            i.preventDefault();
-            var n = $.trim($(t).val());
-            c(t),
-            c(this),
-            r(e, s, a, n)
-        })
+    t.on("keyup", function(i){
+        comment_grow(this);
+        
+        var o = $.trim($(this).val());
+        "13" == (i.keyCode ? i.keyCode : i.which) && "" != o && (c(n), c(t), r(e, s, a, o), i.preventDefault()),
+        o.length > 0 ? c(n, !1, 1) : c(n)
+    }),
+    n.on("click", function(i){
+        i.preventDefault();
+        var n = $.trim($(t).val());
+        c(t),
+        c(this),
+        r(e, s, a, n)
+    })
 }
 
 
-// Monitor where users are sharing articles to: Facebook, Twitter, LinkedIn, or link-copy
+// Monitor where users are sharing articles to: 
+// Facebook, Twitter, LinkedIn, or link-copy
 function monitor_out_share() { // working
 
     const $trigger_facebook = $('.sharer-facebook'),
@@ -251,7 +224,6 @@ function monitor_in_share() { // working
 $(document).ready(() => {
 
     article_verbs(),
-    subscribe(),
     share_comment(),
     monitor_out_share(),
     monitor_in_share()

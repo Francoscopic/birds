@@ -54,7 +54,7 @@
         </p>
     </div>
 
-    <div class="atc-cover-bck bck lozad" id="atc-cover" width="{{ canvas.notes.article.cover_width }}" height="{{ canvas.notes.article.cover_height }}" data-background-image="{{ '/images/community/notes/' ~ canvas.notes.article.cover }}">
+    <div class="atc-cover-bck bck lozad" id="atc-cover" width="{{ canvas.notes.article.cover_width }}" height="{{ canvas.notes.article.cover_height }}" data-background-image="{{ canvas.notes.article.cover }}">
 
     </div>
 
@@ -94,8 +94,8 @@
     <section class="article-poster atc-width">
         <h2 about-section>About Writer</h2>
         <ul class="nt-ul-none nt-lay-flex" img-name>
-            <a href="people.php?up={{ canvas.notes.poster.username }}" class="nt-a">
-                <li class="nt-ui-bck nt-ui-rad50 lozad" data-background-image="{{ '/images/community/profiles/' ~ canvas.notes.poster.display }}" img></li>
+            <a href="{{ canvas.notes.poster.profile_url }}" class="nt-a">
+                <li class="nt-ui-bck nt-ui-rad50 lozad" data-background-image="{{ canvas.notes.poster.display }}" img></li>
             </a>
             <li class="">
                 <ul class="nt-ul-none">
@@ -120,7 +120,20 @@
     <div class="atc-comment atc-width">
         <p class="atc-comment-caveat rad2 ft-sect">Be frank and respectful. We have <a href="#">policies</a>, though.</p>
 
-        {# {{}} #}
+        {% if canvas.profile.visitor_state == false %}
+            <form method="post" name="comment">
+                <div class="cmt-container clear-fix">
+                    <div class="cmt-user-img bck lozad" data-background-image="{{ canvas.notes.viewer.display }}">
+                    </div>
+                    <div id="cmt-area" class="cmt-area">
+                        <input type="hidden" id="comment-assistant" pid="{{ canvas.notes.article.pid }}" name="{{ canvas.notes.poster.name }}" uname="{{ canvas.notes.poster.username }}" />
+                        {# <textarea onkeyup="comment_grow(this)" name="comment" id="cmt-area-textarea" class="cmt-area-textarea noresize ft-sect" placeholder="Share your thoughts.."></textarea><!-- #}
+                        <textarea name="comment" id="cmt-area-textarea" class="cmt-area-textarea noresize ft-sect" placeholder="Share your thoughts.."></textarea><!--
+                        --><button id="cmt-area-post" class="atc-area-but opas5" disabled>Post</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
 
         <div class="atc-comment-thoughts">
             <ul id="comment_un_list" class="ul">
