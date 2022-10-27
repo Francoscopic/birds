@@ -113,44 +113,45 @@ function article_verbs(){ // working
     })
 }
 
-$.comment_grow = function comment_grow(t){
-    t.style.height = "8px",
-    t.style.height = t.scrollHeight+"px"
-}
 function share_comment(){
     var t = $(".cmt-area-textarea"),
         i = $("#comment-assistant"),
         n = $("#cmt-area-post"),
         e = i.attr("pid"),
-        s = i.attr("puid"),
-        a = i.attr("uid"),
         o = i.attr("name");
         
         function c(t, i=!0, n=".5"){
             $(t).attr("disabled", i).css("opacity",n)
         }
-        function r(i, e, s, a){
-            $.post("depends/profiles/article/verbs.php",{com_pid:i,com_puid:e,com_uid:s,com:a},function(i){
-                "10" === $.trim(i) && (t.val(""), c(n), u(o, a))
-            }).fail(function(t, i, n){
-                console.error(n),
-                u('<span style="color:tomato" class="sm-i">Error. Please retry</span>',"")}
-            )
-        }
         function u(i, n){
-            $("#comment_un_list").prepend(`<li id="article-note-comment-park" class="nu-li ft-sect">\n <a class="a" href="comments.php?wp=${e}">\n                                <strong>${i}</strong>\n                                <span>${n}</span>\n                            </a> \n                        </li>`),
+            $("#comment_un_list").prepend(`
+                <li id="article-note-comment-park" class="nu-li ft-sect">
+                    <strong>${i}</strong>
+                    <span>${n}</span>
+                </li>`),
             c(t, !1, 1)
         }
+        function r(i, a){
+            $.post("/ajax/verb/article/comment/", {com_pid:i, com:a}, function(){
+                (
+                    t.val("").keyup(),
+                    c(n), u(o, a)
+                )
+            }).fail(function(t, i, n){
+                console.error(n),
+                u('<span style="color:tomato" class="sm-i">Error. Please retry</span>', "")
+            })
+        }
         function comment_grow(t){
-            t.style.height = "8px",
-            t.style.height = t.scrollHeight+"px"
+            t.style.height = '9px',
+            t.style.height = t.scrollHeight + "px"
         }
         
     t.on("keyup", function(i){
         comment_grow(this);
         
         var o = $.trim($(this).val());
-        "13" == (i.keyCode ? i.keyCode : i.which) && "" != o && (c(n), c(t), r(e, s, a, o), i.preventDefault()),
+        "13" == (i.keyCode ? i.keyCode : i.which) && "" != o && (c(n), c(t), r(e, o), i.preventDefault()),
         o.length > 0 ? c(n, !1, 1) : c(n)
     }),
     n.on("click", function(i){
@@ -158,7 +159,7 @@ function share_comment(){
         var n = $.trim($(t).val());
         c(t),
         c(this),
-        r(e, s, a, n)
+        r(e, n)
     })
 }
 
