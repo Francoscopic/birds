@@ -34,7 +34,7 @@ class ArticleCommentHome extends AbstractController
         )
         {
             $pid     = $this->request->request->get('com_pid');
-            $puid    = IndexFunction::get_poster_uid($pid)['data']; // poster-user_id
+            $puid    = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
             $uid     = $this->user_id;
             $comment = IndexFunction::test_input($this->request->request->get('com'));
 

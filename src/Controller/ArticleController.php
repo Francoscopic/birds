@@ -31,7 +31,7 @@ class ArticleController extends AbstractController
 
         // data
         $link = $this->generateUrl('note_posts', ['post_id'=>$post_id], UrlGeneratorInterface::ABSOLUTE_URL);
-        $this->article_found = $this->article_validate_post_id($post_id);
+        $this->article_found = IndexFunction::article_validate_post_id($post_id);
         $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
 
         if( $intruder_state == true ) {
@@ -64,7 +64,7 @@ class ArticleController extends AbstractController
                 'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title'       => 'Home',
+                'title'       => 'Article',
                 'robot'       => false,
                 'description' => '',
             ),
@@ -100,6 +100,7 @@ class ArticleController extends AbstractController
                     'date'         => $note_date,
                     'comment_url'  => $comment_url,
                 ];
+                $canvas['headers']['title'] = $note_title;
             #
 
             # Details of the Noter, themselves: FUNCTION = GET_NOTE_POSTER()
@@ -302,11 +303,6 @@ class ArticleController extends AbstractController
             $url .= $key.'='.$value.'&';
         }
         return $url;
-    }
-
-    protected static function article_validate_post_id($post_id)
-    {
-        return ( IndexFunction::GET_validate($post_id) === true ) ? true : false;
     }
 }
 

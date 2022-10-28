@@ -72,10 +72,10 @@ class IndexFunction
 
         if ($user_id == false) {
             return array(
-                'name' => 'John Doe',
+                'name'     => 'John Doe',
                 'username' => 'john_doe',
-                'display' => '',
-                'state' => false
+                'display'  => '',
+                'state'    => false,
             );
         }
 
@@ -99,9 +99,9 @@ class IndexFunction
         // Send them to page
         return array(
             'username' => $username,
-            'name' => $name,
-            'state' => $state,
-            'display' => $display
+            'name'     => $name,
+            'state'    => $state,
+            'display'  => $display,
         );
     }
 
@@ -482,7 +482,6 @@ class IndexFunction
         {
             if ($theUid == false) {
                 return array('name'=>'John Doe', 'username'=>'john_doe', 'state'=>false, 'display'=>'');
-                exit;
             }
 
             // Call database
@@ -527,7 +526,7 @@ class IndexFunction
             $poster_uid = $row['uid'];
 
             return array(
-                'data' => $poster_uid,
+                'uid'     => $poster_uid,
                 'message' => '',
             );
         }
@@ -737,6 +736,10 @@ class IndexFunction
             $transformed = trim($data);
             $transformed = filter_var($data, FILTER_UNSAFE_RAW);
             return $transformed;
+        }
+        public static function article_validate_post_id($post_id)
+        {
+            return ( self::GET_validate($post_id) === true ) ? true : false;
         }
     #
 

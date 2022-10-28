@@ -24,7 +24,7 @@ class ArticleLikeHome extends AbstractController
         if( isset( $_POST['thePid'], $_POST['theReason'] ) )
         {
             $pid    = $_POST['thePid'];
-            $puid   = IndexFunction::get_poster_uid($pid)['data']; // poster-user_id
+            $puid   = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
             $uid    = $viewer_id;
             $reason = $_POST['theReason'];
     

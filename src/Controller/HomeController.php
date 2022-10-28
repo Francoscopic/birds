@@ -35,17 +35,17 @@ class HomeController extends AbstractController
         $canvas = array(
             'notes' => array(),
             'profile' => array(
-                'username' => '',
+                'message'       => '[200] Welcome',
                 'visitor_state' => $visitor_state,
             ),
             'misc' => array(
-                'outside' => false,
+                'outside'     => false,
                 'theme_state' => $theme_data['state'],
-                'theme_logo' => $theme_data['logo'],
+                'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title' => 'Home',
-                'robot' => false,
+                'title'       => 'Home',
+                'robot'       => false,
                 'description' => 'Notes helps you share, educate and inspire with writing. And do it in just 7 paragraphs. It\'s for the creators who write.',
             ),
         );
@@ -127,12 +127,6 @@ class HomeController extends AbstractController
 
     #[Route('/about/', name: 'note_about')]
     public function about(): Response
-    {
-        return $this->render('');
-    }
-
-    #[Route('/c/{post_id}/', name: 'note_comment')]
-    public function comment(): Response
     {
         return $this->render('');
     }
