@@ -732,6 +732,12 @@ class IndexFunction
             ];
             return $font_families[$theFont];
         }
+        public static function test_input($data)
+        {
+            $transformed = trim($data);
+            $transformed = filter_var($data, FILTER_UNSAFE_RAW);
+            return $transformed;
+        }
     #
 
     # Profile

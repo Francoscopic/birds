@@ -15,7 +15,6 @@ use App\Function\IndexFunction;
 
 class ArticleCommentHome extends AbstractController
 {
-
     private $request;
     private $get_cookie;
     private $user_id;
@@ -34,11 +33,13 @@ class ArticleCommentHome extends AbstractController
             $this->request->request->has('com')
         )
         {
-            $pid    = $this->request->request->get('com_pid');
-            $puid   = IndexFunction::get_poster_uid($pid)['data']; // poster-user_id
-            $uid    = $this->user_id;
+            $pid     = $this->request->request->get('com_pid');
+            $puid    = IndexFunction::get_poster_uid($pid)['data']; // poster-user_id
+            $uid     = $this->user_id;
+            $comment = IndexFunction::test_input($this->request->request->get('com'));
 
             // Code here
+            $this->submit_comment($pid, $puid, $uid, $comment);
             
             return $this->json([
                 'message' => 'Comment saved',
@@ -49,10 +50,25 @@ class ArticleCommentHome extends AbstractController
         ]);
     }
 
-    protected function post_comment()
+    protected function submit_comment($pid, $puid, $uid, $comment)
     {
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-        // code here
+        $connection_verb = new DatabaseAccess();
+        $connection_verb = $connection_verb->connect('verb');
+
+        $thisID = rand(600, 999) . IndexFunction::randomKey(5);
+
+        # INSERT into comments
+        $stmt = $connection_verb->prepare('INSERT INTO comments (pid, puid, uid, cid) VALUES(?, ?, ?, ?)');
+        $stmt->bind_param('ssss', $pid, $puid, $uid, $thisID);
+
+        # INSERT into comments_list
+        $stmt2 = $connection_verb->prepare('INSERT INTO comments_list (cid, comment) VALUES(?, ?)');
+        $stmt2->bind_param('ss', $thisID, $comment);
+
+        # Execute INSERT
+        $stmt->execute();
+        $stmt2->execute();
+
+        unset($connection_verb, $stmt, $stmt2, $pid, $puid, $uid, $thisID, $comment);
     }
 }

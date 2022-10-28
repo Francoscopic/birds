@@ -136,10 +136,9 @@
 
         <div class="atc-comment-thoughts">
             <ul id="comment_un_list" class="ul">
-                {# {{}} #}
                 {% for comment in canvas.notes.comment %}
                     <li id="article-note-comment-park" class="nu-li ft-sect">
-                        <a class="a" href="comments.php?wp={{-comment.pid-}}">
+                        <a class="a" href="{{ comment.comment_url }}">
                             <strong>{{- comment.name -}}</strong>
                             <span>{{- comment.comment -}}</span>
                         </a>

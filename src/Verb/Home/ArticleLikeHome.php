@@ -64,7 +64,7 @@ class ArticleLikeHome extends AbstractController
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $thisID = rand(99, 9999).round(microtime(true)).randomKey( rand(2, 12) );
+        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
 
         $stmt = $connection_verb->prepare('SELECT state FROM saves WHERE uid = ? AND puid = ? AND pid = ?');
         $stmt->bind_param('sss', $theUid, $thePUid, $thePid);
@@ -102,7 +102,7 @@ class ArticleLikeHome extends AbstractController
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $thisID = rand(99, 9999).round(microtime(true)).randomKey( rand(2, 12) );
+        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
 
         $stmt = $connection_verb->prepare('SELECT state FROM likes WHERE uid = ? AND puid = ? AND pid = ?');
         $stmt->bind_param('sss', $theUid, $thePUid, $thePid);
@@ -142,7 +142,7 @@ class ArticleLikeHome extends AbstractController
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $thisID = rand(99, 9999).round(microtime(true)).randomKey( rand(2, 12) );
+        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
 
         $stmt = $connection_verb->prepare('SELECT state FROM unlikes WHERE uid = ? AND puid = ? AND pid = ?');
         $stmt->bind_param('sss', $theUid, $thePUid, $thePid);
@@ -182,7 +182,7 @@ class ArticleLikeHome extends AbstractController
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $thisID = rand(99, 9999).round(microtime(true)).randomKey( rand(2, 12) );
+        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
 
         $stmt = $connection_verb->prepare('SELECT sid FROM renotes WHERE uid = ? AND puid = ? AND pid = ? AND state = ?');
         $stmt->bind_param('ssss', $theUid, $thePUid, $thePid, $state);
@@ -209,7 +209,7 @@ class ArticleLikeHome extends AbstractController
         // Database Access
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
-        $thisID = rand(99, 9999).round(microtime(true)).randomKey( rand(2, 12) );
+        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
 
         $stmt = $connection_verb->prepare('INSERT INTO report (pid, uid, rid, sitch) VALUES(?, ?, ?, ?)');
         $stmt->bind_param('ssss', $thePid, $theUid, $thisID, $theReportData_asPUid);

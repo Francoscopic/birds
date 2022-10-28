@@ -113,7 +113,7 @@ function article_verbs(){ // working
     })
 }
 
-function share_comment(){
+function share_comment(){ // working
     var t = $(".cmt-area-textarea"),
         i = $("#comment-assistant"),
         n = $("#cmt-area-post"),
@@ -126,8 +126,10 @@ function share_comment(){
         function u(i, n){
             $("#comment_un_list").prepend(`
                 <li id="article-note-comment-park" class="nu-li ft-sect">
-                    <strong>${i}</strong>
-                    <span>${n}</span>
+                    <a href="/c/${e}/" class="a">
+                        <strong>${i}</strong>
+                        <span>${n}</span>
+                    </a>
                 </li>`),
             c(t, !1, 1)
         }

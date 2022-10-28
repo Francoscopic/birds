@@ -16,8 +16,8 @@ use App\Validation\SigninValidation;
 
 class ArticleController extends AbstractController
 {
-    protected bool $article_found = false;
-    protected string $article_message = 'Found article';
+    private bool $article_found = false;
+    private string $article_message = 'Found article';
 
     #[Route('/a/{post_id}/', name: 'note_posts')]
     public function article_start(string $post_id, Request $request): Response
@@ -26,7 +26,7 @@ class ArticleController extends AbstractController
         $login = new SigninValidation();
         $login_state = $login->alright($login->page_state);
         $uid = $login_state['uid'];
-        $visitor_state = $login_state['visit'];
+        $visitor_state  = $login_state['visit'];
         $intruder_state = $login_state['intruder'];
 
         // data
@@ -229,18 +229,20 @@ class ArticleController extends AbstractController
                 $comment_poster_uid = $get_result_row['uid'];
             #
             # Get the user i.e. commenter
-                $commenter_row = get_comment_poster($comment_poster_uid);
+                $commenter_row = IndexFunction::get_comment_poster($comment_poster_uid);
                 $comment_poster = $commenter_row['name'];
             #
             # Get the comment
-                $comments_row = get_comment($comment_id);
-                $comment_comment = $comments_row['comment'];
+                $comments_row    = IndexFunction::get_comment($comment_id);
+                $comment_comment = htmlspecialchars_decode($comments_row['comment']);
+                $comment_url     = $this->generateUrl('note_comment', array('post_id'=>$pid_note));
             #
 
             $content[] = [
-                'pid'     => $pid_note,
-                'name'    => $comment_poster,
-                'comment' => $comment_comment,
+                'pid'         => $pid_note,
+                'name'        => $comment_poster,
+                'comment'     => $comment_comment,
+                'comment_url' => $comment_url,
             ];
         }
         return $content;

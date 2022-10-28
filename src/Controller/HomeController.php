@@ -110,7 +110,7 @@ class HomeController extends AbstractController
 
         $canvas['misc']['load_more'] = $show_load_more;
 
-        return $this->render('pages/in/index.html.twig', [
+        return $this->render('/pages/in/index.html.twig', [
             'canvas' => $canvas,
         ]);
     }
