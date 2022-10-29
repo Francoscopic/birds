@@ -211,14 +211,13 @@ class ArticleController extends AbstractController
 
     protected function article_block_comments($pid_note): array
     {
-
         $content = array();
 
         # Database Access
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $stmt = $connection_verb->prepare('SELECT uid, cid FROM comments WHERE pid = ? ORDER BY sid DESC LIMIT 7');
+        $stmt = $connection_verb->prepare('SELECT co.uid, co.cid, cl.date FROM comments co INNER JOIN comments_list cl WHERE co.cid=cl.cid AND co.pid = ? ORDER BY sid DESC LIMIT 7');
         $stmt->bind_param("s", $pid_note);
         $stmt->execute();
         $get_result = $stmt->get_result();
@@ -226,8 +225,9 @@ class ArticleController extends AbstractController
         while( $get_result_row = $get_result->fetch_array(MYSQLI_ASSOC) ) {
 
             # Instantiate the variables.
-                $comment_id = $get_result_row['cid'];
+                $comment_id         = $get_result_row['cid'];
                 $comment_poster_uid = $get_result_row['uid'];
+                $comment_date       = IndexFunction::timeAgo($get_result_row['date']);
             #
             # Get the user i.e. commenter
                 $commenter_row = IndexFunction::get_comment_poster($comment_poster_uid);
@@ -244,6 +244,7 @@ class ArticleController extends AbstractController
                 'name'        => $comment_poster,
                 'comment'     => $comment_comment,
                 'comment_url' => $comment_url,
+                'date'        => $comment_date,
             ];
         }
         return $content;

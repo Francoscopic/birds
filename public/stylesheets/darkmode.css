@@ -299,18 +299,11 @@ body, html {
     #article-note-comment-park small {
         color: #e0e0e0;
     }
-    #atc-commentpg-li,
+    #article-note-comment-park a {
+        color: var(--text-dark-header-color);
+    }
     #article-note-comment-park {
         border-bottom: 1px solid #202020;
-    }
-    #atc-commentpg-li a {
-        color: #f0f0f0;
-    }
-    #atc-commentpg-li span:not(:last-of-type) {
-        color: #d0d0d0;
-    }
-    #atc-commentpg-li span:last-of-type {
-        color: #a0a0a0;
     }
 
     .nu-comment-li {

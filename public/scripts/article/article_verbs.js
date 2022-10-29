@@ -5,10 +5,10 @@ const page_assistant = $("span#page-assistant"),
     pid  = page_assistant.attr("pid"); //post id
 
 // VISITOR
-    var close_exit = $('.note-small-menu-container-close'),
+    var close_exit                  = $('.note-small-menu-container-close'),
         small_menu_parent_container = $('.notes-small-menu-container'),
-        small_menu_container = $('.nts-host-menu'),
-        isUserAllowed = page_assistant.attr('visit'); // boolean: Visitor?
+        small_menu_container        = $('.nts-host-menu'),
+        isUserAllowed               = page_assistant.attr('visit'); // boolean: Visitor?
     function small_container_visit(){
         const ele = `
         <div class="login_to_connect">
@@ -129,6 +129,7 @@ function share_comment(){ // working
                     <a href="/c/${e}/" class="a">
                         <strong>${i}</strong>
                         <span>${n}</span>
+                        <br><span>now</span>
                     </a>
                 </li>`),
             c(t, !1, 1)

@@ -39,7 +39,7 @@ class CommentController extends AbstractController
             $this->redirectToRoute('note_home');
         }
 
-        if($this->article_found === false ) {
+        if( $this->article_found === false ) {
             $this->article_message = 'We could not find your article';
             // Show the error report.
             $this->redirectToRoute('note_home'); // redirect, for now
@@ -50,6 +50,7 @@ class CommentController extends AbstractController
                 'article'   => array(),
                 'poster'    => array(),
                 'viewer'    => array(),
+                'comment'   => array(),
             ),
             'profile' => array(
                 'visitor_state' => $visitor_state,
@@ -67,9 +68,10 @@ class CommentController extends AbstractController
             ),
         );
 
-        $canvas['notes']['article'] = $this->notes_article($post_id);
-        $canvas['notes']['poster']  = $this->notes_poster($post_id, $visitor_state);
-        $canvas['notes']['viewer']  = $this->notes_viewer($uid, $visitor_state);
+        $canvas['notes']['article']  = $this->notes_article($post_id);
+        $canvas['notes']['poster']   = $this->notes_poster($post_id, $visitor_state);
+        $canvas['notes']['viewer']   = $this->notes_viewer($uid, $visitor_state);
+        $canvas['notes']['comment']  = $this->notes_comment($post_id);
 
         // modify headers
         $canvas['headers']['title'] = $this->notes_article($post_id)['title'];
@@ -77,6 +79,46 @@ class CommentController extends AbstractController
         return $this->render('/pages/in/comment.html.twig', [
             'canvas' => $canvas,
         ]);
+    }
+
+    protected function notes_comment($pid_note)
+    {
+        $connection_verb = new DatabaseAccess();
+        $connection_verb = $connection_verb->connect('verb');
+
+        $content = array();
+
+        $stmt = $connection_verb->prepare('SELECT uid, cid FROM comments WHERE pid = ? ORDER BY sid DESC LIMIT 200');
+        $stmt->bind_param("s", $pid_note);
+        $stmt->execute();
+        $get_result = $stmt->get_result();
+        while( $get_result_row = $get_result->fetch_array(MYSQLI_ASSOC) ) {
+
+            # Instantiate the variables.
+                $comment_id         = $get_result_row['cid'];
+                $comment_poster_uid = $get_result_row['uid'];
+            #
+            # Get the user i.e. commenter
+                $commenter_row  = IndexFunction::get_comment_poster($comment_poster_uid);
+                $comment_poster = $commenter_row['name'];
+                $comment_uname  = $commenter_row['username'];
+            #
+            # Get the comment
+                $comments_row    = IndexFunction::get_comment($comment_id);
+                $comment_comment = $comments_row['comment'];
+                $comment_date    = $comments_row['date'];
+            #
+
+            $profile_url = $this->generateUrl('note_profile', array('user_name'=>$comment_uname));
+
+            $content[] = [
+                'name'        => $comment_poster,
+                'comment'     => $comment_comment,
+                'profile_url' => $profile_url,
+                'date'        => IndexFunction::timeAgo($comment_date),
+            ];
+        }
+        return $content;
     }
 
     protected function notes_poster($pid, $visitor_state)

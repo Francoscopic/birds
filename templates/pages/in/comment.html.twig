@@ -3,7 +3,7 @@
 
 
 {# HEADERS #}
-    {% block description %}Read comment on articles.{% endblock %}
+    {% block description %}{{ canvas.headers.description }}{% endblock %}
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('stylesheets/notes_article.css') }}" >
     {% endblock %}
@@ -20,7 +20,6 @@
 {% block page_contents %}
 
     {# <h1>I see you</h1> #}
-
 
     <div class="">
         <div class="comment-back-article ft-sect">
@@ -54,14 +53,13 @@
         
         <div class="atc-comment-thoughts">
             <ul id="comment_un_list" class="ul ft-sect">
-                {# {% for row in canvas.comments %}
-                    <li id="atc-commentpg-li" class="nu-li atc-commentpg-li">
+                {% for row in canvas.notes.comment %}
+                    <li id="article-note-comment-park" class="nu-li ft-sect">
                         <strong><a class="a" href="{{row.profile_url}}">{{row.name}}.</a></strong>
                         <span>{{row.comment}}</span>
-                        <br>
-                        <span>{{row.date}}</span>
+                        <br><small>{{row.date}}</small>
                     </li>
-                {% endfor %} #}
+                {% endfor %}
             </ul>
         </div>
     </div>
@@ -79,5 +77,5 @@
 
 {% block script_modules %}
     <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/comment/comment_verbs.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/article_verbs.js')}}"></script>
 {% endblock %}

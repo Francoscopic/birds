@@ -345,6 +345,9 @@
 .nu-li span {
     color: #505050;
 }
+.nu-li a {
+    color: var(--text-header-color);
+}
 .npcoc-textarea {
     width: calc(100% - 10px);
     height: auto;
