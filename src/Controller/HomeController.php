@@ -115,16 +115,6 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/{user_name}/', name: 'note_profile')]
-    public function profiles(string $user_name): Response
-    {
-        $contents = $this->renderView('pages/in/profiles.html.twig', [
-            'user_name' => $user_name,
-        ]);
-
-        return new Response($contents);
-    }
-
     #[Route('/about/', name: 'note_about')]
     public function about(): Response
     {

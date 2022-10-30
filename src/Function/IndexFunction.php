@@ -823,6 +823,31 @@ class IndexFunction
             NAV;
             return $nav;
         }
+        public static function profile_check_username($user_name): array
+        {
+            $connection = new DatabaseAccess();
+            $connection = $connection->connect('');
+
+            $stmt = $connection->prepare('SELECT sid, uid FROM user_sapphire WHERE uname = ?');
+            $stmt->bind_param('s', $user_name);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $data = $result->fetch_array(MYSQLI_ASSOC);
+            $rows = $result->num_rows;
+            
+            if($rows == 1 ) {
+                return array(
+                    'message' => 'I found user',
+                    'content' => true,
+                    'uid'     => $data['uid'],
+                );
+            }
+            return array(
+                'message' => 'I couldn\'t find user',
+                'content' => false,
+                'uid'     => 'not-found',
+            );
+        }
     #
 
     # Draft

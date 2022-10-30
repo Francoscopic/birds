@@ -1,0 +1,28 @@
+
+{% extends 'pages/in/layout.html.twig' %}
+
+
+{# HEADERS #}
+    {% block darkmode_stylesheet %}
+        {% if canvas.misc.theme_state == true %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+        {% else %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/lightmode.css') }}" watch="theme" />
+        {% endif %}
+    {% endblock %}
+{# HEADERS - END #}
+
+
+{% block page_contents %}
+    <h1>{{ canvas.profile.message }}</h1>
+
+    
+{% endblock page_contents %}
+
+
+
+{% block script_modules %}
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/profiles.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/grow.js')}}"></script>
+{% endblock %}
