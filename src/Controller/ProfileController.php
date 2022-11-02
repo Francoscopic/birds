@@ -35,6 +35,9 @@ class ProfileController extends AbstractController
         $this->profile_found = IndexFunction::profile_check_username($user_name);
         $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
 
+        // my profile or not
+        $my_profile = $this->profile_found['uid'] == $uid ? true : false;
+
         if( $intruder_state === true ) {
             $this->redirectToRoute('note_home');
         }
@@ -44,13 +47,20 @@ class ProfileController extends AbstractController
             // Show the error report.
             $this->redirectToRoute('note_home'); // redirect, for now
         }
+
+        if($my_profile == false) {
+            $uid = $this->profile_found['uid'];
+        }
         
         $this->canvas = array(
             'notes' => [
-                'nav_menu'  => array(),
-                'profile'   => array(),
-                'articles'  => array(),
-                'check'     => $this->profile_found['content'],
+                'nav_menu'   => array(),
+                'profile'    => array(),
+                'articles'   => array(),
+                'validation' => [
+                    'check'      => $this->profile_found['content'],
+                    'my_profile' => $my_profile,
+                ],
             ],
             'profile' => array(
                 'visitor_state' => $visitor_state,
