@@ -762,31 +762,32 @@ class IndexFunction
 
             # Instantiate the variables
             $username = $figures_array['uname'];
-            $name = $figures_array['name'];
-            $email = $figures_array['email'];
-            $state = $figures_array['state'];
+            $name     = $figures_array['name'];
+            $email    = $figures_array['email'];
+            $state    = $figures_array['state'];
             $location = $figures_array['location'];
-            $website = $figures_array['website'];
-            $bio = $figures_array['about'];
-            $cover = $figures_array['cover'];
-            $display = $figures_array['display'];
+            $website  = $figures_array['website'];
+            $bio      = $figures_array['about'];
+            $cover    = self::image_file_paths('profile')['content'] . $figures_array['cover'];
+            $display  = self::image_file_paths('profile')['content'] . $figures_array['display'];
 
             unset($connection_sur, $stmt, $get_figures_array, $figures_array, $user_id);
             # Send them to page
             return array(
-                'username'=>$username,
-                'name'=>$name,
-                'email'=>$email,
-                'state'=>$state,
-                'location'=>$location,
-                'website'=>$website,
-                'about'=>$bio,
-                'cover'=>$cover,
-                'display'=>$display
+                'username' => $username,
+                'name'     => $name,
+                'email'    => $email,
+                'state'    => $state,
+                'location' => $location,
+                'website'  => $website,
+                'about'    => $bio,
+                'cover'    => $cover,
+                'display'  => $display
             );
         }
-        public static function profile_navigation($page='profile'): string
+        public static function profile_navigation($page='profile'): array
         {
+            $content = array();
             $highlight = 'profile-tab-active';
             $profile=$history=$draft=$saved='';
             switch ($page) {
@@ -805,23 +806,13 @@ class IndexFunction
                 default:
                     break;
             }
-            $nav = <<<NAV
-            <div class="profile-user-navigation ft-sect">
-                <a href="profiles.php" class="$profile a">
-                    <p>Notes</p>
-                </a>
-                <a href="history.php" class="$history a">
-                    <p>History</p>
-                </a>
-                <a href="draft.php" class="$draft a">
-                    <p>Drafts</p>
-                </a>
-                <a href="saved.php" class="$saved a">
-                    <p>Saved</p>
-                </a>
-            </div>
-            NAV;
-            return $nav;
+            $content = [
+                'profile' => $profile,
+                'history' => $history,
+                'draft'   => $draft,
+                'saved'   => $saved,
+            ];
+            return $content;
         }
         public static function profile_check_username($user_name): array
         {

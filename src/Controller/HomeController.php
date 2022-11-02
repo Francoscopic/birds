@@ -139,6 +139,12 @@ class HomeController extends AbstractController
         return $this->render('');
     }
 
+    #[Route('/{user_name}/followers/', name: 'note_followers')]
+    public function followers(): Response
+    {
+        return $this->render('');
+    }
+
     #[Route('/{user_name}/following/', name: 'note_following')]
     public function following(): Response
     {
@@ -159,6 +165,18 @@ class HomeController extends AbstractController
 
     #[Route('/{user_name}/change/', name: 'note_change')]
     public function change(): Response
+    {
+        return $this->render('');
+    }
+
+    #[Route('/{user_name}/draft/', name: 'note_draft')]
+    public function draft(): Response
+    {
+        return $this->render('');
+    }
+
+    #[Route('/{user_name}/desk/', name: 'note_write')]
+    public function desk(): Response
     {
         return $this->render('');
     }

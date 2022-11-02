@@ -6,13 +6,12 @@ function notes_small_menu() {
         small_menu_parent_container = $('.notes-small-menu-container'),
         small_menu_container = $('.nts-host-menu');
 
-    function small_container(title, name, link, pid, vid) {
+    function small_container(title, pid) {
         const ele = `
-        <span id="small-menu-assistant" class="hd" pid="${pid}" uid="${vid}"></span>
+        <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
         <div class="nts-host-menu-post_details">
-            <a class="a" href="${link}">
+            <a class="a" href="#">
                 <h1>${title}</h1>
-                <p>${name}</p>
             </a>
         </div>
         <div class="nts-host-menu-post-response">
@@ -45,12 +44,9 @@ function notes_small_menu() {
 
         var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
             post_id      = $assistant.attr('pid'),
-            viewer_id    = $assistant.attr('uid'),
-            article_link = $assistant.attr('read'),
-            title        = $assistant.attr('title'),
-            poster       = $assistant.attr('poster');
+            title        = $assistant.attr('title');
 
-        (small_container(title, poster, article_link, post_id, viewer_id) == true) ? small_menu_parent_container.fadeIn() : null;
+        (small_container(title, post_id) == true) ? small_menu_parent_container.fadeIn() : null;
         deleteNote(post_id, viewer_id)
     }),
     close_exit.on('click', function(e){

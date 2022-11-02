@@ -1,5 +1,6 @@
 
 {% extends 'pages/in/layout.html.twig' %}
+{% use 'pages/layout/profile.html.twig' %}
 
 
 {# HEADERS #}
@@ -14,8 +15,62 @@
 
 
 {% block page_contents %}
-    <h1>{{ canvas.profile.message }}</h1>
 
+    {% if canvas.notes.check == true %}
+        <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
+
+        </div>
+
+        <div class="center">
+
+            <div class="vf clear-fix">
+                <div class="">
+                    <div class="npo-top">
+                        <img id="profile-me-photo" class="npo-top-img rad50 lozad" data-src="{{canvas.notes.profile.display}}" />
+                        <a class="a" href="{{ path('note_change', {'user_name':canvas.notes.profile.username}) }}">
+                            <li class="npo-top-button ul ft-sect rad20 trn3-bck-color fwr" title="Update Account">
+                                <span><i class="sm-i fa fa-cog note-"></i> change</span>
+                            </li>
+                        </a>
+                        <a class="a" href="{{ path('note_write', {'user_name':canvas.notes.profile.username}) }}">
+                            <li class="npo-top-button ul ft-sect rad20 trn3-bck-color fwr" title="Share something great">
+                                <span><i class="sm-i fa fa-plus"></i> write</span>
+                            </li>
+                        </a>
+                    </div>
+                    <div class="npo-two">
+                        <h1 id="profile-me-name" class="ft-sect">{{canvas.notes.profile.name}}<br><small class="sm-i">@{{canvas.notes.profile.username}}</small></h1>
+                        <p id="profile-me-about" class="sm-i ft-sect-lite">{{canvas.notes.profile.about}}</p>
+                    </div>
+                    <div class="npo-three ft-sect">
+                        <ul class="nt-ul ul">
+                            <li><i class="sm-i far fa-map"></i> {{canvas.notes.profile.location}}</li>
+                            <li><a href="{{ path('note_followers', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.followers}}</strong> Followers</a></li>
+                            <li><a href="{{ path('note_following', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.following}}</strong> Following</a></li>
+                        </ul>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="vf">
+                <div class="pt-one">
+                    {{ block('profile_navigation') }}
+
+                    {# Notes  #}
+                    <div class="home-two-cover contain">
+                        <div id="notes-container" class="home-notes-cover clear-fix">
+                            {{ block('articles') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    {% else %}
+        <h1>{{ canvas.profile.message }}</h1>
+    {% endif %}
     
 {% endblock page_contents %}
 
