@@ -182,6 +182,7 @@ body, html {
     .note-small-menu-container-close > div {
         background-color: var(--canvas-hover-dark-palette);
     }
+    .nts-host-menu-plate,
     .menu-august,
     .nts-host-menu {
         border-color: var(--nt-border-dark-color);

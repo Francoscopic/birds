@@ -67,7 +67,7 @@ $.nt_small_menu = function () // working
     }
     function call_menu(ele) {
         small_menu.empty(),
-            small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
+        small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
     }
     function tools_contractor(pid, save_ask, like_ask, unlike_ask) {
 

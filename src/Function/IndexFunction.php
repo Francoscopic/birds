@@ -13,15 +13,17 @@ class IndexFunction
     {
         $user_file = self::retrieve_details($uid);
 
-        $username = strtolower($user_file['username']);
-        $name = stripslashes($user_file['name']);
-        $state = ($user_file['state'] === 1) ? 'darkmode' : 'lightmode';
-        $display = $user_file['display'];
+        $username       = strtolower($user_file['username']);
+        $name           = stripslashes($user_file['name']);
+        $state          = ($user_file['state'] === 1) ? 'darkmode' : 'lightmode';
+        $display        = $user_file['display'];
+        $display_small  = $user_file['display_small'];
         return array(
-            'name'=>$name,
-            'username'=>$username,
-            'state'=>$state,
-            'display'=>$display
+            'name'          => $name,
+            'username'      => $username,
+            'state'         => $state,
+            'display'       => $display,
+            'display_small' => $display_small,
         );
     }
 
@@ -69,8 +71,7 @@ class IndexFunction
 
     public static function retrieve_details($user_id): array
     {
-
-        if ($user_id == false) {
+        if ($user_id === false) {
             return array(
                 'name'     => 'John Doe',
                 'username' => 'john_doe',
@@ -90,18 +91,20 @@ class IndexFunction
         $result_array = $the_result->fetch_array(MYSQLI_ASSOC);
 
         // Instantiate the variables
-        $username = $result_array['uname'];
-        $name     = $result_array['name'];
-        $state    = $result_array['state'];
-        $display  = $result_array['display'];
+        $username       = $result_array['uname'];
+        $name           = $result_array['name'];
+        $state          = $result_array['state'];
+        $display        = self::image_file_paths('profile')['content'] . $result_array['display'];
+        $display_small  = self::image_file_paths('profile')['content'] . 'shk_' . $result_array['display'];
 
         unset($stmt, $connection, $user_id, $the_result, $result_array);
         // Send them to page
         return array(
-            'username' => $username,
-            'name'     => $name,
-            'state'    => $state,
-            'display'  => $display,
+            'username'      => $username,
+            'name'          => $name,
+            'state'         => $state,
+            'display'       => $display,
+            'display_small' => $display_small,
         );
     }
 
@@ -174,7 +177,7 @@ class IndexFunction
 
         unset($stmt, $connection, $theResult, $theResult_row, $theUid);
         return array(
-            'name' => $myName,
+            'name'     => $myName,
             'username' => $myUname
         );
     }

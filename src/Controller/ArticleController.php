@@ -55,6 +55,7 @@ class ArticleController extends AbstractController
                 'note_more' => array(),
             ],
             'profile' => array(
+                'user'          => $login_state['user'],
                 'visitor_state' => $visitor_state,
                 'message'       => $this->article_message,
             ),

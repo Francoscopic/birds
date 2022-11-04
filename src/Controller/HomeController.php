@@ -16,13 +16,13 @@ use App\Validation\SigninValidation;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'note_home')]
-    public function corpus(): Response
+    public function index(): Response
     {
         # Profile data
-        $login = new SigninValidation();
-        $login_state = $login->alright($login->page_state);
-        $uid = $login_state['uid'];
-        $visitor_state = $login_state['visit'];
+        $login          = new SigninValidation();
+        $login_state    = $login->alright($login->page_state);
+        $uid            = $login_state['uid'];
+        $visitor_state  = $login_state['visit'];
         $intruder_state = $login_state['intruder'];
 
         if( $intruder_state == true ) {
@@ -35,6 +35,7 @@ class HomeController extends AbstractController
         $canvas = array(
             'notes' => array(),
             'profile' => array(
+                'user'          => $login_state['user'],
                 'message'       => '[200] Welcome',
                 'visitor_state' => $visitor_state,
             ),

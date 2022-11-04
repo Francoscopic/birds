@@ -143,20 +143,20 @@ class SigninValidation
         unset($stmt, $visitor_id);
     }
 
-    public function alright($page_state) 
+    public function alright($page_state)
     {
         $uid = $path = '';
         $intruder = false;
 
         if( $page_state == true ) {
-            // $uid = $this->session_cell->get('uid');
             $uid = $this->cookie_cell->get('cookie_user');
             $intruder = false;
             return array(
-                'message' => '[User] Logged in',
-                'uid' => $uid,
-                'visit' => false,
+                'message'  => '[User] Logged in',
+                'uid'      => $uid,
+                'visit'    => false,
                 'intruder' => $intruder,
+                'user'     => IndexFunction::user_profile_state($uid),
             );
         } else {
 
@@ -192,17 +192,19 @@ class SigninValidation
             }
             unset($allowed_pages, $reception, $_SESSION['uid']);
             return array(
-                'message' => '[Visitor] Limited access',
-                'uid' => $uid, 
-                'visit' => true,
+                'message'  => '[Visitor] Limited access',
+                'uid'      => $uid, 
+                'visit'    => true,
                 'intruder' => $intruder,
+                'user'     => IndexFunction::user_profile_state(false),
             );
         }
         return array(
-            'message' => '[Visitor] Something horrible happened',
-            'uid' => $uid,
-            'visit' => true,
+            'message'  => '[Visitor] Something horrible happened',
+            'uid'      => $uid,
+            'visit'    => true,
             'intruder' => $intruder,
+            'user'     => IndexFunction::user_profile_state(false),
         );
     }
 }

@@ -64,6 +64,7 @@ class ProfileController extends AbstractController
                 ],
             ],
             'profile' => array(
+                'user'          => $login_state['user'],
                 'visitor_state' => $visitor_state,
                 'message'       => $this->profile_message,
             ),
