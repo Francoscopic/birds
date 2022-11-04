@@ -57,6 +57,7 @@ class ProfileController extends AbstractController
                 'nav_menu'   => array(),
                 'profile'    => array(),
                 'articles'   => array(),
+                'subscribe'  => array(),
                 'validation' => [
                     'check'      => $this->profile_found['content'],
                     'my_profile' => $my_profile,
@@ -79,9 +80,10 @@ class ProfileController extends AbstractController
         );
 
         // Work
-        $this->canvas['notes']['profile']  = $this->notes_profile($uid);
-        $this->canvas['notes']['nav_menu'] = IndexFunction::profile_navigation('profile');
-        $this->canvas['notes']['articles'] = $this->notes_articles($uid);
+        $this->canvas['notes']['profile']   = $this->notes_profile($uid);
+        $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('profile');
+        $this->canvas['notes']['articles']  = $this->notes_articles($uid);
+        $this->canvas['notes']['subscribe'] = $this->notes_subscribe($this->profile_found['uid'], $uid, $visitor_state);
 
         return $this->render('pages/in/profile.html.twig', [
             'canvas' => $this->canvas,
@@ -170,6 +172,18 @@ class ProfileController extends AbstractController
             ];
         }
         return $content;
+    }
+
+    protected function notes_subscribe($people_uid, $uid, $visitor_state)
+    {
+        $subscribe_state = ($visitor_state == true) ? false : IndexFunction::get_subscribe_state($people_uid, $uid);
+        $state_variables = IndexFunction::subscribe_state_variables($subscribe_state);
+        $sub_state_text  = $state_variables['title'];
+        $sub_state_state = $state_variables['state'];
+        return [
+            'title' => $sub_state_text,
+            'state' => $sub_state_state,
+        ];
     }
 }
 

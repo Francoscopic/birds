@@ -100,7 +100,7 @@
             <li class="">
                 <ul class="nt-ul-none">
                     <li name>
-                        <a href="people.php?up={{ canvas.notes.poster.username }}" class="nt-a">{{ canvas.notes.poster.name }}</a>
+                        <a href="{{ canvas.notes.poster.profile_url }}" class="nt-a">{{ canvas.notes.poster.name }}</a>
                     </li>
                     <li numbers>
                         <span><strong>{{ canvas.notes.viewer.note_posted }}</strong> <small>articles</small> ::</span>
@@ -152,7 +152,6 @@
 
     <div class="article-history atc-width">
         <h1 id="article-history-namer" class="ft-menu">Read More</h1>
-        {# {{}} #}
         {% for note in canvas.notes.note_more %}
             <div class="artHist">
                 <span id="page-assistant" class="hd" pid="{{note.pid}}" uid=""></span>

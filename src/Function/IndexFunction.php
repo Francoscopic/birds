@@ -253,6 +253,7 @@ class IndexFunction
     {
         $connection_sur = new DatabaseAccess();
         $connection_sur = $connection_sur->connect('sur');
+
         $stmt = $connection_sur->prepare('SELECT state FROM subscribes WHERE publisher = ? AND customer = ?');
         $stmt->bind_param('ss', $publisher_id, $customer_id);
         $stmt->execute();

@@ -5,9 +5,14 @@ function notes_small_menu() {
         close_exit = $('.note-small-menu-container-close'),
         small_menu_parent_container = $('.notes-small-menu-container'),
         small_menu_container = $('.nts-host-menu');
+    
+    var page_assistant = $('#profile-assistant'),
+        if_people      = page_assistant.attr('place');
+
+        alert(if_people);
 
     function small_container(title, pid) {
-        const ele = `
+        var ele = `
         <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
         <div class="nts-host-menu-post_details">
             <a class="a" href="#">
@@ -17,6 +22,17 @@ function notes_small_menu() {
         <div class="nts-host-menu-post-response">
             <a href="#" class="nts-delete-on-profile"><p><span class="fa fa-trash"></span> Delete</p></a>
         </div>`;
+        if(if_people == 'people') {
+            ele = `
+            <div class="nts-host-menu-post_details">
+                <a class="a">
+                    <h1>Coming soon..</h1>
+                </a>
+            </div>
+            <div class="nts-host-menu-post-response">
+                
+            </div>`;
+        }
         small_menu_container.html(ele);
         return true;
     }
