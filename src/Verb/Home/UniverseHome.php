@@ -36,15 +36,15 @@ class UniverseHome extends AbstractController
     {
         $details = IndexFunction::profile_user_figures($uid);
 
-        $name    = $details['name'];
+        $name     = $details['name'];
         $username = $details['username'];
-        $display = IndexFunction::image_file_paths('profile')['content'] . $details['display'];
+        $display  = $details['display'];
 
-        $theme_state = IndexFunction::get_user_state($uid)['state'];
+        $theme_state   = IndexFunction::get_user_state($uid)['state'];
         $theme_checked = ($theme_state == 1) ? 'checked' : '';
-        $get_theme = IndexFunction::light_mode_response($theme_state);
-        $theme_icon = $get_theme['icon'];
-        $theme_text = $get_theme['text'];
+        $get_theme     = IndexFunction::light_mode_response($theme_state);
+        $theme_icon    = $get_theme['icon'];
+        $theme_text    = $get_theme['text'];
 
         $this->menu_canvas['menu'] = [
             'name'        => $name,

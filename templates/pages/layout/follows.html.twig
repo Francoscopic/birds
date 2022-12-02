@@ -1,0 +1,55 @@
+
+{% block followers_page_one %}
+    <div class="profile-headers clear-fix">
+        <div class="profile-headers-div fwl">
+            <a class="a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}"><button class="profile-headers-button ft-sect no-bod"><i class="profile-headers-button-i sm-i fa fa-arrow-left"></i> profile</button></a>
+        </div>
+        <div class="profile-headers-div fwr">
+
+        </div>
+    </div>
+
+    <div class="pc-user-world center">
+        <div class="vf">
+            <div class="vf clear-fix">
+                <div class="pt-one">
+                    <div class="profile-user-navigation ft-sect">
+                        <a href="#" class="profile-tab-active a">
+                            <p>{{canvas.notes.profile.followers}} Followers</p>
+                        </a>
+                        <a href="{{ path('note_following', {'user_name':canvas.notes.profile.username}) }}" class="a">
+                            <p>{{canvas.notes.profile.following}} Following</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="followpage-envelope desktop-middle tablet mobile-followpage">
+            {{ block('followers_list') }}
+        </div>
+        <br>
+    </div>
+{% endblock followers_page_one %}
+
+{% block followers_list %}
+    {% if canvas.notes.follows != null %}
+        {% for row in canvas.notes.follows %}
+            <div class="followpeople clear-fix relative">
+                <a class="a" href="{{ path('note_profile', {'user_name':row.username}) }}">
+                    <div class="fwl followpeople-left">
+                        <img class="followpeople-left-img rad50 lozad" data-src="{{ row.display }}" />
+                    </div>
+                    <div class="fwl followpeople-right">
+                        <h1 class="followpeople-right-h1 ft-sect" id="followpeople-right-h1">{{ row.name }}</h1>
+                        <span class="sm-i note-e ft-sect">@{{ row.username }}</span>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <span class="center note-e ft-sect">
+            You don't have subscribers
+        </span>
+    {% endif %}
+{% endblock followers_list %}

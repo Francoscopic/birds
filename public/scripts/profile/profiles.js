@@ -9,8 +9,6 @@ function notes_small_menu() {
     var page_assistant = $('#profile-assistant'),
         if_people      = page_assistant.attr('place');
 
-        alert(if_people);
-
     function small_container(title, pid) {
         var ele = `
         <span id="small-menu-assistant" class="hd" pid="${pid}"></span>

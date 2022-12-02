@@ -51,6 +51,7 @@
 
 
 {% block people_page %}
+<span>
     <input id="profile-assistant" type="hidden" place="people" />
 
     <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
@@ -100,10 +101,12 @@
             </div>
         </div>
     </div>
+</span>
 {% endblock people_page %}
 
 
 {% block profile_page %}
+<span> 
     <input id="profile-assistant" type="hidden" place="profile" />
 
     <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
@@ -155,4 +158,5 @@
             </div>
         </div>
     </div>
+</span>
 {% endblock profile_page %}

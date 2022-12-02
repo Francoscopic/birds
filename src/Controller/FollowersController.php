@@ -16,13 +16,13 @@ use App\Validation\SigninValidation;
 
 use App\Function\ProfileFunction;
 
-class ProfileController extends AbstractController
+class FollowersController extends AbstractController
 {
     private array $profile_found;
     private string $profile_message = 'Found account';
     private array $canvas = array();
 
-    #[Route('/{user_name}/', name: 'note_profile')]
+    #[Route('/{user_name}/followers/', name: 'note_followers')]
     public function index(string $user_name, Request $request): Response
     {
         // Profile data
@@ -33,12 +33,11 @@ class ProfileController extends AbstractController
         $intruder_state = $login_state['intruder'];
 
         // data
-        $link = $this->generateUrl('note_profile', ['user_name'=>$user_name], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->profile_found = IndexFunction::profile_check_username($user_name);
         $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
 
         // my profile or not
-        $my_profile = $this->profile_found['uid'] == $uid ? true : false;
+        $my_profile = ($this->profile_found['uid'] == $uid) ? true : false;
 
         if( $intruder_state === true ) {
             $this->redirectToRoute('note_home');
@@ -58,8 +57,8 @@ class ProfileController extends AbstractController
             'notes' => [
                 'nav_menu'   => array(),
                 'profile'    => array(),
-                'articles'   => array(),
                 'subscribe'  => array(),
+                'follows'    => array(),
                 'validation' => [
                     'check'      => $this->profile_found['content'],
                     'my_profile' => $my_profile,
@@ -76,22 +75,22 @@ class ProfileController extends AbstractController
                 'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title'       => 'Profile',
-                'robot'       => false,
-                'description' => '',
+                'title'       => 'Followers',
+                'robot'       => true,
+                'description' => 'Check out the subscribers of your blog',
             ),
         );
 
         // Work
         $ProfileFunction = new ProfileFunction();
-        $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($uid);
-        $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('profile');
-        $this->canvas['notes']['articles']  = $ProfileFunction->notes_articles($uid);
-        $this->canvas['notes']['subscribe'] = $ProfileFunction->notes_subscribe($this->profile_found['uid'], $uid, $visitor_state);
+        $this->canvas['notes']['profile']           = $ProfileFunction->notes_profile($uid);
+        $this->canvas['notes']['nav_menu']          = IndexFunction::profile_navigation('profile');
+        $this->canvas['notes']['follows']           = $ProfileFunction->notes_follows($uid);
+        $this->canvas['notes']['subscribe']         = $ProfileFunction->notes_subscribe($this->profile_found['uid'], $uid, $visitor_state);
 
-        $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'];
+        $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - ' . '(Followers)';
 
-        return $this->render('pages/in/profile.html.twig', [
+        return $this->render('pages/in/followers.html.twig', [
             'canvas' => $this->canvas,
         ]);
     }
