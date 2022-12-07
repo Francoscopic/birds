@@ -182,6 +182,32 @@ class IndexFunction
         );
     }
 
+    public static function get_profile_uid($the_username=''): array 
+    {
+        $connection = new DatabaseAccess();
+        $connection = $connection->connect('');
+
+        $stmt=$connection->prepare("SELECT uid FROM user_sapphire WHERE uname = ?");
+        $stmt->bind_param('s', $the_username);
+        $stmt->execute();
+        $theResult = $stmt->get_result();
+
+        if($theResult->num_rows == 0) {
+            return [
+                'message' => 'not-found',
+                'uid'    => null,
+            ];
+        }
+
+        $theResult_row = $theResult->fetch_array(MYSQLI_ASSOC);
+        $my_uid = $theResult_row['uid'];
+
+        return [
+            'message' => 'found',
+            'uid'    => $my_uid,
+        ];
+    }
+
     public static function get_this_note($thePid): array
     {
 

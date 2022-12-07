@@ -15,10 +15,17 @@ use App\Function\IndexFunction;
 
 class ArticleFollowHome extends AbstractController
 {
+    private $request;
+    private $get_cookie;
+    public function __construct()
+    {
+        $this->request = Request::createFromGlobals();
+
+        $this->get_cookie = new RetrieveCookie();
+    }
     public function verbs(): JsonResponse
     {
-        $get_cookie = new RetrieveCookie();
-        $viewer_id = $get_cookie->get_netintui_user_id()['user_id'];
+        $viewer_id = $this->get_cookie->get_netintui_user_id()['user_id'];
 
         if( isset( $_POST['thePid'], $_POST['theReason'] ) )
         {
@@ -26,13 +33,18 @@ class ArticleFollowHome extends AbstractController
             $puid   = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
             $uid    = $viewer_id;
             $reason = $_POST['theReason'];
-
-            $get_state = $this->validate_subscribe($puid, $uid);
-    
-            if( trim($reason) == 'follow' && $get_state === false )
-            {
-                $this->subscribe_me($puid, $uid);
-            }
+            $this->work($puid, $uid, $reason);
+            return $this->json([
+                'message' => 'Data saved',
+            ]);
+        }
+        if( $this->request->request->has('publisher_uname') &&
+            $this->request->request->has('reason')
+        )
+        {
+            $puid = IndexFunction::get_profile_uid($this->request->request->get('publisher_uname'))['uid'];
+            $reason = $this->request->request->get('reason');
+            $this->work($puid, $viewer_id, $reason);
             return $this->json([
                 'message' => 'Data saved',
             ]);
@@ -40,6 +52,17 @@ class ArticleFollowHome extends AbstractController
         return $this->json([
             'message' => '[500]Something bad happened',
         ]);
+    }
+
+    protected function work($puid, $uid, $reason)
+    {
+        $has_follow_history = $this->validate_subscribe($puid, $uid);
+    
+        if( trim($reason) == 'follow' && !$has_follow_history )
+        {
+            $this->subscribe_me($puid, $uid);
+        }
+        return true;
     }
 
     protected function subscribe_me($pub_uid, $cusm_uid)
@@ -78,7 +101,7 @@ class ArticleFollowHome extends AbstractController
             unset($connection_sur, $stmt, $pub_uid, $cusm_uid, $get_result, $state);
             return true;
         }
-        return false;
+        return false; // no follow history
     }
 
     protected function unsubscribe_me($pub_uid, $cusm_uid, $state = 0)

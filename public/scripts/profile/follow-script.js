@@ -1,8 +1,7 @@
 
 function subscribe() {
     var s = $(".unsub-assistant, .page-sub-assistant"),
-        e = s.attr("puid"),
-        n = s.attr("uid"),
+        puname = s.attr("puname"),
         i = $(".followpeople-unsubs-input, .people-subs-label > input");
     var isUserAllowed = $(i).attr('visit'),
         close_exit = $('.note-small-menu-container-close'),
@@ -25,9 +24,9 @@ function subscribe() {
                 }
                 $(e).is(":checked") ? a(i, "far", "fas", n, "SUBSCRIBED") : a(i, "fas", "far", n, "SUBSCRIBE");
             })(this),
-            (s = e),
-            (i = n),
-            $.post("depends/profiles/people/verbs.php", { publisher_uid: s, customer_uid: i }, function () {}).fail(function (s, e, n) {
+            // (s = e),(i = n),
+            // $.post("depends/profiles/people/verbs.php", { publisher_uid: s, customer_uid: i }, function () {}).fail(function (s, e, n) {
+            $.post("/ajax/verb/article/follows/", { publisher_uname: puname, reason: 'follow' }, function () {}).fail(function (s, e, n) {
                 console.error(n);
             });
     });
@@ -35,13 +34,13 @@ function subscribe() {
     function small_container_visit(){
         const ele = `
         <div class="login_to_connect">
-            <div><img src="../../public/images/7.png" alt="Netintui Notes" /></div>
+            <div><img src="/images/7.png" alt="Netintui Notes" /></div>
             <p class="nt-ft-calib" message="">Log in to interact with the world on Notes.</p>
             <p class="nt-ft-robt" action="">
-                <a href="../out/aquamarine/signin.php" class="a">
+                <a href="/signin/" class="a">
                     <button>Log in</button>
                 </a>
-                <a href="../out/aquamarine/signup.php" class="a">
+                <a href="/signup/" class="a">
                     <button>Sign up</button>
                 </a>
             </p>
