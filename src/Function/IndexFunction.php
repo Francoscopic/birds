@@ -832,13 +832,13 @@ class IndexFunction
             
             if($rows == 1 ) {
                 return array(
-                    'message' => 'I found user',
+                    'message' => 'Found',
                     'content' => true,
                     'uid'     => $data['uid'],
                 );
             }
             return array(
-                'message' => 'I couldn\'t find user',
+                'message' => 'Not found',
                 'content' => false,
                 'uid'     => 'not-found',
             );
@@ -955,15 +955,15 @@ class IndexFunction
         }
         public static function subscribe_but($uid_poster, $uid): array
         {   # Get the subscribe state between the user and people
-            $subscribe_state = get_subscribe_state($uid_poster, $uid);
-            $state_variables = subscribe_state_variables($subscribe_state);
-            $subs_text  = $state_variables['title'];
-            $subs_state = $state_variables['state'];
+            $subscribe_state = self::get_subscribe_state($uid_poster, $uid);
+            $state_variables = self::subscribe_state_variables($subscribe_state);
+            $subs_text       = $state_variables['title'];
+            $subs_state      = $state_variables['state'];
 
             unset($uid_poster, $uid, $subscribe_state, $state_variables);
             return array(
-                'text'=>$subs_text,
-                'state'=>$subs_state
+                'text'  => $subs_text,
+                'state' => $subs_state
             );
         }
     #

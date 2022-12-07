@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ProfileFunction
 {
-
     public function notes_profile($uid): array
     {
         $content = array();
@@ -131,6 +130,45 @@ class ProfileFunction
                 'name'     => $subber_name,
                 'username' => $subber_uname,
                 'display'  => $subber_display,
+            ];
+        }
+        return $content;
+    }
+
+    public function notes_following($uid): array
+    {
+        $content = array();
+        $connection_sur = new DatabaseAccess();
+        $connection_sur = $connection_sur->connect('sur');
+
+        $stmt = $connection_sur->prepare("SELECT publisher FROM subscribes WHERE customer = ? AND state = 1");
+        $stmt->bind_param('s', $uid);
+        $stmt->execute();
+        $get_subs = $stmt->get_result();
+
+        $check = ($get_subs->num_rows > 0); // returns bool
+        while( $check && ($subs = $get_subs->fetch_array(MYSQLI_ASSOC)) ) {
+
+            $subs_id = $subs['publisher'];
+
+            $subs_details = IndexFunction::retrieve_details($subs_id);
+            $subber_uname   = $subs_details['username'];
+            $subber_name    = $subs_details['name'];
+            $subber_display = $subs_details['display_small'];
+
+            # For the subscribe button
+            $subs_state       = IndexFunction::subscribe_but($subs_id, $uid);
+            $subs_state_text  = $subs_state['text'];
+            $subs_state_state = $subs_state['state'];
+
+            // labour
+            $content[] = [
+                'name'     => $subber_name,
+                'username' => $subber_uname,
+                'display'  => $subber_display,
+
+                'state'      => $subs_state_state,
+                'state_text' => $subs_state_text,
             ];
         }
         return $content;

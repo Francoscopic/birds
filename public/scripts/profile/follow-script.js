@@ -1,3 +1,4 @@
+
 function subscribe() {
     var s = $(".unsub-assistant, .page-sub-assistant"),
         e = s.attr("puid"),

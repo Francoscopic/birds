@@ -38,7 +38,7 @@ class ProfileController extends AbstractController
         $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
 
         // my profile or not
-        $my_profile = $this->profile_found['uid'] == $uid ? true : false;
+        $my_profile = ($this->profile_found['uid'] == $uid) ? true : false;
 
         if( $intruder_state === true ) {
             $this->redirectToRoute('note_home');
@@ -48,10 +48,6 @@ class ProfileController extends AbstractController
             $this->profile_message = $this->profile_found['message'];
             // Show the error report.
             $this->redirectToRoute('note_home'); // redirect, for now
-        }
-
-        if($my_profile == false) {
-            $uid = $this->profile_found['uid'];
         }
         
         $this->canvas = array(
@@ -84,9 +80,9 @@ class ProfileController extends AbstractController
 
         // Work
         $ProfileFunction = new ProfileFunction();
-        $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($uid);
+        $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($this->profile_found['uid']);
         $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('profile');
-        $this->canvas['notes']['articles']  = $ProfileFunction->notes_articles($uid);
+        $this->canvas['notes']['articles']  = $ProfileFunction->notes_articles($this->profile_found['uid']);
         $this->canvas['notes']['subscribe'] = $ProfileFunction->notes_subscribe($this->profile_found['uid'], $uid, $visitor_state);
 
         $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'];

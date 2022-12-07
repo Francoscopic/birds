@@ -140,12 +140,6 @@ class HomeController extends AbstractController
         return $this->render('');
     }
 
-    #[Route('/{user_name}/following/', name: 'note_following')]
-    public function following(): Response
-    {
-        return $this->render('');
-    }
-
     #[Route('/{user_name}/saved/', name: 'note_saved')]
     public function saved(): Response
     {

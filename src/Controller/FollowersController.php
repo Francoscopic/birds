@@ -86,7 +86,6 @@ class FollowersController extends AbstractController
         $this->canvas['notes']['profile']           = $ProfileFunction->notes_profile($uid);
         $this->canvas['notes']['nav_menu']          = IndexFunction::profile_navigation('profile');
         $this->canvas['notes']['follows']           = $ProfileFunction->notes_follows($uid);
-        $this->canvas['notes']['subscribe']         = $ProfileFunction->notes_subscribe($this->profile_found['uid'], $uid, $visitor_state);
 
         $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - ' . '(Followers)';
 
