@@ -173,4 +173,50 @@ class ProfileFunction
         }
         return $content;
     }
+
+    public function  notes_history($uid): array 
+    {
+
+        $content = array();
+        $connection_verb = new DatabaseAccess();
+        $connection_verb = $connection_verb->connect('verb');
+
+        $stmt = $connection_verb->prepare("SELECT DISTINCT(pid) FROM views WHERE uid=? AND access=1 ORDER BY sid DESC LIMIT 15");
+        $stmt->bind_param('s', $uid);
+        $stmt->execute();
+        $get_result = $stmt->get_result();
+        $num_rows = $get_result->num_rows;
+
+        if($num_rows == 0) {
+            return [
+                'content' => null,
+                'message' => 'History is empty',
+            ];
+        }
+
+        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
+
+            # Get post and my details
+                $the_pid = $get_rows['pid'];
+            #
+
+            # Instantiate acting variables
+                $my_note_row = IndexFunction::get_this_note($the_pid);
+                $note_title  = stripslashes($my_note_row['title']);
+                $note_parags = $my_note_row['paragraphs'];
+                $note_cover  = IndexFunction::note_cover($my_note_row['cover'], 'notes');
+                $note_state_article_or_image = ($my_note_row['state'] == 'art') ? 'hd' : '';
+                $note_date   = IndexFunction::timeAgo($my_note_row['date']);
+            #
+
+            $note_poster_data  = IndexFunction::get_me($uid);
+            $note_poster_name  = $note_poster_data['name'];
+            $note_poster_uname = $note_poster_data['username'];
+
+            $content[] = [
+                
+            ];
+        }
+        return array('content'=>$content, 'rows'=>$num_rows);
+    }
 }

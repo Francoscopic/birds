@@ -53,6 +53,7 @@ class HistoryController extends AbstractController
         
         $this->canvas = array(
             'notes' => [
+                'nav_menu'   => array(),
                 'profile'    => array(),
                 'articles'   => array(),
                 'validation' => [
@@ -80,6 +81,7 @@ class HistoryController extends AbstractController
         // Work
         $ProfileFunction = new ProfileFunction();
         $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($this->profile_found['uid']);
+        $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('history');
         $this->canvas['notes']['articles']  = $ProfileFunction->notes_articles($this->profile_found['uid']);
 
         $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - (History)';

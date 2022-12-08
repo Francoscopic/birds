@@ -1,6 +1,6 @@
 
 {% extends 'pages/in/layout.html.twig' %}
-{# {% use 'pages/layout/profile.html.twig' %} #}
+{% use 'pages/layout/profile.html.twig' %}
 
 
 {# HEADERS #}
@@ -16,8 +16,8 @@
 
     {% if canvas.notes.validation.check == true %}
         {% if canvas.notes.validation.my_profile == true %}
-            {# {{ block('people_page') }} #}
-            <h1>Welcome</h1>
+            {{ block('history_header') }}
+            {{ block('history_body') }}
         {% else %}
             {# Access denied #}
             <h1>You do not have access to view this page</h1>

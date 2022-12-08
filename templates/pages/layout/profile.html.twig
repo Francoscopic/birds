@@ -160,3 +160,37 @@
     </div>
 </span>
 {% endblock profile_page %}
+
+
+{# HISTORY #}
+{% block history_header %}
+    <div class="profile-headers clear-fix">
+        <div class="profile-headers-div fwl">
+            <a class="a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}"><button class="profile-headers-button ft-sect no-bod"><i class="profile-headers-button-i sm-i fa fa-arrow-left"></i> profile</button></a>
+        </div>
+        <div class="profile-headers-div fwr">
+            
+        </div>
+    </div>
+{% endblock history_header %}
+
+{% block history_body %}
+    <div class="pc-user-world center">
+        <div class="vf">
+            <div class="vf clear-fix">
+                <div class="pt-one">
+
+                    {{ block('profile_navigation') }}
+
+                    <div class="home-two-cover contain bck-wht" id="bck-wht">                
+                        <div id="notes-container" class="home-notes-cover clear-fix">
+                            '. block_a()['content'] .'
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock history_body %}
+{# HISTORY - END #}
