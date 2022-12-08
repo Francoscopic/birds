@@ -77,7 +77,7 @@
     {% if canvas.notes.follows != null %}
         {% for row in canvas.notes.follows %}
             <div class="followpeople clear-fix relative">
-                <input class="unsub-assistant" type="hidden" puid="" uid=""/>
+                <input class="unsub-assistant" type="hidden" puname="{{ row.username }}" />
                 <a class="a" href="{{ path('note_profile', {'user_name':row.username}) }}">
                     <div class="fwl followpeople-left">
                         <img class="followpeople-left-img rad50 lozad" data-src="{{ row.display }}" />
@@ -89,7 +89,7 @@
                 </a>
                 <label class="followpeople-unsubs ft-sect">
                     <input type="checkbox" name="subscribe" class="followpeople-unsubs-input" {{ row.state }} />
-                    <span class=""><i class=""></i> <span>{{ row.state_text }}</span></span>
+                    <span class=""><span>{{ row.state_text }}</span></span>
                 </label>
             </div>
         {% endfor %}
@@ -110,3 +110,8 @@
         </div>
     </div>
 {% endblock follows_header %}
+
+{% block follows_script %}
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/follow-script.js')}}"></script>
+{% endblock follows_script %}

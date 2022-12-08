@@ -13,34 +13,30 @@ function subscribe() {
             (small_container_visit() == true) ? small_menu_parent_container.fadeIn() : null;
             return;
         }
-
-        var s, i;
-            (function (s) {
-                var e = $(s),
-                    n = $(s).next("span"),
-                    i = $(n).children("i");
-                function a(s, e, n, i, a) {
-                    $(s).removeClass(e).addClass(n), $(i).children("span").text(a);
-                }
-                $(e).is(":checked") ? a(i, "far", "fas", n, "SUBSCRIBED") : a(i, "fas", "far", n, "SUBSCRIBE");
-            })(this),
-            // (s = e),(i = n),
-            // $.post("depends/profiles/people/verbs.php", { publisher_uid: s, customer_uid: i }, function () {}).fail(function (s, e, n) {
-            $.post("/ajax/verb/article/follows/", { publisher_uname: puname, reason: 'follow' }, function () {}).fail(function (s, e, n) {
-                console.error(n);
-            });
+        (function (s) {
+            var e = $(s),
+                n = $(s).next("span"),
+                i = $(n).children("i");
+            function a(s, e, n, i, a) {
+                $(s).removeClass(e).addClass(n), $(i).children("span").text(a);
+            }
+            $(e).is(":checked") ? a(i, "far", "fas", n, "SUBSCRIBED") : a(i, "fas", "far", n, "SUBSCRIBE");
+        })(this),
+        $.post("/ajax/verb/article/follows/", { publisher_uname: puname, reason: 'follow' }, function () {}).fail(function (s, e, n) {
+            console.error(n);
+        });
     });
 
     function small_container_visit(){
         const ele = `
         <div class="login_to_connect">
-            <div><img src="/images/7.png" alt="Netintui Notes" /></div>
+            <div><img src="/images/support/7.png" alt="Netintui Notes" /></div>
             <p class="nt-ft-calib" message="">Log in to interact with the world on Notes.</p>
             <p class="nt-ft-robt" action="">
-                <a href="/signin/" class="a">
+                <a href="/o/signin/" class="a">
                     <button>Log in</button>
                 </a>
-                <a href="/signup/" class="a">
+                <a href="/o/signup/" class="a">
                     <button>Sign up</button>
                 </a>
             </p>

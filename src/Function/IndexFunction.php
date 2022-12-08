@@ -73,10 +73,11 @@ class IndexFunction
     {
         if ($user_id === false) {
             return array(
-                'name'     => 'John Doe',
-                'username' => 'john_doe',
-                'display'  => '',
-                'state'    => false,
+                'name'          => 'John Doe',
+                'username'      => 'john_doe',
+                'state'         => false,
+                'display'       => '',
+                'display_small' => '',
             );
         }
 
