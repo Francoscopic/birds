@@ -859,13 +859,13 @@ class IndexFunction
             
             if($rows == 1 ) {
                 return array(
-                    'message' => 'Found',
+                    'message' => 'Account Found',
                     'content' => true,
                     'uid'     => $data['uid'],
                 );
             }
             return array(
-                'message' => 'Not found',
+                'message' => 'Account Not found',
                 'content' => false,
                 'uid'     => 'not-found',
             );

@@ -146,12 +146,6 @@ class HomeController extends AbstractController
         return $this->render('');
     }
 
-    #[Route('/{user_name}/history/', name: 'note_history')]
-    public function history(): Response
-    {
-        return $this->render('');
-    }
-
     #[Route('/{user_name}/change/', name: 'note_change')]
     public function change(): Response
     {

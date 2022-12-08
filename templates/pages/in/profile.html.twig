@@ -7,8 +7,6 @@
     {% block darkmode_stylesheet %}
         {% if canvas.misc.theme_state == true %}
             <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
-        {% else %}
-            <link rel="stylesheet" href="{{ asset('/stylesheets/lightmode.css') }}" watch="theme" />
         {% endif %}
     {% endblock %}
 {# HEADERS - END #}

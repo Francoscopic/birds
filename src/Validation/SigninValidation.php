@@ -143,7 +143,7 @@ class SigninValidation
         unset($stmt, $visitor_id);
     }
 
-    public function alright($page_state)
+     public function alright($page_state)
     {
         $uid = $path = '';
         $intruder = false;
