@@ -19,10 +19,10 @@
 
 
 {# PROFILE #}
-    {% block articles %}
+    {% block profile_articles %}
         {% for board in canvas.notes.articles %}
             <div class="nts-host relative">
-                <span id="page-assistant" class="hd" title="{{board.title}}"></span>
+                <span id="page-assistant" class="hd" title="{{board.title}}" pid="{{board.pid}}"></span>
                 <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
                     <div class="nts-host-banner relative">
                         <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
@@ -42,14 +42,52 @@
                     </div>
                 </a>
                 <div class="nts-host-verb-author ft-sect">
-                    <a href="#" class="a">
-                        <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
-                    </a>
+                    {% if board.access == 1 %}
+                        <a href="#" class="a">
+                            <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                        </a>
+                    {% else %}
+                        <a class="a">
+                            <p>[Removed]</p>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
-    {% endblock articles %}
-
+    {% endblock profile_articles %}
+    
+    {% block people_articles %}
+        {% for board in canvas.notes.articles %}
+            {% if board.access == 1 %}
+                <div class="nts-host relative">
+                    <span id="page-assistant" class="hd" title="{{board.title}}"></span>
+                    <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
+                        <div class="nts-host-banner relative">
+                            <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
+                                {% if board.note_is_img == true %}
+                                    <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
+                                {% endif %}
+                                <div class="nts-host-display-filter"></div>
+                            </div>
+                        </div>
+                        <div class="nts-host-verb ft-sect">
+                            <p>
+                                <strong title="Paragraphs">{{board.paragraphs}}</strong><span class=""> paragraphs</span>
+                            </p>
+                        </div>
+                        <div id="nts-host-title" class="nts-host-title">
+                            <p class="trn3-color">{{board.if_view ~ board.title}}</p>
+                        </div>
+                    </a>
+                    <div class="nts-host-verb-author ft-sect">                    
+                        <a href="#" class="a">
+                            <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endblock people_articles %}
 
     {% block people_page %}
     <span>
@@ -96,7 +134,7 @@
                         </div>
 
                         <div id="notes-container" class="home-notes-cover people-notes-container clear-fix">
-                            {{ block('articles') }}
+                            {{ block('people_articles') }}
                         </div>
                     </div>
                 </div>
@@ -104,7 +142,6 @@
         </div>
     </span>
     {% endblock people_page %}
-
 
     {% block profile_page %}
     <span> 
@@ -153,7 +190,7 @@
                     {# Notes  #}
                     <div class="home-two-cover contain">
                         <div id="notes-container" class="home-notes-cover clear-fix">
-                            {{ block('articles') }}
+                            {{ block('profile_articles') }}
                         </div>
                     </div>
                 </div>

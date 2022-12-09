@@ -49,7 +49,8 @@ class ProfileFunction
         $connection_sur = new DatabaseAccess();
         $connection_sur = $connection_sur->connect('sur');
 
-        $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 15");
+        // $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 15");
+        $stmt = $connection_sur->prepare("SELECT uid, pid, access FROM big_sur WHERE uid = ? ORDER BY sid DESC LIMIT 15");
         $stmt->bind_param('s', $uid);
         $stmt->execute();
         $get_result = $stmt->get_result();
@@ -60,6 +61,7 @@ class ProfileFunction
             # Get post and my details
                 $the_pid    = $get_rows['pid'];
                 $poster_uid = $get_rows['uid'];
+                $the_access = $get_rows['access'];
             #
 
             # Instantiate acting variables
@@ -79,6 +81,7 @@ class ProfileFunction
                 $view_eye = ($if_view === true) ? '*' : '';
             #
             $content[] = [
+                'access'          => $the_access,
                 'pid'             => $the_pid,
                 'title'           => $note_title,
                 'paragraphs'      => $note_parags,

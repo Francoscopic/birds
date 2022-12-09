@@ -1,5 +1,7 @@
 
-function notes_small_menu() {
+
+// Working
+function profile_notes_small_menu() {
 
     var ellipsis                    = $('.nts-show-menu-profiles'),
         close_exit                  = $('.note-small-menu-container-close'),
@@ -36,23 +38,27 @@ function notes_small_menu() {
         small_menu_container.html(ele);
         return true;
     }
-    function deleteNote(pid, uid) {
+    function deleteNote(the_canvas, pid) {
         var trigger = $('.nts-delete-on-profile');
 
         trigger.on('click', function(e){
             e.preventDefault();
 
-           var confirmDelete = confirm("Confirm delete");
+           var confirmDelete = confirm("Confirm to continue");
 
            (confirmDelete == true) ? 
            (
-                $.post(`depends/profiles/profiles-activity.php`,{profile_pid:pid}),
+                $.post('/ajax/verb/profile/hide_article/',{hide_article:'',profile_pid:pid}).fail( function(a,b,er){console.error(er)} ),
+                removeFeedback(the_canvas),
                 close_exit.click()
             ) : 
             (
                 close_exit.click()
             )
-        })
+        });
+        function removeFeedback(canvas) {
+            $(canvas).parents('.nts-host-verb-author').prepend(`<a class="a"><p>[Removed]</p></a>`);
+        }
     }
 
     ellipsis.on('click', function(e){
@@ -63,7 +69,7 @@ function notes_small_menu() {
             title        = $assistant.attr('title');
 
         (small_container(title, post_id) == true) ? small_menu_parent_container.fadeIn() : null;
-        deleteNote(post_id)
+        deleteNote(this, post_id)
     }),
     close_exit.on('click', function(e){
         e.preventDefault();
@@ -71,7 +77,7 @@ function notes_small_menu() {
     })
 }
 
-// below: WORKING
+// Working
 function history_small_menu() {
     var ellipsis = $('.nts-show-menu-history'),
         close_exit = $('.note-small-menu-container-close'),
@@ -139,7 +145,7 @@ function history_small_menu() {
 
 $(document).ready(function(){
 
-    notes_small_menu(),
+    profile_notes_small_menu(),
     history_small_menu()
 });
 

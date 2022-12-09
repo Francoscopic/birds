@@ -39,4 +39,7 @@ ajax_article_comment:
     controller: App\Verb\Home\ArticleCommentHome::verbs
 
 # PROFILE
+ajax_article_hide_articles:
+    path: /ajax/verb/profile/hide_article/
+    controller: App\Verb\Home\ProfileVerbsHome::index
 
