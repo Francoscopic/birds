@@ -18,211 +18,213 @@
 {% endblock profile_navigation %}
 
 
-{% block articles %}
-    {% for board in canvas.notes.articles %}
-        <div class="nts-host relative">
-            <span id="page-assistant" class="hd" title="{{board.title}}"></span>
-            <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
-                <div class="nts-host-banner relative">
-                    <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
-                        {% if board.note_is_img == true %}
-                            <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
-                        {% endif %}
-                        <div class="nts-host-display-filter"></div>
-                    </div>
-                </div>
-                <div class="nts-host-verb ft-sect">
-                    <p>
-                        <strong title="Paragraphs">{{board.paragraphs}}</strong><span class=""> paragraphs</span>
-                    </p>
-                </div>
-                <div id="nts-host-title" class="nts-host-title">
-                    <p class="trn3-color">{{board.if_view ~ board.title}}</p>
-                </div>
-            </a>
-            <div class="nts-host-verb-author ft-sect">
-                <a href="#" class="a">
-                    <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
-                </a>
-            </div>
-        </div>
-    {% endfor %}
-{% endblock articles %}
-
-
-{% block people_page %}
-<span>
-    <input id="profile-assistant" type="hidden" place="people" />
-
-    <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
-
-    </div>
-    
-    <div class="center">
-
-        <div class="vf clear-fix">
-            <div class="">
-                <div class="npo-top relative">
-                    <img id="profile-me-photo" class="npo-top-img rad50 lozad" data-src="{{canvas.notes.profile.display}}" />
-                    <input class="page-sub-assistant" type="hidden" puname="{{canvas.notes.profile.username}}" />
-                    <label class="people-subs-label followpeople-unsubs ft-sect">
-                        <input type="checkbox" name="subscribe" class="" {{canvas.notes.subscribe.state}} visit="{{canvas.profile.visitor_state}}" />
-                        <span class=""><span>{{canvas.notes.subscribe.title}}</span></span>
-                    </label>
-                </div>
-                <div class="npo-two">
-                    <h1 id="profile-me-name" class="ft-sect">{{canvas.notes.profile.name}}<br><small class="sm-i">@{{canvas.notes.profile.username}}</small></h1>
-                    <p id="profile-me-about" class="sm-i ft-sect-lite">{{canvas.notes.profile.about}}</p>
-                </div>
-                <div class="npo-three ft-sect">
-                    <ul class="nt-ul ul">
-                        <li><i class="sm-i far fa-map"></i> {{canvas.notes.profile.location}}</li>
-                        <li><a href="{{ path('note_followers', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.followers}}</strong> Followers</a></li>
-                        <li><a href="{{ path('note_following', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.following}}</strong> Following</a></li>
-                    </ul>
-                    <br>
-                </div>
-            </div>
-        </div>
-
-        <div class="vf">
-            <div class="vf clear-fix">
-                <div class="pt-one">
-                    <div class="profile-user-navigation ft-sect">
-                        <a href="" class="profile-tab-active a">
-                            <p>Notes</p>
-                        </a>
-                    </div>
-
-                    <div id="notes-container" class="home-notes-cover people-notes-container clear-fix">
-                        {{ block('articles') }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</span>
-{% endblock people_page %}
-
-
-{% block profile_page %}
-<span> 
-    <input id="profile-assistant" type="hidden" place="profile" />
-
-    <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
-
-    </div>
-
-    <div class="center">
-
-        <div class="vf clear-fix">
-            <div class="">
-                <div class="npo-top">
-                    <img id="profile-me-photo" class="npo-top-img rad50 lozad" data-src="{{canvas.notes.profile.display}}" />
-                    <a class="a" href="{{ path('note_change', {'user_name':canvas.notes.profile.username}) }}">
-                        <li class="npo-top-button ul ft-sect rad20 trn3-bck-color fwr" title="Update Account">
-                            <span><i class="sm-i fa fa-cog note-"></i> change</span>
-                        </li>
-                    </a>
-                    <a class="a" href="{{ path('note_write', {'user_name':canvas.notes.profile.username}) }}">
-                        <li class="npo-top-button ul ft-sect rad20 trn3-bck-color fwr" title="Share something great">
-                            <span><i class="sm-i fa fa-plus"></i> write</span>
-                        </li>
-                    </a>
-                </div>
-                <div class="npo-two">
-                    <h1 id="profile-me-name" class="ft-sect">{{canvas.notes.profile.name}}<br><small class="sm-i">@{{canvas.notes.profile.username}}</small></h1>
-                    <p id="profile-me-about" class="sm-i ft-sect-lite">{{canvas.notes.profile.about}}</p>
-                </div>
-                <div class="npo-three ft-sect">
-                    <ul class="nt-ul ul">
-                        <li><i class="sm-i far fa-map"></i> {{canvas.notes.profile.location}}</li>
-                        <li><a href="{{ path('note_followers', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.followers}}</strong> Followers</a></li>
-                        <li><a href="{{ path('note_following', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.following}}</strong> Following</a></li>
-                    </ul>
-                    <br>
-                </div>
-            </div>
-        </div>
-
-        <div class="vf">
-            <div class="pt-one">
-                {{ block('profile_navigation') }}
-
-                {# Notes  #}
-                <div class="home-two-cover contain">
-                    <div id="notes-container" class="home-notes-cover clear-fix">
-                        {{ block('articles') }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</span>
-{% endblock profile_page %}
-
-
-{# HISTORY #}
-{% block history_header %}
-    <div class="profile-headers clear-fix">
-        <div class="profile-headers-div fwl">
-            <a class="a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}"><button class="profile-headers-button ft-sect no-bod"><i class="profile-headers-button-i sm-i fa fa-arrow-left"></i> profile</button></a>
-        </div>
-        <div class="profile-headers-div fwr">
-            
-        </div>
-    </div>
-{% endblock history_header %}
-
-{% block history_body %}
-    <div class="pc-user-world center">
-        <div class="vf">
-            <div class="vf clear-fix">
-                <div class="pt-one">
-
-                    {{ block('profile_navigation') }}
-
-                    <div class="home-two-cover contain bck-wht" id="bck-wht">                
-                        {{ block('history_list') }}
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock history_body %}
-
-{% block history_list %}
-    <div id="notes-container" class="home-notes-cover clear-fix">
-        {% for row in canvas.notes.articles.content %}
+{# PROFILE #}
+    {% block articles %}
+        {% for board in canvas.notes.articles %}
             <div class="nts-host relative">
-                <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
-                <a href="{{path('note_posts', {'post_id':row.pid})}}" class="nts-host-anchor a">
+                <span id="page-assistant" class="hd" title="{{board.title}}"></span>
+                <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
                     <div class="nts-host-banner relative">
-                        <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
-                            <div class="nts-host-display-type nt-ui-rad4 ft-sect {{row.type}}"><span>photo</span></div>
+                        <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
+                            {% if board.note_is_img == true %}
+                                <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
+                            {% endif %}
                             <div class="nts-host-display-filter"></div>
                         </div>
                     </div>
                     <div class="nts-host-verb ft-sect">
                         <p>
-                            <strong title="Paragraphs">{{row.paragraphs}}</strong><span class=""> paragraphs</span>
+                            <strong title="Paragraphs">{{board.paragraphs}}</strong><span class=""> paragraphs</span>
                         </p>
                     </div>
                     <div id="nts-host-title" class="nts-host-title">
-                        <p class="trn3-color">{{row.title}}</p>
+                        <p class="trn3-color">{{board.if_view ~ board.title}}</p>
                     </div>
                 </a>
                 <div class="nts-host-verb-author ft-sect">
-                    <a href="{{ path('note_profile', {'user_name':row.username}) }}" class="a">
-                        <p>{{row.name}}</p>
-                    </a>
                     <a href="#" class="a">
-                        <button class="nts-show-menu-profiles nts-show-menu-history no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                        <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
                     </a>
                 </div>
             </div>
         {% endfor %}
-    </div>
-{% endblock history_list %}
+    {% endblock articles %}
+
+
+    {% block people_page %}
+    <span>
+        <input id="profile-assistant" type="hidden" place="people" />
+
+        <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
+
+        </div>
+        
+        <div class="center">
+
+            <div class="vf clear-fix">
+                <div class="">
+                    <div class="npo-top relative">
+                        <img id="profile-me-photo" class="npo-top-img rad50 lozad" data-src="{{canvas.notes.profile.display}}" />
+                        <input class="page-sub-assistant" type="hidden" puname="{{canvas.notes.profile.username}}" />
+                        <label class="people-subs-label followpeople-unsubs ft-sect">
+                            <input type="checkbox" name="subscribe" class="" {{canvas.notes.subscribe.state}} visit="{{canvas.profile.visitor_state}}" />
+                            <span class=""><span>{{canvas.notes.subscribe.title}}</span></span>
+                        </label>
+                    </div>
+                    <div class="npo-two">
+                        <h1 id="profile-me-name" class="ft-sect">{{canvas.notes.profile.name}}<br><small class="sm-i">@{{canvas.notes.profile.username}}</small></h1>
+                        <p id="profile-me-about" class="sm-i ft-sect-lite">{{canvas.notes.profile.about}}</p>
+                    </div>
+                    <div class="npo-three ft-sect">
+                        <ul class="nt-ul ul">
+                            <li><i class="sm-i far fa-map"></i> {{canvas.notes.profile.location}}</li>
+                            <li><a href="{{ path('note_followers', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.followers}}</strong> Followers</a></li>
+                            <li><a href="{{ path('note_following', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.following}}</strong> Following</a></li>
+                        </ul>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vf">
+                <div class="vf clear-fix">
+                    <div class="pt-one">
+                        <div class="profile-user-navigation ft-sect">
+                            <a href="" class="profile-tab-active a">
+                                <p>Notes</p>
+                            </a>
+                        </div>
+
+                        <div id="notes-container" class="home-notes-cover people-notes-container clear-fix">
+                            {{ block('articles') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </span>
+    {% endblock people_page %}
+
+
+    {% block profile_page %}
+    <span> 
+        <input id="profile-assistant" type="hidden" place="profile" />
+
+        <div id="profile-me-cover" class="pc-user-cover bck lozad" data-background-image="{{canvas.notes.profile.cover}}">
+
+        </div>
+
+        <div class="center">
+
+            <div class="vf clear-fix">
+                <div class="">
+                    <div class="npo-top">
+                        <img id="profile-me-photo" class="npo-top-img rad50 lozad" data-src="{{canvas.notes.profile.display}}" />
+                        <a class="a" href="{{ path('note_change', {'user_name':canvas.notes.profile.username}) }}">
+                            <li class="npo-top-button ul ft-sect rad20 trn3-bck-color fwr" title="Update Account">
+                                <span><i class="sm-i fa fa-cog note-"></i> change</span>
+                            </li>
+                        </a>
+                        <a class="a" href="{{ path('note_write', {'user_name':canvas.notes.profile.username}) }}">
+                            <li class="npo-top-button ul ft-sect rad20 trn3-bck-color fwr" title="Share something great">
+                                <span><i class="sm-i fa fa-plus"></i> write</span>
+                            </li>
+                        </a>
+                    </div>
+                    <div class="npo-two">
+                        <h1 id="profile-me-name" class="ft-sect">{{canvas.notes.profile.name}}<br><small class="sm-i">@{{canvas.notes.profile.username}}</small></h1>
+                        <p id="profile-me-about" class="sm-i ft-sect-lite">{{canvas.notes.profile.about}}</p>
+                    </div>
+                    <div class="npo-three ft-sect">
+                        <ul class="nt-ul ul">
+                            <li><i class="sm-i far fa-map"></i> {{canvas.notes.profile.location}}</li>
+                            <li><a href="{{ path('note_followers', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.followers}}</strong> Followers</a></li>
+                            <li><a href="{{ path('note_following', {'user_name':canvas.notes.profile.username}) }}" class="a"><strong>{{canvas.notes.profile.following}}</strong> Following</a></li>
+                        </ul>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vf">
+                <div class="pt-one">
+                    {{ block('profile_navigation') }}
+
+                    {# Notes  #}
+                    <div class="home-two-cover contain">
+                        <div id="notes-container" class="home-notes-cover clear-fix">
+                            {{ block('articles') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </span>
+    {% endblock profile_page %}
+{# PROFILE - end #}
+
+
+{# HISTORY #}
+    {% block history_header %}
+        <div class="profile-headers clear-fix">
+            <div class="profile-headers-div fwl">
+                <a class="a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}"><button class="profile-headers-button ft-sect no-bod"><i class="profile-headers-button-i sm-i fa fa-arrow-left"></i> profile</button></a>
+            </div>
+            <div class="profile-headers-div fwr">
+                
+            </div>
+        </div>
+    {% endblock history_header %}
+
+    {% block history_body %}
+        <div class="pc-user-world center">
+            <div class="vf">
+                <div class="vf clear-fix">
+                    <div class="pt-one">
+
+                        {{ block('profile_navigation') }}
+
+                        <div class="home-two-cover contain bck-wht" id="bck-wht">                
+                            {{ block('history_list') }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock history_body %}
+
+    {% block history_list %}
+        <div id="notes-container" class="home-notes-cover clear-fix">
+            {% for row in canvas.notes.articles.content %}
+                <div class="nts-host relative">
+                    <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
+                    <a href="{{path('note_posts', {'post_id':row.pid})}}" class="nts-host-anchor a">
+                        <div class="nts-host-banner relative">
+                            <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
+                                <div class="nts-host-display-type nt-ui-rad4 ft-sect {{row.type}}"><span>photo</span></div>
+                                <div class="nts-host-display-filter"></div>
+                            </div>
+                        </div>
+                        <div class="nts-host-verb ft-sect">
+                            <p>
+                                <strong title="Paragraphs">{{row.paragraphs}}</strong><span class=""> paragraphs</span>
+                            </p>
+                        </div>
+                        <div id="nts-host-title" class="nts-host-title">
+                            <p class="trn3-color">{{row.title}}</p>
+                        </div>
+                    </a>
+                    <div class="nts-host-verb-author ft-sect">
+                        <a href="{{ path('note_profile', {'user_name':row.username}) }}" class="a">
+                            <p>{{row.name}}</p>
+                        </a>
+                        <a href="#" class="a">
+                            <button class="nts-show-menu-history no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endblock history_list %}
 {# HISTORY - END #}

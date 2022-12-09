@@ -180,7 +180,7 @@ class ProfileFunction
         $connection_verb = new DatabaseAccess();
         $connection_verb = $connection_verb->connect('verb');
 
-        $stmt = $connection_verb->prepare("SELECT DISTINCT(post_id) FROM visits WHERE user_id=? ORDER BY date DESC LIMIT 15");
+        $stmt = $connection_verb->prepare("SELECT DISTINCT(post_id) FROM visits WHERE user_id=? AND state=1 ORDER BY date DESC LIMIT 15");
         $stmt->bind_param('s', $uid);
         $stmt->execute();
         $get_result = $stmt->get_result();
