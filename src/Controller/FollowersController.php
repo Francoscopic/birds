@@ -19,7 +19,7 @@ use App\Function\ProfileFunction;
 class FollowersController extends AbstractController
 {
     private array $profile_found;
-    private string $profile_message = 'Found account';
+    private string $profile_message = 'Found';
     private array $canvas = array();
 
     #[Route('/{user_name}/followers/', name: 'note_followers')]
@@ -43,13 +43,7 @@ class FollowersController extends AbstractController
             $this->redirectToRoute('note_home');
         }
 
-        if($this->profile_found['content'] === false) {
-            $this->profile_message = $this->profile_found['message'];
-            // Show the error report.
-            $this->redirectToRoute('note_home'); // redirect, for now
-        }
-
-        if($my_profile == false) {
+        if(!$my_profile) {
             $uid = $this->profile_found['uid'];
         }
         
@@ -60,7 +54,7 @@ class FollowersController extends AbstractController
                 'subscribe'  => array(),
                 'follows'    => array(),
                 'validation' => [
-                    'check'      => $this->profile_found['content'],
+                    'check'      => $this->profile_found['state'],
                     'my_profile' => $my_profile,
                 ],
             ],
@@ -80,6 +74,13 @@ class FollowersController extends AbstractController
                 'description' => 'Check out the subscribers of your blog',
             ),
         );
+
+        if(!$this->profile_found['state']) {
+            // We could not find user.
+            return $this->render('pages/in/followers.html.twig', [
+                'canvas' => $this->canvas,
+            ]);
+        }
 
         // Work
         $ProfileFunction = new ProfileFunction();

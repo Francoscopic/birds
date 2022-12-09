@@ -553,12 +553,13 @@ class IndexFunction
             $stmt->bind_param('s', $post_id);
             $stmt->execute();
             $result = $stmt->get_result();
+            $num_rows = $result->num_rows;
             $row = $result->fetch_array(MYSQLI_ASSOC);
             $poster_uid = $row['uid'];
 
             return array(
                 'uid'     => $poster_uid,
-                'message' => '',
+                'message' => 'Get UID with PID',
             );
         }
         public static function save_like_verb($table, $theUid, $thePosterUid, $thePid, $type, $state = 1): array
@@ -850,24 +851,24 @@ class IndexFunction
             $connection = new DatabaseAccess();
             $connection = $connection->connect('');
 
-            $stmt = $connection->prepare('SELECT sid, uid FROM user_sapphire WHERE uname = ?');
+            $stmt = $connection->prepare('SELECT uid FROM user_sapphire WHERE uname = ?');
             $stmt->bind_param('s', $user_name);
             $stmt->execute();
             $result = $stmt->get_result();
-            $data = $result->fetch_array(MYSQLI_ASSOC);
             $rows = $result->num_rows;
             
             if($rows == 1 ) {
+                $data = $result->fetch_array(MYSQLI_ASSOC);
                 return array(
-                    'message' => 'Account Found',
-                    'content' => true,
+                    'state'   => true,
+                    'message' => 'found',
                     'uid'     => $data['uid'],
                 );
             }
             return array(
-                'message' => 'Account Not found',
-                'content' => false,
-                'uid'     => 'not-found',
+                'state'   => false,
+                'message' => 'Not found',
+                'uid'     => null,
             );
         }
     #

@@ -19,7 +19,7 @@ use App\Function\ProfileFunction;
 class HistoryController extends AbstractController
 {
     private array $profile_found;
-    private string $profile_message = 'Found account';
+    private string $profile_message = 'Undiscovered';
     private array $canvas = array();
 
     #[Route('/{user_name}/history/', name: 'note_history')]
@@ -42,14 +42,6 @@ class HistoryController extends AbstractController
         if($intruder_state) {
             $this->redirectToRoute('note_home');
         }
-
-        if(!$this->profile_found['content']) {
-            $this->profile_message = $this->profile_found['message'];
-            // Show the error report.
-            $this->redirectToRoute('note_home'); // redirect, for now
-
-            // We could not find user.
-        }
         
         $this->canvas = array(
             'notes' => [
@@ -57,7 +49,7 @@ class HistoryController extends AbstractController
                 'profile'    => array(),
                 'articles'   => array(),
                 'validation' => [
-                    'check'      => $this->profile_found['content'],
+                    'check'      => $this->profile_found['state'],
                     'my_profile' => $my_profile,
                 ],
             ],
@@ -72,17 +64,24 @@ class HistoryController extends AbstractController
                 'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title'       => 'Profile',
+                'title'       => '(History)',
                 'robot'       => false,
                 'description' => '',
             ),
         );
 
+        if(!$this->profile_found['state']) {
+            // We could not find user.
+            return $this->render('pages/in/history.html.twig', [
+                'canvas' => $this->canvas,
+            ]);
+        }
+
         // Work
         $ProfileFunction = new ProfileFunction();
         $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($this->profile_found['uid']);
         $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('history');
-        $this->canvas['notes']['articles']  = $ProfileFunction->notes_articles($this->profile_found['uid']);
+        $this->canvas['notes']['articles']  = $ProfileFunction->notes_history($this->profile_found['uid']);
 
         $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - (History)';
 

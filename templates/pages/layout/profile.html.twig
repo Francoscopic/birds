@@ -183,9 +183,7 @@
                     {{ block('profile_navigation') }}
 
                     <div class="home-two-cover contain bck-wht" id="bck-wht">                
-                        <div id="notes-container" class="home-notes-cover clear-fix">
-                            '. block_a()['content'] .'
-                        </div>
+                        {{ block('history_list') }}
                     </div>
 
                 </div>
@@ -193,4 +191,38 @@
         </div>
     </div>
 {% endblock history_body %}
+
+{% block history_list %}
+    <div id="notes-container" class="home-notes-cover clear-fix">
+        {% for row in canvas.notes.articles.content %}
+            <div class="nts-host relative">
+                <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
+                <a href="{{path('note_posts', {'post_id':row.pid})}}" class="nts-host-anchor a">
+                    <div class="nts-host-banner relative">
+                        <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
+                            <div class="nts-host-display-type nt-ui-rad4 ft-sect {{row.type}}"><span>photo</span></div>
+                            <div class="nts-host-display-filter"></div>
+                        </div>
+                    </div>
+                    <div class="nts-host-verb ft-sect">
+                        <p>
+                            <strong title="Paragraphs">{{row.paragraphs}}</strong><span class=""> paragraphs</span>
+                        </p>
+                    </div>
+                    <div id="nts-host-title" class="nts-host-title">
+                        <p class="trn3-color">{{row.title}}</p>
+                    </div>
+                </a>
+                <div class="nts-host-verb-author ft-sect">
+                    <a href="{{ path('note_profile', {'user_name':row.username}) }}" class="a">
+                        <p>{{row.name}}</p>
+                    </a>
+                    <a href="#" class="a">
+                        <button class="nts-show-menu-profiles nts-show-menu-history no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock history_list %}
 {# HISTORY - END #}

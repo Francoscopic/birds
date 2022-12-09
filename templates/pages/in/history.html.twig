@@ -16,6 +16,7 @@
 
     {% if canvas.notes.validation.check == true %}
         {% if canvas.notes.validation.my_profile == true %}
+            {# Access granted #}
             {{ block('history_header') }}
             {{ block('history_body') }}
         {% else %}
@@ -33,7 +34,5 @@
 
 {% block script_modules %}
     <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
-    {# <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/profiles.js')}}"></script> #}
-    {# <script type="module" type="text/javascript" src="{{  asset('/scripts/people/people.js')}}"></script> #}
-    {# <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/follow-script.js')}}"></script> #}
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/profiles.js')}}"></script>
 {% endblock %}

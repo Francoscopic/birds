@@ -21,8 +21,8 @@
             {{ block('following_page_one') }}
         {% endif %}
     {% else %}
-        {# Error message #}
-        <h1>{{ canvas.profile.message }}</h1>
+        {# Account not found #}
+        <h1>Account was not found</h1>
     {% endif %}
     
 {% endblock page_contents %}

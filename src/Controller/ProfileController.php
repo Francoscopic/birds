@@ -19,7 +19,7 @@ use App\Function\ProfileFunction;
 class ProfileController extends AbstractController
 {
     private array $profile_found;
-    private string $profile_message = 'Found account';
+    private string $profile_message = 'uncovered';
     private array $canvas = array();
 
     #[Route('/{user_name}/', name: 'note_profile')]
@@ -40,14 +40,8 @@ class ProfileController extends AbstractController
         // my profile or not
         $my_profile = ($this->profile_found['uid'] == $uid) ? true : false;
 
-        if( $intruder_state === true ) {
+        if( $intruder_state ) {
             $this->redirectToRoute('note_home');
-        }
-
-        if($this->profile_found['content'] === false) {
-            $this->profile_message = $this->profile_found['message'];
-            // Show the error report.
-            $this->redirectToRoute('note_home'); // redirect, for now
         }
         
         $this->canvas = array(
@@ -57,7 +51,7 @@ class ProfileController extends AbstractController
                 'articles'   => array(),
                 'subscribe'  => array(),
                 'validation' => [
-                    'check'      => $this->profile_found['content'],
+                    'check'      => $this->profile_found['state'],
                     'my_profile' => $my_profile,
                 ],
             ],
@@ -72,11 +66,17 @@ class ProfileController extends AbstractController
                 'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title'       => 'Profile',
+                'title'       => '(Profile)',
                 'robot'       => false,
                 'description' => '',
             ),
         );
+
+        if(!$this->profile_found['state']) {
+            return $this->render('pages/in/profile.html.twig', [
+                'canvas' => $this->canvas,
+            ]);
+        }
 
         // Work
         $ProfileFunction = new ProfileFunction();
