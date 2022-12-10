@@ -140,12 +140,6 @@ class HomeController extends AbstractController
         return $this->render('');
     }
 
-    #[Route('/{user_name}/saved/', name: 'note_saved')]
-    public function saved(): Response
-    {
-        return $this->render('');
-    }
-
     #[Route('/{user_name}/change/', name: 'note_change')]
     public function change(): Response
     {
