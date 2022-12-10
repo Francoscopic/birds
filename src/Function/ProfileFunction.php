@@ -42,7 +42,7 @@ class ProfileFunction
         return $content;
     }
 
-    public function notes_articles($uid)
+    public function notes_articles($uid): array
     {
         $content = array();
 
@@ -224,5 +224,37 @@ class ProfileFunction
             'content' => $content,
             'message' => 'Get articles UID has read',
         );
+    }
+
+    public function notes_draft($uid): array
+    {
+        $content = array();
+        $connection_sur = new DatabaseAccess();
+        $connection_sur = $connection_sur->connect('sur');
+
+        $stmt = $connection_sur->prepare("SELECT pid, title, body, date FROM big_sur_draft WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 10");
+        $stmt->bind_param('s', $uid);
+        $stmt->execute();
+        $get_result = $stmt->get_result();
+        $num_rows = $get_result->num_rows;
+
+        $check = ($num_rows > 0); // returns bool
+        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
+
+            # Get post and my details
+                $the_pid        = $get_rows['pid'];
+                $the_title      = stripslashes($get_rows['title']);
+                $the_paragraphs = IndexFunction::count_paragraphs($get_rows['body']);
+                $the_date       = IndexFunction::timeAgo($get_rows['date']);
+            #
+            $content[] = [
+                'pid'        => $the_pid,
+                'title'      => $the_title,
+                'paragraphs' => $the_paragraphs,
+                'date'       => $the_date,
+            ];
+        }
+        unset($connection_sur, $stmt, $get_result, $num_rows, $check, $the_pid, $the_title, $the_paragraphs, $the_date);
+        return $content;
     }
 } 

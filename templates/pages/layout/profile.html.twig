@@ -17,6 +17,21 @@
     </div>
 {% endblock profile_navigation %}
 
+{% block nav_header %}
+    <div class="profile-headers clear-fix">
+        <div class="profile-headers-div fwl">
+            <a class="a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}">
+                <button class="profile-headers-button ft-sect no-bod">
+                    <i class="profile-headers-button-i sm-i fa fa-arrow-left"></i> profile
+                </button>
+            </a>
+        </div>
+        <div class="profile-headers-div fwr">
+            
+        </div>
+    </div>
+{% endblock nav_header %}
+
 
 {# PROFILE #}
     {% block profile_articles %}
@@ -202,17 +217,6 @@
 
 
 {# HISTORY #}
-    {% block history_header %}
-        <div class="profile-headers clear-fix">
-            <div class="profile-headers-div fwl">
-                <a class="a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}"><button class="profile-headers-button ft-sect no-bod"><i class="profile-headers-button-i sm-i fa fa-arrow-left"></i> profile</button></a>
-            </div>
-            <div class="profile-headers-div fwr">
-                
-            </div>
-        </div>
-    {% endblock history_header %}
-
     {% block history_body %}
         <div class="pc-user-world center">
             <div class="vf">
@@ -233,35 +237,86 @@
 
     {% block history_list %}
         <div id="notes-container" class="home-notes-cover clear-fix">
-            {% for row in canvas.notes.articles.content %}
-                <div class="nts-host relative">
-                    <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
-                    <a href="{{path('note_posts', {'post_id':row.pid})}}" class="nts-host-anchor a">
-                        <div class="nts-host-banner relative">
-                            <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
-                                <div class="nts-host-display-type nt-ui-rad4 ft-sect {{row.type}}"><span>photo</span></div>
-                                <div class="nts-host-display-filter"></div>
+            {% if canvas.notes.articles.content != null %}
+                {% for row in canvas.notes.articles.content %}
+                    <div class="nts-host relative">
+                        <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
+                        <a href="{{path('note_posts', {'post_id':row.pid})}}" class="nts-host-anchor a">
+                            <div class="nts-host-banner relative">
+                                <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
+                                    <div class="nts-host-display-type nt-ui-rad4 ft-sect {{row.type}}"><span>photo</span></div>
+                                    <div class="nts-host-display-filter"></div>
+                                </div>
+                            </div>
+                            <div class="nts-host-verb ft-sect">
+                                <p>
+                                    <strong title="Paragraphs">{{row.paragraphs}}</strong><span class=""> paragraphs</span>
+                                </p>
+                            </div>
+                            <div id="nts-host-title" class="nts-host-title">
+                                <p class="trn3-color">{{row.title}}</p>
+                            </div>
+                        </a>
+                        <div class="nts-host-verb-author ft-sect">
+                            <a href="{{ path('note_profile', {'user_name':row.username}) }}" class="a">
+                                <p>{{row.name}}</p>
+                            </a>
+                            <a href="#" class="a">
+                                <button class="nts-show-menu-history no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h1>History is empty</h1>
+            {% endif %}
+        </div>
+    {% endblock history_list %}
+{# HISTORY - end #}
+
+
+{# DRAFT #}
+    {% block draft_body %}
+        <div class="pc-user-world center">
+            <div class="vf">
+                <div class="vf clear-fix">
+                    <div class="pt-one">
+                        {{ block('profile_navigation') }}
+
+                        <div class="home-two-cover contain bck-wht" id="bck-wht">
+                            <div id="notes-container" class="home-notes-cover">
+                                {{ block('draft_list') }}
                             </div>
                         </div>
-                        <div class="nts-host-verb ft-sect">
-                            <p>
-                                <strong title="Paragraphs">{{row.paragraphs}}</strong><span class=""> paragraphs</span>
-                            </p>
-                        </div>
-                        <div id="nts-host-title" class="nts-host-title">
-                            <p class="trn3-color">{{row.title}}</p>
-                        </div>
-                    </a>
-                    <div class="nts-host-verb-author ft-sect">
-                        <a href="{{ path('note_profile', {'user_name':row.username}) }}" class="a">
-                            <p>{{row.name}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock draft_body %}
+
+    {% block draft_list %}
+        {% if canvas.notes.articles != null %}
+            {% for row in canvas.notes.articles %}
+                <div class="draft-box desktop-middle nt-ui-rad20 ft-sect">
+                    <span id="draft-assistant" class="hd" pid="{{row.pid}}"></span>
+                    <div class="draft-box-a">
+                        <p>{{row.date}}</p>
+                        <p>{{row.paragraphs}} paragraphs</a>
+                    </div>
+                    <div class="draft-box-b">
+                        <a href="/nt/write/?drf=&did={{row.pid}}" class="a">
+                            <p>{{row.title}}</p>
                         </a>
-                        <a href="#" class="a">
-                            <button class="nts-show-menu-history no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                    </div>
+                    <div class="draft-box-c">
+                        <a href="#" class="draft-box-c-delete a">
+                            <p>Delete</p>
                         </a>
                     </div>
                 </div>
             {% endfor %}
-        </div>
-    {% endblock history_list %}
-{# HISTORY - END #}
+        {% else %}
+            <h1>There is nothing in draft</h1>
+        {% endif %}
+    {% endblock draft_list %}
+{# DRAFT - end #}

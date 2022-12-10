@@ -39,6 +39,18 @@ class ProfileVerbsHome extends AbstractController
                 'message' => 'success',
             ]);
         }
+        if ( $this->request->request->has('draft_delete') ) {
+
+            $post_id         = $this->request->request->get('draft_pid');
+            $user_visitor_id = $this->user_visitor_id;
+    
+            $this->draft_delete($post_id, $user_visitor_id);
+
+            return $this->json([
+                'message' => 'success',
+                'data'    => 13,
+            ]);
+        }
         return $this->json([
             'message' => '[500] Something bad happened',
         ]);
@@ -51,6 +63,18 @@ class ProfileVerbsHome extends AbstractController
         $connection_sur = $connection_sur->connect('sur');
 
         $stmt = $connection_sur->prepare('UPDATE big_sur SET access=0 WHERE pid=? AND uid=?');
+        $stmt->bind_param('ss', $pid, $uid);
+        $stmt->execute();
+        unset($connection_sur, $stmt, $pid, $uid);
+    }
+
+    protected function draft_delete($pid, $uid)
+    {
+        // Database Access
+        $connection_sur = new DatabaseAccess();
+        $connection_sur = $connection_sur->connect('sur');
+
+        $stmt = $connection_sur->prepare('UPDATE big_sur_draft SET access=0 WHERE pid=? AND uid=?');
         $stmt->bind_param('ss', $pid, $uid);
         $stmt->execute();
         unset($connection_sur, $stmt, $pid, $uid);

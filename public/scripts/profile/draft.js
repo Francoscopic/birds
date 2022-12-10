@@ -9,22 +9,20 @@ function actions() {
             e.preventDefault();
 
             var $assistant = $(this).parents('.draft-box').children('span#draft-assistant'),
-                draft_pid = $assistant.attr('pid'),
-                draft_uid = $assistant.attr('uid');
+                draft_pid = $assistant.attr('pid');
 
             var confirmDelete = confirm("Confirm delete");
-            (confirmDelete == true) ? query_db(draft_pid, draft_uid, $(this)) : false;
+            (confirmDelete == true) ? (query_db(draft_pid), delete_feedback(this)) : null;
         });
-        function query_db(pid, uid, ele) {
-
-            $.post('depends/profiles/profiles-activity.php',{draft_pid:pid, draft_uid:uid}, function(data){
-                ('13' == data.trim()) ? delete_feedback(ele) : console.error(data);
+        function query_db(pid) {
+            $.post('/ajax/verb/draft/delete_draft/',{draft_delete:'',draft_pid:pid}, function(){
+                
             }).fail(function(a,b,er){
                 console.error(er)
             })
         }
         function delete_feedback(ele) {
-            ele.parents('.draft-box').slideUp()
+            $(ele).parents('.draft-box').slideUp()
         }
     }
     draft_delete();

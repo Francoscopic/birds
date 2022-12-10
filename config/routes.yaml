@@ -42,4 +42,7 @@ ajax_article_comment:
 ajax_article_hide_articles:
     path: /ajax/verb/profile/hide_article/
     controller: App\Verb\Home\ProfileVerbsHome::index
+ajax_draft_delete_articles:
+    path: /ajax/verb/draft/delete_draft/
+    controller: App\Verb\Home\ProfileVerbsHome::index
 

@@ -152,12 +152,6 @@ class HomeController extends AbstractController
         return $this->render('');
     }
 
-    #[Route('/{user_name}/draft/', name: 'note_draft')]
-    public function draft(): Response
-    {
-        return $this->render('');
-    }
-
     #[Route('/{user_name}/desk/', name: 'note_write')]
     public function desk(): Response
     {
