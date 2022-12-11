@@ -72,36 +72,40 @@
     {% endblock profile_articles %}
     
     {% block people_articles %}
-        {% for board in canvas.notes.articles %}
-            {% if board.access == 1 %}
-                <div class="nts-host relative">
-                    <span id="page-assistant" class="hd" title="{{board.title}}"></span>
-                    <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
-                        <div class="nts-host-banner relative">
-                            <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
-                                {% if board.note_is_img == true %}
-                                    <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
-                                {% endif %}
-                                <div class="nts-host-display-filter"></div>
+        {% if canvas.notes.articles != null %}
+            {% for board in canvas.notes.articles %}
+                {% if board.access == 1 %}
+                    <div class="nts-host relative">
+                        <span id="page-assistant" class="hd" title="{{board.title}}"></span>
+                        <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
+                            <div class="nts-host-banner relative">
+                                <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
+                                    {% if board.note_is_img == true %}
+                                        <div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>
+                                    {% endif %}
+                                    <div class="nts-host-display-filter"></div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="nts-host-verb ft-sect">
-                            <p>
-                                <strong title="Paragraphs">{{board.paragraphs}}</strong><span class=""> paragraphs</span>
-                            </p>
-                        </div>
-                        <div id="nts-host-title" class="nts-host-title">
-                            <p class="trn3-color">{{board.if_view ~ board.title}}</p>
-                        </div>
-                    </a>
-                    <div class="nts-host-verb-author ft-sect">                    
-                        <a href="#" class="a">
-                            <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                            <div class="nts-host-verb ft-sect">
+                                <p>
+                                    <strong title="Paragraphs">{{board.paragraphs}}</strong><span class=""> paragraphs</span>
+                                </p>
+                            </div>
+                            <div id="nts-host-title" class="nts-host-title">
+                                <p class="trn3-color">{{board.if_view ~ board.title}}</p>
+                            </div>
                         </a>
+                        <div class="nts-host-verb-author ft-sect">                    
+                            <a href="#" class="a">
+                                <button class="nts-show-menu-profiles no-bod"><i class="lg-i fa fa-ellipsis-v"></i></button>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            {% endif %}
-        {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <h1>There is nothing here</h1>
+        {% endif %}
     {% endblock people_articles %}
 
     {% block people_page %}
@@ -268,7 +272,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h1>History is empty</h1>
+                <h1>There is nothing here</h1>
             {% endif %}
         </div>
     {% endblock history_list %}
@@ -316,7 +320,64 @@
                 </div>
             {% endfor %}
         {% else %}
-            <h1>There is nothing in draft</h1>
+            <h1>There is nothing here</h1>
         {% endif %}
     {% endblock draft_list %}
 {# DRAFT - end #}
+
+
+{# SAVED #}
+    {% block saved_body %}
+        <div class="pc-user-world center">
+            <div class="vf">
+                <div class="vf clear-fix">
+                    <div class="pt-one">
+                        {{ block('profile_navigation') }}
+
+                        <div class="home-two-cover contain bck-wht" id="bck-wht">
+                            <div id="notes-container" class="home-notes-cover clear-fix">
+                                {{ block('saved_list') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock saved_body %}
+
+    {% block saved_list %}
+        {% if canvas.notes.articles != null %}
+            {% for row in canvas.notes.articles %}
+                <div class="nts-host relative">
+                    <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
+                    <a href="{{ path('note_posts', {'post_id':row.pid}) }}" class="vw-anchor nts-host-anchor a">
+                        <div class="nts-host-banner relative">
+                            <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
+                                <div class="nts-host-display-type nt-ui-rad4 ft-sect {{row.type}}"><span>photo</span></div>
+                                <div class="nts-host-display-filter"></div>
+                            </div>
+                        </div>
+                        <div class="nts-host-verb ft-sect">
+                            <p>
+                                <strong title="Paragraphs">{{row.paragraphs}}</strong><span class=""> paragraphs</span>
+                            </p>
+                        </div>
+                        <div id="nts-host-title" class="nts-host-title">
+                            <p class="trn3-color">{{row.seen}} {{row.title}}</p>
+                        </div>
+                    </a>
+                    <div class="nts-host-verb-author ft-sect">
+                        <a href="{{ path('note_profile', {'user_name':row.username}) }}" class="a">
+                            <p>{{row.name}}</p>
+                        </a>
+                        <a href="#" class="a">
+                            <button class="nts-show-menu-profiles nts-show-menu-saved no-bod"><i class="lg-i fa fa-bookmark"></i></button>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <h1>There is nothing here</h1>
+        {% endif %}
+    {% endblock saved_list %}       
+{# SAVED - end #}

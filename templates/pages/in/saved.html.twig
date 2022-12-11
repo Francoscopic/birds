@@ -1,0 +1,38 @@
+
+{% extends 'pages/in/layout.html.twig' %}
+{% use 'pages/layout/profile.html.twig' %}
+
+
+{# HEADERS #}
+    {% block darkmode_stylesheet %}
+        {% if canvas.misc.theme_state == true %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+        {% endif %}
+    {% endblock %}
+{# HEADERS - END #}
+
+
+{% block page_contents %}
+
+    {% if canvas.notes.validation.check == true %}
+        {% if canvas.notes.validation.my_profile == true %}
+            {# Access granted #}
+            {{ block('nav_header') }}
+            {{ block('saved_body') }}
+        {% else %}
+            {# Access denied #}
+            <h1>You do not have access to view this page</h1>
+        {% endif %}
+    {% else %}
+        {# Account not found #}
+        <h1>Account was not found</h1>
+    {% endif %}
+    
+{% endblock page_contents %}
+
+
+
+{% block script_modules %}
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/profiles.js')}}"></script>
+{% endblock %}

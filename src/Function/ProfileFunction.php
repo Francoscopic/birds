@@ -257,4 +257,61 @@ class ProfileFunction
         unset($connection_sur, $stmt, $get_result, $num_rows, $check, $the_pid, $the_title, $the_paragraphs, $the_date);
         return $content;
     }
+
+    public function notes_saved($uid): array 
+    {
+        $content = array();
+        $connection_verb = new DatabaseAccess();
+        $connection_verb = $connection_verb->connect('verb');
+
+        $stmt = $connection_verb->prepare("SELECT puid, pid FROM saves WHERE uid = ? AND state = 1 ORDER BY sid DESC LIMIT 12");
+        $stmt->bind_param('s', $uid);
+        $stmt->execute();
+        $get_result = $stmt->get_result();
+        $num_rows = $get_result->num_rows;
+
+        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
+
+            # Get post and my details
+                $the_pid    = $get_rows['pid'];
+                $poster_uid = $get_rows['puid'];
+            #
+
+            # Instantiate acting variables
+                $my_note_row                 = IndexFunction::get_this_note($the_pid);
+                $note_title                  = IndexFunction::ShowMore(stripslashes($my_note_row['title']));
+                $note_parags                 = $my_note_row['paragraphs'];
+                $note_cover                  = IndexFunction::note_cover($my_note_row['cover'], 'notes');
+                $note_state_article_or_image = ($my_note_row['state'] == 'art') ? 'hd' : '';
+                $note_date                   = IndexFunction::timeAgo($my_note_row['date']);
+            #
+
+            $note_poster_data  = IndexFunction::get_me($poster_uid);
+            $note_poster_name  = $note_poster_data['name'];
+            $note_poster_uname = $note_poster_data['username'];
+
+            # Get me view details
+                $if_view = IndexFunction::get_if_views($the_pid, $uid);
+                $view_eye = ($if_view === true) ? '*' : '';
+            #
+
+            $content[] = [
+                'pid'        => $the_pid,
+                'title'      => $note_title,
+                'paragraphs' => $note_parags,
+                'cover'      => $note_cover,
+                'type'       => $note_state_article_or_image,
+                'date'       => $note_date,
+                'name'       => $note_poster_name,
+                'username'   => $note_poster_uname,
+                'seen'       => $view_eye,
+            ];
+        }
+        unset(
+            $connection_verb, $stmt, $get_result, $num_rows, $the_pid, $poster_uid, 
+            $my_note_row, $note_title, $note_parags, $note_cover, $note_state_article_or_image, 
+            $note_date, $note_poster_data, $note_poster_name, $note_poster_uname, $if_view, $view_eye
+        );
+        return $content;
+    }
 } 

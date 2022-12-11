@@ -16,7 +16,7 @@ use App\Validation\SigninValidation;
 
 use App\Function\ProfileFunction;
 
-class DraftController extends AbstractController
+class SavedController extends AbstractController
 {
     private array $profile_found;
     private string $profile_message = 'Undiscovered';
@@ -64,7 +64,7 @@ class DraftController extends AbstractController
                 'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title'       => '(Draft)',
+                'title'       => '(Saved)',
                 'robot'       => false,
                 'description' => 'See the articles you saved.',
             ),
@@ -81,7 +81,7 @@ class DraftController extends AbstractController
         $ProfileFunction = new ProfileFunction();
         $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($this->profile_found['uid']);
         $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('saved');
-        $this->canvas['notes']['articles']  = $ProfileFunction->notes_draft($this->profile_found['uid']);
+        $this->canvas['notes']['articles']  = $ProfileFunction->notes_saved($this->profile_found['uid']);
 
         $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - (Saved)';
 
