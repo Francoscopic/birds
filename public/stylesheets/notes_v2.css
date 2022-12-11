@@ -1175,13 +1175,13 @@ div.profile-user-navigation .profile-tab-active {
     font-size: 0.7em;
     font-weight: 600;
 }
-.nts-show-menu-history:hover,
+.nts-show-menu-profiles-unv:hover,
 .nts-show-menu-profiles:hover,
 .nts-show-menu:hover,
 .nts-host-verb-author a:hover p {
     color: #505050;
 }
-.nts-show-menu-history,
+.nts-show-menu-profiles-unv,
 .nts-show-menu-profiles,
 .nts-show-menu {
     width: 30px;
