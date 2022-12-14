@@ -1,6 +1,6 @@
 
 
-function actions() {
+function draft_verbs() {
 
     function draft_delete() {
         var trigger = $('.draft-box-c-delete');
@@ -31,6 +31,6 @@ function actions() {
 
 $(document).ready(function(){
 
-    actions();
+    draft_verbs();
 
 });

@@ -1,3 +1,4 @@
+
 function growPeople() {
     var o = 0;
     const e = $("#grow-notes"),

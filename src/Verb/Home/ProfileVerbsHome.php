@@ -51,6 +51,18 @@ class ProfileVerbsHome extends AbstractController
                 'data'    => 13,
             ]);
         }
+        if ( $this->request->request->has('saved_remove') ) 
+        {
+            $post_id = $this->request->request->get('saved_remove_pid');
+            $user_visitor_id = $this->user_visitor_id;
+
+            $this->saved_remove($post_id, $user_visitor_id);
+
+            return $this->json([
+                'message' => 'success',
+                'data'    => 13,
+            ]);
+        }
         return $this->json([
             'message' => '[500] Something bad happened',
         ]);
@@ -78,5 +90,19 @@ class ProfileVerbsHome extends AbstractController
         $stmt->bind_param('ss', $pid, $uid);
         $stmt->execute();
         unset($connection_sur, $stmt, $pid, $uid);
+    }
+
+    protected function saved_remove($pid, $uid)
+    {
+        // Database access
+        $connection_verb = new DatabaseAccess();
+        $connection_verb = $connection_verb->connect('verb');
+
+        $puid = indexFunction::get_poster_uid($pid)['uid'];
+
+        $stmt = $connection_verb->prepare('UPDATE saves SET state=0 WHERE pid=? AND puid=? AND uid=?');
+        $stmt->bind_param('sss', $pid, $puid, $uid);
+        $stmt->execute();
+        unset($connection_verb, $stmt, $pid, $puid, $uid);
     }
 }

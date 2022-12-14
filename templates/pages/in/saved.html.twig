@@ -13,7 +13,6 @@
 
 
 {% block page_contents %}
-
     {% if canvas.notes.validation.check == true %}
         {% if canvas.notes.validation.my_profile == true %}
             {# Access granted #}
@@ -27,7 +26,6 @@
         {# Account not found #}
         <h1>Account was not found</h1>
     {% endif %}
-    
 {% endblock page_contents %}
 
 
@@ -35,5 +33,5 @@
 {% block script_modules %}
     <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js') }}"></script>
     <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/profiles.js') }}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/saved.js') }}"></script>
+    {# <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/saved.js') }}"></script> #}
 {% endblock %}

@@ -45,4 +45,7 @@ ajax_article_hide_articles:
 ajax_draft_delete_articles:
     path: /ajax/verb/draft/delete_draft/
     controller: App\Verb\Home\ProfileVerbsHome::index
+ajax_saved_remove_articles:
+    path: /ajax/verb/saved/remove_saved/
+    controller: App\Verb\Home\ProfileVerbsHome::index
 

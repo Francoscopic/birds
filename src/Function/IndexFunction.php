@@ -225,18 +225,18 @@ class IndexFunction
         $result_array = $get_result->fetch_array(MYSQLI_ASSOC);
 
         # variables
-        $title = $result_array['title'];
-        $paragraphs = $result_array['parags'];
-        $cover = $result_array['cover'];
+        $title            = $result_array['title'];
+        $paragraphs       = $result_array['parags'];
+        $cover            = $result_array['cover'];
         $article_or_image = $result_array['state'];
-        $date = $result_array['date'];
+        $date             = $result_array['date'];
 
         return array(
-            'title' => $title,
+            'title'      => $title,
             'paragraphs' => $paragraphs,
-            'cover' => $cover,
-            'state' => $article_or_image,
-            'date' => $date
+            'cover'      => $cover,
+            'state'      => $article_or_image,
+            'date'       => $date
         );
     }
 
