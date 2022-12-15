@@ -381,3 +381,66 @@
         {% endif %}
     {% endblock saved_list %}       
 {# SAVED - end #}
+
+
+{# CHANGE #}
+    {% block change_body %}
+        <form method="POST" office="uid" id="change-form" class="change-form" enctype="multipart/form-data">
+            <div class="profile-headers clear-fix">
+                <div class="profile-headers-div fwl">
+                    <a class="cancel-change a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}">
+                        <button class="profile-headers-button ft-sect no-bod"><i class="sm-i fa fa-arrow-left"></i> cancel</button>
+                    </a>
+                </div>
+                <div class="profile-headers-div fwr">
+                    <button id="check-submit" type="submit" name="submit" class="check-submit profile-headers-button profile-headers-button-submit ft-sect no-bod">Save</button>
+                </div>
+            </div>
+
+            <div id="profile-me-cover" class="pc-user-cover relative bck" my_cover="0" change="0" style="background-image:url('{{canvas.notes.profile.cover}}')">
+                <input id="change-cover" class="hd" type="file" name="cover" />
+                <button id="cover-trigger" class="profile-change-cover-button sha1 no-bod rad50" title="Change"><i class="sm-i note-a fa fa-camera"></i></button>
+            </div>
+
+            <div class="pc-user-world center">
+                <div class="vf clear-fix">
+                    <div class="new-po-one">
+                        <div class="npo-top relative">
+                            <img id="profile-me-display" class="npo-top-img rad50" src="{{canvas.notes.profile.display}}" />
+                            <input id="change-display" class="hd" type="file" name="display" />
+                            <button id="display-trigger" class="profile-change-button sha1 no-bod rad50" title="Change"><i class="sm-i note-a fa fa-camera"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="vf">
+                    <div id="change-me-division" class="change-division ft-sect">
+                        <p>Name: <span id="name-error" class="change-p-span note-s sm-i"></span></p>
+                        <input id="chg-name" class="change-name ft-sect" type="text" name="name" cur_value="{{canvas.notes.profile.name}}" value="{{canvas.notes.profile.name}}" />
+
+                        <p>Bio: <span id="bio-error" class="change-p-span note-s sm-i"></span></p>
+                        <textarea id="chg-about" class="change-about ft-sect" name="about" onkeyup="auto_grow(this)" value="{{canvas.notes.profile.about}}">{{canvas.notes.profile.about}}</textarea>
+
+                        <p>Location: <span id="location-error" class="change-p-span note-s sm-i"></span></p>
+                        <input id="chg-location" class="change-location ft-sect" type="text" name="location" cur_value="{{canvas.notes.profile.location}}" value="{{canvas.notes.profile.location}}" />
+                    </div>
+
+                    <div class="profile-headers clear-fix">
+                        <div class="profile-headers-div fwl">
+                            <a class="cancel-change a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}">
+                                <button class="profile-headers-button ft-sect no-bod"><i class="sm-i fa fa-arrow-left"></i> cancel</button>
+                            </a>
+                        </div>
+                        <div class="profile-headers-div fwr">
+                            <button id="check-submit" type="submit" name="submit" class="check-submit profile-headers-button profile-headers-button-submit ft-sect no-bod">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="change-notification hdd rad2" id="change-notification">
+            <div class="change-notification-inner">
+                <p id="change-notification-p" class="ft-sect">Making a difference</p>
+            </div>
+        </div>
+    {% endblock change_body %}
+{# CHANGE - end #}

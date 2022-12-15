@@ -65,7 +65,7 @@ class HistoryController extends AbstractController
             ),
             'headers' => array(
                 'title'       => '(History)',
-                'robot'       => false,
+                'robot'       => true,
                 'description' => '',
             ),
         );

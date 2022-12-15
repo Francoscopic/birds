@@ -16,13 +16,13 @@ use App\Validation\SigninValidation;
 
 use App\Function\ProfileFunction;
 
-class DraftController extends AbstractController
+class ChangeController extends AbstractController
 {
     private array $profile_found;
     private string $profile_message = 'Undiscovered';
     private array $canvas = array();
 
-    #[Route('/{user_name}/draft/', name: 'note_draft')]
+    #[Route('/{user_name}/change/', name: 'note_change')]
     public function index(string $user_name, Request $request): Response
     {
         // Profile data
@@ -45,9 +45,7 @@ class DraftController extends AbstractController
         
         $this->canvas = array(
             'notes' => [
-                'nav_menu'   => array(),
                 'profile'    => array(),
-                'articles'   => array(),
                 'validation' => [
                     'check'      => $this->profile_found['state'],
                     'my_profile' => $my_profile,
@@ -64,28 +62,26 @@ class DraftController extends AbstractController
                 'theme_logo'  => $theme_data['logo'],
             ),
             'headers' => array(
-                'title'       => '(Draft)',
+                'title'       => '(Change)',
                 'robot'       => true,
-                'description' => 'Continue writing from where you left off.',
+                'description' => 'Make changes to your account',
             ),
         );
 
         if(!$this->profile_found['state']) {
             // We could not find user.
-            return $this->render('pages/in/draft.html.twig', [
+            return $this->render('pages/in/change.html.twig', [
                 'canvas' => $this->canvas,
             ]);
         }
 
         // Work
         $ProfileFunction = new ProfileFunction();
-        $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($this->profile_found['uid']);
-        $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('draft');
-        $this->canvas['notes']['articles']  = $ProfileFunction->notes_draft($this->profile_found['uid']);
+        $this->canvas['notes']['profile'] = $ProfileFunction->notes_profile($this->profile_found['uid']);
 
-        $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - (Draft)';
+        $this->canvas['headers']['title'] = $this->canvas['notes']['profile']['name'] . ' - (Change)';
 
-        return $this->render('pages/in/draft.html.twig', [
+        return $this->render('pages/in/change.html.twig', [
             'canvas' => $this->canvas,
         ]);
     }

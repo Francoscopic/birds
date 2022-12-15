@@ -65,7 +65,7 @@ class SavedController extends AbstractController
             ),
             'headers' => array(
                 'title'       => '(Saved)',
-                'robot'       => false,
+                'robot'       => true,
                 'description' => 'See the articles you saved.',
             ),
         );

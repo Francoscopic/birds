@@ -51,8 +51,8 @@ class ProfileVerbsHome extends AbstractController
                 'data'    => 13,
             ]);
         }
-        if ( $this->request->request->has('saved_remove') ) 
-        {
+        if ( $this->request->request->has('saved_remove') ) {
+            
             $post_id = $this->request->request->get('saved_remove_pid');
             $user_visitor_id = $this->user_visitor_id;
 
