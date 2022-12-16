@@ -2,7 +2,7 @@
 
 // Working
 function saved_menu() {
-
+    
     var ellipsis                    = $('.nts-show-menu-saved'),
         close_exit                  = $('.note-small-menu-container-close'),
         small_menu_parent_container = $('.notes-small-menu-container'),

@@ -48,4 +48,10 @@ ajax_draft_delete_articles:
 ajax_saved_remove_articles:
     path: /ajax/verb/saved/remove_saved/
     controller: App\Verb\Home\ProfileVerbsHome::index
+ajax_changes_on_bio:
+    path: /ajax/verb/change/on_bio/
+    controller: App\Verb\Profile\ChangeProfile::index
+ajax_changes_on_cover:
+    path: /ajax/verb/change/on_cover/
+    controller: App\Verb\Profile\ChangeProfile::index
 

@@ -2,6 +2,9 @@
 var coverIsChanged   = 0,
     displayIsChanged = 0;
 
+var thisForm = $("#change-form"),
+    user_office = $(thisForm).attr("office");
+
 function change_cover() {
     $("#change-notification");
     var a = $("#profile-me-cover"),
@@ -124,11 +127,73 @@ function update_account() {
     )
 }
 
+function update_only_bio() {
+    var o = $("#chg-name"),
+        n = $("#chg-about"),
+        e = $("#chg-location"),
+        t = $(o).val(),
+        a = $(n).val(),
+        i = $(e).val();
+    $.post("/ajax/verb/change/on_bio/", {change_on_bio:'', change_name:t, change_bio:a, change_loc:i}, function(res){
+        res.status===500 ? notify(`${res.message}`) : notify(`${res.message}`, 'mediumseagreen')
+    }).fail(function(o, n, e) {
+        notify("Error encountered. Try again."),
+        console.error(e)
+    })
+}
+
+function update_only_cover_display(o, n) {
+    if(""===o.val()) notify("Select your image", "tomato");
+    else {
+        var e = $("form").get(0);
+        $.ajax({
+            // url: `../out/diamonds_pages/change.php?${n}=${user_office}`,
+            url: '/ajax/verb/change/on_cover/',
+            type: "POST",
+            data: new FormData(e),
+            xhr: function(){
+                var o = new window.XMLHttpRequest;
+                return o.upload.addEventListener("progress", t, !1),
+                o
+            },
+            contentType: !1,
+            cache: !1,
+            processData: !1,
+            success: function(res) {
+                // "10"===o.trim() ? (
+                //         notify("Upload success","mediumseagreen"),
+                //         e.reset()
+                //     ): notify(`${o}`)
+                res.status===500 ? notify(`${res.message}`) : notify(`${res.message}`, 'mediumseagreen')
+            },
+            error: function(o, n, e) {
+                notify(e),
+                console.error(e)
+            }
+        })
+    }
+    function t(o){
+        if(o.lengthComputable) {
+            var n = o.total,
+            e = o.loaded,
+            t = Math.round(100*e/n);
+            notify(`Uploading: ${t}%`,"darkorange"),
+            t >= 100 && notify("Finessing...","darkorange")
+        }
+    }
+}
+function notify(o, n="#505050") {
+    var e = $("#change-notification"),
+        t = $("#change-notification-p");
+    e.css("background-color", n),
+    $(t).html(`${o}`)
+}
+
 function save_change() {
     var a = $(".check-submit");
-    $(a).on("click", function(a){
+    $(a).on("click", function(e){
         update_account(),
-        a.preventDefault()
+        e.preventDefault()
     })
 }
 function cancel_change() {
@@ -144,3 +209,12 @@ function makeErrEmpty(a) {
 function travel(a) {
     $(location).attr("href",a)
 }
+
+$(document).ready(function(){
+
+    change_cover(),
+    change_display(),
+    update_account(),
+    save_change(),
+    cancel_change()
+});

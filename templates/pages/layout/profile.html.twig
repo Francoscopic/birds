@@ -386,6 +386,7 @@
 {# CHANGE #}
     {% block change_body %}
         <form method="POST" office="uid" id="change-form" class="change-form" enctype="multipart/form-data">
+            <input type="hidden" name="change_on_cover" value="" />
             <div class="profile-headers clear-fix">
                 <div class="profile-headers-div fwl">
                     <a class="cancel-change a" href="{{ path('note_profile', {'user_name':canvas.notes.profile.username}) }}">
