@@ -18,6 +18,8 @@ class ChangeProfile extends AbstractController
 {
     private $request;
     private $uid;
+    private $file_path;
+    private $connection;
 
     public function __construct()
     {
@@ -27,6 +29,13 @@ class ChangeProfile extends AbstractController
 
         // get request
         $this->request = Request::createFromGlobals();
+
+        // set constants
+        $this->file_path = dirname(__DIR__).'/../../public/images/community/profiles/';
+
+        // access database
+        $this->connection = new DatabaseAccess();
+        $this->connection = $this->connection->connect('');
     }
 
     public function index(): JsonResponse
@@ -40,8 +49,16 @@ class ChangeProfile extends AbstractController
             ]);
         }
         // on cover
-        if($this->request->request->has('change_on_cover')) {
+        if($this->request->request->has('on_cover')) {
             $res = $this->change_cover($this->uid);
+            return $this->json([
+                'message' => $res['message'],
+                'status'  => $res['status'],
+            ]);
+        }
+        // on display
+        if($this->request->request->has('on_display')) {
+            $res = $this->change_display($this->uid);
             return $this->json([
                 'message' => $res['message'],
                 'status'  => $res['status'],
@@ -55,6 +72,7 @@ class ChangeProfile extends AbstractController
 
     protected function change_bio($uid)
     {
+        $connection = $this->connection;
         // User office first
         $name = trim($this->request->request->get('change_name'));
         $bio  = trim($this->request->request->get('change_bio'));
@@ -71,19 +89,17 @@ class ChangeProfile extends AbstractController
         if( !empty($name) && !$goodName) {
 
             return [
-                'status'  => 500,
                 'message' => 'Name: Special characters',
+                'status'  => 500,
             ];
         } elseif( !empty($loc) && !$goodLoc) {
 
             return [
-                'status'  => 500,
                 'message' => 'Location: Special characters',
+                'status'  => 500,
             ];
         } else {
             // Check if you're giving me the same thing.
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('');
             $stmt = $connection->prepare("SELECT name, about, location FROM user_sapphire WHERE uid = ?");
             $stmt->bind_param("s", $uid);
             $stmt->execute();
@@ -100,8 +116,8 @@ class ChangeProfile extends AbstractController
             if( $same ) {
 
                 return [
+                    'message' => 'You made no changes to bio',
                     'status'  => 500,
-                    'message' => 'You made no changes',
                 ];
             } else {
 
@@ -114,21 +130,20 @@ class ChangeProfile extends AbstractController
                 $stmt->execute();
 
                 # Success
+                // Unset varaiables to free memory
+                unset($connection, $stmt, $name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
                 return [
+                    'message' => 'Success',
                     'status'  => 200,
-                    'message' => 'Update success',
                 ];
             }
-
-            // Unset varaiables to free memory
-            unset($connection_sur, $stmt, $name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
         }
     }
 
     protected function change_cover($uid)
     {
-        // Initiate the paths
-        $file_path = dirname(__DIR__).'/public/images/community/profiles/';
+        $connection = $this->connection;
+        $file_path  = $this->file_path;
 
         // Get the file components
         $file_error = $_FILES['cover']['error'];
@@ -149,19 +164,19 @@ class ChangeProfile extends AbstractController
 
             // field empty
             echo 'Select image';
-            return $this->json([
-                'message' => 'Select image',
+            return [
+                'message' => 'Select cover',
                 'status'  => 500,
-            ]);
+            ];
         } else if(in_array($file_type, $valid_types)) {
 
             if($file_size > 10247680 || file_exists($file_path.$new_name)) {
 
                 // size exceeded limit 10MB or Name already exist -not likely to happen (the name part)
-                return $this->json([
-                    'message' => 'File exceeds 10MB',
+                return [
+                    'message' => 'Cover image exceeds 10MB',
                     'status'  => 500,
-                ]);
+                ];
             } else {
 
                 if(!IndexFunction::nPhoto_resize($file_tmp, $file_size, $file_type, $saveImage)) {
@@ -172,23 +187,95 @@ class ChangeProfile extends AbstractController
 
                     // free-up memory
                     unset($connection, $stmt, $uid, $file_path, $saveImage, $valid_types, $format, $new_name, $file_error, $file_type, $file_size, $file_tmp, $file_name);
-                    return $this->json([
-                        'message' => 'Upload success',
+                    return [
+                        'message' => 'Success',
                         'status'  => 200,
-                    ]);
+                    ];
                 } else {
-                    return $this->json([
+                    return [
                         'message' => 'Error encountered. Please retry',
                         'status'  => 500,
-                    ]);
+                    ];
                 }
             }
         } else {
 
-            return $this->json([
-                'message' => 'File type not supported',
+            return [
+                'message' => 'Cover image type not supported',
                 'status'  => 500,
-            ]);
+            ];
+        }
+    }
+
+    protected function change_display($uid)
+    {
+        $connection = $this->connection;
+        $file_path  = $this->file_path;
+
+        // Get the file components
+        $file_error = $_FILES['display']['error'];
+        $file_type  = $_FILES['display']['type'];
+        $file_size  = $_FILES['display']['size'];
+        $file_tmp   = $_FILES['display']['tmp_name'];
+        $file_name  = IndexFunction::validateInput(IndexFunction::test_input($_FILES['display']['name']));
+
+        // Set-up the necessary image changes
+        $format    = explode('.', $file_name);
+        $new_name  = round(microtime(true)).rand(13,53478).IndexFunction::randomKey(4).'.'.end($format);
+
+        // Initiate the image changes
+        $saveImage   = $file_path.$new_name;
+        $saveShrink  = $file_path.'shk_'.$new_name;
+        $valid_types = array("image/jpeg", "image/jpg", "image/png");
+
+        if( empty($file_name) ) {
+            // field empty
+            return [
+                'message' => 'Select display',
+                'status'  => 500,
+            ];
+        } else if(in_array($file_type, $valid_types)) {
+
+            if($file_size > 10247680 || file_exists($file_path.$new_name)) {
+
+                // size exceeded limit 10MB or Name already exist -not likely to happen (the name part)
+                return [
+                    'message' => 'Display exceeds 10MB',
+                    'status'  => 500,
+                ];
+            } else {
+
+                if(!IndexFunction::nPhoto_square( $file_tmp, $file_size, $file_type, $saveImage, 200 ) && !IndexFunction::nPhoto_square( $file_tmp, $file_size, $file_type, $saveShrink, 50 )) {
+
+                    $stmt=$connection->prepare('UPDATE user_sapphire SET display = ? WHERE uid = ?');
+                    $stmt->bind_param('ss', $new_name, $uid);
+                    $stmt->execute();
+
+                    // Unset variables to free-up memory
+                    unset($connection, $stmt, $uid, $file_path);
+                    unset($file_error, $file_type, $file_size, $file_tmp, $file_name);
+                    unset($format, $new_name);
+                    unset($saveImage, $saveShrink, $valid_types);
+
+                    // Upload success.
+                    return [
+                        'message' => 'Success',
+                        'status'  => 200,
+                    ];
+                } else {
+                    // error encountered
+                    return [
+                        'message' => 'Error encountered. Please retry',
+                        'status'  => 500,
+                    ];
+                }
+            }
+        } else {
+            // file type not supported
+            return [
+                'message' => 'Display file type not supported',
+                'status'  => 500,
+            ];
         }
     }
 }

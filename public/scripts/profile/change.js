@@ -1,6 +1,7 @@
 
 var coverIsChanged   = 0,
-    displayIsChanged = 0;
+    displayIsChanged = 0,
+    otherIsChanged   = 0;
 
 var thisForm = $("#change-form"),
     user_office = $(thisForm).attr("office");
@@ -111,20 +112,21 @@ function update_account() {
             void 0
     }
     c===l && i===s && o===p ? 1===g() ? notify("You haven't made any changes","tomato") : 
-    2===g() ? update_only_cover_display(t, "coveroff") : 
-    3===g() ? update_only_cover_display(r,"dispoff") : 
-    4===g() && (update_only_cover_display(t,"coveroff"), update_only_cover_display(r,"dispoff")) : 
+    2===g() ? update_only_cover_display(t, "on_cover") : 
+    3===g() ? update_only_cover_display(r,"on_display") : 
+    4===g() && (update_only_cover_display(t,"on_cover"), update_only_cover_display(r,"on_display")) : 
     (
         h(), !0===h() && (1===g() ? update_only_bio() : 
-        2===g() ? (update_only_bio(), update_only_cover_display(t,"coveroff")) : 
-        3===g() ? (update_only_bio(), update_only_cover_display(r,"dispoff")): 
+        2===g() ? (update_only_bio(), update_only_cover_display(t,"on_cover")) : 
+        3===g() ? (update_only_bio(), update_only_cover_display(r,"on_display")): 
         4===g()&&(
                     update_only_bio(), 
-                    update_only_cover_display(t,"coveroff"), 
-                    update_only_cover_display(r,"dispoff")
+                    update_only_cover_display(t,"on_cover"), 
+                    update_only_cover_display(r,"on_display")
                 )
             )
-    )
+    ),
+    coverIsChanged = displayIsChanged = 0;
 }
 
 function update_only_bio() {
@@ -142,15 +144,22 @@ function update_only_bio() {
     })
 }
 
-function update_only_cover_display(o, n) {
+function update_only_cover_display(o, onImage) {
     if(""===o.val()) notify("Select your image", "tomato");
     else {
-        var e = $("form").get(0);
+        var on_state = 'on_cover'===onImage ? 'on_cover' : 'on_display';
+        // var e = $("form").get(0);
+        var the_data = function(a) {
+            var n = $("form").get(0),
+                a = new FormData(n);
+                return a.append(`${on_state}`,''),
+                a
+        }(onImage);
         $.ajax({
-            // url: `../out/diamonds_pages/change.php?${n}=${user_office}`,
             url: '/ajax/verb/change/on_cover/',
             type: "POST",
-            data: new FormData(e),
+            data: the_data,
+            // data: new FormData(e),
             xhr: function(){
                 var o = new window.XMLHttpRequest;
                 return o.upload.addEventListener("progress", t, !1),
@@ -160,10 +169,6 @@ function update_only_cover_display(o, n) {
             cache: !1,
             processData: !1,
             success: function(res) {
-                // "10"===o.trim() ? (
-                //         notify("Upload success","mediumseagreen"),
-                //         e.reset()
-                //     ): notify(`${o}`)
                 res.status===500 ? notify(`${res.message}`) : notify(`${res.message}`, 'mediumseagreen')
             },
             error: function(o, n, e) {
@@ -198,9 +203,9 @@ function save_change() {
 }
 function cancel_change() {
     var a = $(".cancel-change");
-    $(a).on("click", function(a){
-        !0===confirm("Confirm cancel") && travel("profiles.php"),
-        a.preventDefault()
+    $(a).on("click", function(e){
+        !0===confirm("Confirm cancel (Changes might be lost)") && travel("../"),
+        e.preventDefault()
     })
 }
 function makeErrEmpty(a) {
