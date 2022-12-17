@@ -128,7 +128,7 @@ class ChangeProfile extends AbstractController
     protected function change_cover($uid)
     {
         // Initiate the paths
-        $file_path = '/public/images/community/profiles/';
+        $file_path = dirname(__DIR__).'/public/images/community/profiles/';
 
         // Get the file components
         $file_error = $_FILES['cover']['error'];
