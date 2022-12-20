@@ -34,9 +34,7 @@
             <link href="{{ asset('images/logo/favicon.ico') }}" rel="icon" type="image/x-icon" />
             <link href="{{ asset('stylesheets/notes_v2.css') }}" rel="stylesheet" />
             {% block stylesheets %}{% endblock %}
-            {% block darkmode_stylesheet %}
-                <link href="{{ asset('stylesheets/lightmode.css') }}" rel="stylesheet" watch="theme" />
-            {% endblock %}
+            {% block darkmode_stylesheet %}{% endblock %}
     </head>
     <body>
         <input type="hidden" id="page-assistant" />

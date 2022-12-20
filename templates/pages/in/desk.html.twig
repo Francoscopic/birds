@@ -1,0 +1,29 @@
+
+{% extends 'pages/in/layout.html.twig' %}
+{% use 'pages/layout/desk.html.twig' %}
+
+
+{# HEADERS #}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('/stylesheets/write.css') }}" />
+    {% endblock stylesheets %}
+    
+    {% block darkmode_stylesheet %}
+        {% if canvas.misc.theme_state == true %}
+            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+        {% endif %}
+    {% endblock %}
+{# HEADERS - END #}
+
+
+{% block page_contents %}
+    {{ block('desk_body') }}
+{% endblock page_contents %}
+
+
+
+{% block script_modules %}
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js') }}"></script>
+    <script type="text/javascript" src="{{  asset('/scripts/plugins/autosize.min.js') }}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/write.js') }}"></script>
+{% endblock %}

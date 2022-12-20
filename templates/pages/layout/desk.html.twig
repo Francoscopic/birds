@@ -1,0 +1,84 @@
+{# DESK #}
+    {% block desk_body %}
+        <div class="write-house">
+            <div id="write-cover" class="write-cover relative">
+                <div class="nt-form-load-interface">
+
+                </div>
+
+                {{ block('desk_form') }}
+            </div>
+        </div>
+    {% endblock desk_body %}
+
+    {% block desk_form %}
+        <form method="POST" id="write-form" class="write-form" office="'. $uid .'" enctype="multipart/form-data">
+            <div class="write-header-features">
+                <div class="write-header-features-tools">
+                    <ul class="ul">
+                        <a href="#" class="feature-tools-selector a" title="Type text">
+                            <p class="write-selector-text feature-tools-selector-active" type="text"><i class="fa-solid fa-i-cursor"></i><br><span>Text</span></p>
+                        </a>
+                        <a href="#" class="feature-tools-selector a" title="Share photos">
+                            <p class="write-selector-photo" type="photo"><i class="fa-solid fa-camera-retro"></i><br><span>Photo</span></p>
+                        </a>
+                        <a class="a"><p><span>|</span></p></a>
+                        <a href="#" class="feature-tools-draft a" title="Save to continue later">
+                            <p><i class="fa-solid fa-file"></i><br><span>Save</span></p>
+                        </a>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="write-title-div">
+                <button id="focusForTitle" disabled="true" class="write-active-top-line"></button>
+                <pre><textarea id="write-title" class="write-title-textarea ft-menu no-bod" name="title" onkeyup="auto_grow(this)" placeholder="Title.."></textarea></pre>
+                <div class="write-title-textarea-error">
+                    <span id="title-response" class="write-title-textarea-error-span title-response ft-sect">100</span>
+                </div>
+            </div>
+
+            <div id="wrt-cover-div" class="wrt-cover-div relative">
+                <div id="wrt-cover-hero" class="wrt-cover-hero relative bck">
+                    <button id="wrt-cover-del" class="wrt-cover-del rad50 hd no-bod" title="Remove cover"><i class="sm-i fas fa-times"></i></button>
+                </div>
+                <div class="wrt-cover-but-div">
+                    <input id="write-cover-input" class="hd ft-sect" type="file" name="cover" />
+                    <button id="write-display-action" class="wrt-cover-but rad20 trn3-bck-color no-bod ft-sect">
+                        <i class="sm-i fa fa-camera"></i> cover</button>
+                    <div id="wrt-drk-txt">
+                        <span id="cover-response" class="wrt-cover-error ft-sect">.</span>
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" name="line" value="$uid" />
+
+            <div class="wrt-parags-div">
+                <button id="focusForNotes" disabled="true" class="write-active-top-line"></button>
+                <textarea id="wrt-parags-edit" class="wrt-parags-edit nt-ft-robt rad4 ft-sect" name="notes" placeholder="What's on your mind?"></textarea>
+
+                <div class="write-title-textarea-error">
+                    <div class="wrt-parags-txt-err">
+                        <p id="wrt-editor-err" class="write-title-textarea-error-span parag-error ft-sect">7 Paragraphs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrt-photos-div hd">
+                <input id="write-images-input" class="hd ft-sect" type="file" name="images[]" multiple />
+                <div class="wrt-photos-gallery">
+                    <span></span>
+                </div>
+
+                <button class="wrt-select-photos-but nt-ui-rad10">Add Photos<p>(As much as 7 photos)</p></button>
+            </div>
+
+            <div class="write-submit-div clear-fix">
+                <button id="write-submit" disabled="true" class="write-submit-submit fwl opas5 ft-sect no-bod"><span class="lg-i">PREVIEW</span></button>
+
+                <button id="write-save-submit" type="submit" name="submit" class="write-submit-submit fwr ft-sect no-bod hd"><span class="lg-i">SHARE</span> <i class="lg-i fa fa-arrow-right"></i></button>
+            </div>
+        </form>
+    {% endblock desk_form %}
+{# DESK - end #}

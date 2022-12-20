@@ -523,6 +523,7 @@ function saveEditing(){
 
 
 $(document).ready(function(){
+
     writeTitle(),
     writeCover(),
     writeIdea(),
