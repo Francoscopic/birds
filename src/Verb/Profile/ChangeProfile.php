@@ -163,7 +163,6 @@ class ChangeProfile extends AbstractController
         if( empty($file_name) ) {
 
             // field empty
-            echo 'Select image';
             return [
                 'message' => 'Select cover',
                 'status'  => 500,

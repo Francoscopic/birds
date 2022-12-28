@@ -54,4 +54,7 @@ ajax_changes_on_bio:
 ajax_changes_on_cover:
     path: /ajax/verb/change/on_cover/
     controller: App\Verb\Profile\ChangeProfile::index
+ajax_desk_save_draft:
+    path: /ajax/verb/desk/save_draft/
+    controller: App\Verb\Profile\DeskProfile::index
 

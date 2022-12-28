@@ -1136,9 +1136,9 @@ class IndexFunction
                 default: $ext = ''; break;
             }
 
-            if( $file_size > 1024768 || $file_size > (1024768 / 2) ) {
+            if( $file_size > 1024768 ) {
                 list( $width, $height ) = getimagesize( $photoTmp );
-                $newWidth = $width/2;
+                $newWidth  = $width/2;
                 $newHeight = $height/2;
                 $tmp = imagecreatetruecolor( $newWidth, $newHeight );
                 imagecopyresampled( $tmp, $ext, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height );

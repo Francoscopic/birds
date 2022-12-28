@@ -19,7 +19,7 @@ class DeskProfile extends AbstractController
     private $request;
     private $uid;
     private $file_path;
-    private $connection;
+    private $connection_sur;
 
     public function __construct()
     {
@@ -31,34 +31,25 @@ class DeskProfile extends AbstractController
         $this->request = Request::createFromGlobals();
 
         // set constants
-        $this->file_path = dirname(__DIR__).'/../../public/images/community/profiles/';
+        $this->file_path = dirname(__DIR__).'/../../public/images/community/notes/';
 
         // access database
-        $this->connection = new DatabaseAccess();
-        $this->connection = $this->connection->connect('');
+        $this->connection_sur = new DatabaseAccess();
+        $this->connection_sur = $this->connection_sur->connect('sur');
     }
 
     public function index(): JsonResponse
     {
-        // on bio
-        if($this->request->request->has('change_on_bio')) {
-            $res = $this->change_bio($this->uid);
+        // save article for later
+        if($this->request->request->has('desk_save_draft')) {
+            $res = $this->desk_saveForLater($this->uid);
             return $this->json([
                 'message' => $res['message'],
                 'status'  => $res['status'],
             ]);
         }
-        // on cover
-        if($this->request->request->has('on_cover')) {
-            $res = $this->change_cover($this->uid);
-            return $this->json([
-                'message' => $res['message'],
-                'status'  => $res['status'],
-            ]);
-        }
-        // on display
-        if($this->request->request->has('on_display')) {
-            $res = $this->change_display($this->uid);
+        if($this->request->request->has('mydesk')) {
+            $res = $this->desk_save_selector($this->uid);
             return $this->json([
                 'message' => $res['message'],
                 'status'  => $res['status'],
@@ -70,212 +61,156 @@ class DeskProfile extends AbstractController
         ]);
     }
 
-    protected function change_bio($uid)
+    protected function desk_saveForLater($uid)
     {
-        $connection = $this->connection;
-        // User office first
-        $name = trim($this->request->request->get('change_name'));
-        $bio  = trim($this->request->request->get('change_bio'));
-        $loc  = trim($this->request->request->get('change_loc'));
+        $title = $this->request->request->get('desk_save_title');
+        $body  = $this->request->request->get('desk_save_body');
+        $pid   = $this->request->request->get('desk_save_pid');
 
-        // Do PHP validations
-        $goodName = IndexFunction::goodName($name, 'A-Za-z0-9 ');
-        $goodBio  = IndexFunction::goodName($bio, 'A-Za-z0-9\,\.\:\;\!\@\#\&\+\-\_\\n\'\" ');
-        $goodLoc  = IndexFunction::goodName($loc, 'A-Za-z\, ');
-
-        $goodSaveBio = IndexFunction::validateInput($bio);
-
-
-        if( !empty($name) && !$goodName) {
-
-            return [
-                'message' => 'Name: Special characters',
-                'status'  => 500,
-            ];
-        } elseif( !empty($loc) && !$goodLoc) {
-
-            return [
-                'message' => 'Location: Special characters',
-                'status'  => 500,
-            ];
-        } else {
-            // Check if you're giving me the same thing.
-            $stmt = $connection->prepare("SELECT name, about, location FROM user_sapphire WHERE uid = ?");
-            $stmt->bind_param("s", $uid);
+        $stmt = $this->connection_sur->prepare('SELECT sid FROM big_sur_draft WHERE uid = ? AND pid = ? AND access=1 ORDER BY sid DESC LIMIT 1');
+        $stmt->bind_param('ss', $uid, $pid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $rows = $result->num_rows;
+        if( $rows > 0  ) {
+            $stmt = $this->connection_sur->prepare('UPDATE big_sur_draft SET title=?, body=? WHERE uid=? AND pid=?');
+            $stmt->bind_param('ssss', $title, $body, $uid, $pid);
             $stmt->execute();
-            $check = $stmt->get_result();
-            $check_row = $check->fetch_array(MYSQLI_ASSOC);
-
-            // Get values
-            $name_saved = stripslashes($check_row['name']);
-            $bio_saved  = stripslashes($check_row['about']);
-            $loc_saved  = stripslashes($check_row['location']);
-
-            // Validate if same
-            $same = ( $name==$name_saved && $bio==$bio_saved && $loc==$loc_saved );
-            if( $same ) {
-
-                return [
-                    'message' => 'You made no changes to bio',
-                    'status'  => 500,
-                ];
-            } else {
-
-                $name_cleaned = IndexFunction::validateInput($name);
-                $loc_cleaned  = IndexFunction::validateInput($loc);
-                $bio_cleaned  = IndexFunction::test_input($bio);
-                // Save the changes
-                $stmt = $connection->prepare("UPDATE user_sapphire SET name=?, about=?, location=?, date=? WHERE uid=?");
-                $stmt->bind_param("sssss", $name_cleaned, $bio_cleaned, $loc_cleaned, $date, $uid);
-                $stmt->execute();
-
-                # Success
-                // Unset varaiables to free memory
-                unset($connection, $stmt, $name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
-                return [
-                    'message' => 'Success',
-                    'status'  => 200,
-                ];
-            }
+            
+            unset($stmt, $rows, $result, $title, $body, $pid, $uid);
+            return [
+                'message' => 'Updated',
+                'status'  => 200,
+            ];
         }
+
+        $stmt = $this->connection_sur->prepare('INSERT INTO big_sur_draft (access, uid, pid, title, body) VALUES(1, ?, ?, ?, ?)');
+        $stmt->bind_param('ssss', $uid, $pid, $title, $body);
+        $stmt->execute();
+        unset($stmt, $result, $rows, $title, $body, $pid, $uid);
+        return [
+            'message' => 'Saved',
+            'status'  => 200,
+        ];
     }
 
-    protected function change_cover($uid)
+    protected function desk_save_selector($uid)
     {
-        $connection = $this->connection;
-        $file_path  = $this->file_path;
+        $notes_save_handle = 0;   # 0 for articles, 1 for images.
+        $image_extensions  = '';
 
-        // Get the file components
-        $file_error = $_FILES['cover']['error'];
-        $file_type  = $_FILES['cover']['type'];
-        $file_size  = $_FILES['cover']['size'];
-        $file_tmp   = $_FILES['cover']['tmp_name'];
-        $file_name  = IndexFunction::validateInput($_FILES['cover']['name']);
+        $title = IndexFunction::validateInput($this->request->request->get('ttl'));
+        $body  = $this->request->request->get('nt');
+        $pid   = IndexFunction::randomKey(9);
 
-        // Set-up the necessary image changes
-        $format    = explode('.', $file_name);
-        $new_name  = round(microtime(true)).rand(13,53478).IndexFunction::randomKey(4).'.'.end($format);
+        #
+            # Get the file components
+            $cover_type         = $_FILES['cover']['type'];
+            $cover_tmp          = $_FILES['cover']['tmp_name'];
+            $cover_size         = $_FILES['cover']['size'];
+            $cover_name         = IndexFunction::validateInput($_FILES['cover']['name']);  # Clean.
+            $cover_format       = explode('.', $cover_name);
+            $cover_new_name     = IndexFunction::randomKey(5).round(microtime(true));
+            $cover_new_name_ext = $cover_new_name.'.'.end($cover_format);
 
-        // Initiate the image changes
-        $saveImage = $file_path.$new_name;
-        $valid_types = array("image/jpeg", "image/jpg", "image/png");
+            # Initiate the image changes
+            $save_cover_image   = $this->file_path.$cover_new_name_ext;
 
-        if( empty($file_name) ) {
+            $image_extensions .= end($cover_format);
+        #
 
-            // field empty
-            echo 'Select image';
-            return [
-                'message' => 'Select cover',
-                'status'  => 500,
-            ];
-        } else if(in_array($file_type, $valid_types)) {
+        if(
+            $this->request->request->has('editor')
+            &&
+            $this->request->request->get('editor') == 1
+        )
+        { // images
+            $number_of_images = count($_FILES['images']['name']);
+            for( $i=0; $i<$number_of_images; $i++ ) {
+                $image_tmp      = $_FILES['images']['tmp_name'][$i];
+                $image_name     = IndexFunction::validateInput($_FILES['images']['name'][$i]);
+                $image_format   = explode('.', $image_name);
+                $image_new_name = $cover_new_name .'-'. $i .'.'.end($image_format);
 
-            if($file_size > 10247680 || file_exists($file_path.$new_name)) {
-
-                // size exceeded limit 10MB or Name already exist -not likely to happen (the name part)
-                return [
-                    'message' => 'Cover image exceeds 10MB',
-                    'status'  => 500,
-                ];
-            } else {
-
-                if(!IndexFunction::nPhoto_resize($file_tmp, $file_size, $file_type, $saveImage)) {
-
-                    $stmt=$connection->prepare('UPDATE user_sapphire SET cover = ?, date = ? WHERE uid = ?');
-                    $stmt->bind_param('sss', $new_name, $date, $uid);
-                    $stmt->execute();
-
-                    // free-up memory
-                    unset($connection, $stmt, $uid, $file_path, $saveImage, $valid_types, $format, $new_name, $file_error, $file_type, $file_size, $file_tmp, $file_name);
-                    return [
-                        'message' => 'Success',
-                        'status'  => 200,
-                    ];
-                } else {
-                    return [
-                        'message' => 'Error encountered. Please retry',
-                        'status'  => 500,
-                    ];
-                }
+                move_uploaded_file($image_tmp, $this->file_path.$image_new_name);
+                $image_extensions .= ','.end($image_format);
             }
-        } else {
-
-            return [
-                'message' => 'Cover image type not supported',
-                'status'  => 500,
-            ];
+            $notes_save_handle = 1;
+        } else { //article
+            $body              = IndexFunction::validateInput(trim($body));
+            $paragraphs        = IndexFunction::count_paragraphs($body);
+            $notes_save_handle = 0;
         }
+
+        if($notes_save_handle == 0) { # Save article
+
+            $cover_upload = !IndexFunction::nPhoto_resize( $cover_tmp, $cover_size, $cover_type, $save_cover_image );
+            if($cover_upload) {
+                $res = $this->desk_save($uid, $pid, $title, $body, $paragraphs, $cover_new_name_ext, 'art', '');
+                return [
+                    'message' => $res['message'],
+                    'status'  => $res['status'],
+                ];
+            }
+        } else { # Save images
+
+            $cover_upload = !IndexFunction::nPhoto_resize( $cover_tmp, $cover_size, $cover_type, $save_cover_image );
+            if($cover_upload) {
+                $res = $this->desk_save($uid, $pid, $title, '', $number_of_images, $cover_new_name_ext, 'img', $image_extensions);
+                return [
+                    'message' => $res['message'],
+                    'status'  => $res['status'],
+                ];
+            }
+        }
+
+        unset($title, $notes, $uid);
+        unset($paragraph_array, $first_paragraph, $paragraphs, $pid);
+        unset($file_type, $file_size, $file_tmp, $file_name, $format, $new_name, $saveImage, $valid_types);
     }
 
-    protected function change_display($uid)
+    protected function desk_save($uid, $pid, $title, $notes, $paragraphs, $img, $which_editor, $extensions)
     {
-        $connection = $this->connection;
-        $file_path  = $this->file_path;
+        # Note scoring
+            # Score = Paragraphs * First_Paragraphs_Words * Title Red Flags            
+            $First_Paragraphs_Words = [0,1];
+            $red = 0;
+            $red_flags = 0;
+            $flags = 0;
+            (string) $note_score = $this->desk_score_algo($paragraphs, $First_Paragraphs_Words[0], $red_flags);
+        #
 
-        // Get the file components
-        $file_error = $_FILES['display']['error'];
-        $file_type  = $_FILES['display']['type'];
-        $file_size  = $_FILES['display']['size'];
-        $file_tmp   = $_FILES['display']['tmp_name'];
-        $file_name  = IndexFunction::validateInput(IndexFunction::test_input($_FILES['display']['name']));
+        $stmt = $this->connection_sur->prepare('INSERT INTO big_sur (access, uid, pid, note_score) VALUES(1, ?, ?, ?)');
+        $stmt->bind_param('sss', $uid, $pid, $note_score);
+        $executeOne = $stmt->execute();
 
-        // Set-up the necessary image changes
-        $format    = explode('.', $file_name);
-        $new_name  = round(microtime(true)).rand(13,53478).IndexFunction::randomKey(4).'.'.end($format);
+        if($executeOne)
+        {
+            $stmt = $this->connection_sur->prepare('INSERT INTO big_sur_list (access, state, pid, title, note, parags, cover, cover_extension) VALUES(1, ?, ?, ?, ?, ?, ?, ?)');
+            $stmt->bind_param('sssssss', $which_editor, $pid, $title, $notes, $paragraphs, $img, $extensions);
+            $executeTwo = $stmt->execute();
 
-        // Initiate the image changes
-        $saveImage   = $file_path.$new_name;
-        $saveShrink  = $file_path.'shk_'.$new_name;
-        $valid_types = array("image/jpeg", "image/jpg", "image/png");
+            $stmt = $this->connection_sur->prepare('INSERT INTO note_score_details (pid, paragraphs, red_flags, flags, score) VALUES(?, ?, ?, ?, ?)');
+            $stmt->bind_param('sssss', $pid, $paragraphs, $red_flags, $flags, $note_score);
+            $executeScore = $stmt->execute();
 
-        if( empty($file_name) ) {
-            // field empty
+            unset($uid, $pid, $title, $notes, $paragraphs, $img);
+            unset($stmt, $executeOne, $executeTwo, $executeScore, $First_Paragraphs_Words, $red_flags, $flags, $note_score);
             return [
-                'message' => 'Select display',
-                'status'  => 500,
-            ];
-        } else if(in_array($file_type, $valid_types)) {
-
-            if($file_size > 10247680 || file_exists($file_path.$new_name)) {
-
-                // size exceeded limit 10MB or Name already exist -not likely to happen (the name part)
-                return [
-                    'message' => 'Display exceeds 10MB',
-                    'status'  => 500,
-                ];
-            } else {
-
-                if(!IndexFunction::nPhoto_square( $file_tmp, $file_size, $file_type, $saveImage, 200 ) && !IndexFunction::nPhoto_square( $file_tmp, $file_size, $file_type, $saveShrink, 50 )) {
-
-                    $stmt=$connection->prepare('UPDATE user_sapphire SET display = ? WHERE uid = ?');
-                    $stmt->bind_param('ss', $new_name, $uid);
-                    $stmt->execute();
-
-                    // Unset variables to free-up memory
-                    unset($connection, $stmt, $uid, $file_path);
-                    unset($file_error, $file_type, $file_size, $file_tmp, $file_name);
-                    unset($format, $new_name);
-                    unset($saveImage, $saveShrink, $valid_types);
-
-                    // Upload success.
-                    return [
-                        'message' => 'Success',
-                        'status'  => 200,
-                    ];
-                } else {
-                    // error encountered
-                    return [
-                        'message' => 'Error encountered. Please retry',
-                        'status'  => 500,
-                    ];
-                }
-            }
-        } else {
-            // file type not supported
-            return [
-                'message' => 'Display file type not supported',
-                'status'  => 500,
+                'message' => 'Success',
+                'status'  => 200,
             ];
         }
+        unset($uid, $pid, $title, $body, $paragraphs, $img);
+        unset($stmt, $executeOne, $executeTwo, $executeScore, $First_Paragraphs_Words, $red_flags, $flags, $note_score);
+        return [
+            'message' => 'Error encountered',
+            'status'  => 500,
+        ];
+    }
+
+    protected function desk_score_algo(...$a)
+    {
+        return 200;
     }
 }

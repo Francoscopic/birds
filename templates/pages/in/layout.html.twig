@@ -43,7 +43,7 @@
                         <a href="#" class="note-menu-open" title="Show menu">
                             <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
                         </a>
-                        <a href="#" class="note-yours-prevent" title="Share something great">
+                        <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
                             <p><i class="fa-regular fa-square-plus"></i></p>
                         </a>
                         <a href="{{ url('note_home') }}" title="From the community">
@@ -58,7 +58,7 @@
                         <a href="#" class="note-menu-open" title="Show menu">
                             <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
                         </a>
-                        <a href="#" class="note-yours-prevent" title="Share something great">
+                        <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
                             <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
                         </a>
                         <a href="{{ url('note_home') }}" title="From the community">
