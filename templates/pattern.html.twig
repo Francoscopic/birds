@@ -29,6 +29,7 @@
             <title>{{ block('title') }} :: Netintui Notes</title>
 
         {# STYLES #}
+            {# {{ encore_entry_link_tags('app') }} #}
             <link href="{{ asset('lib/icons/fontawesome6/css/all.min.css') }}" rel="stylesheet" />
             <link href="{{ asset('stylesheets/framework.css') }}" rel="stylesheet" />
             <link href="{{ asset('images/logo/favicon.ico') }}" rel="icon" type="image/x-icon" />
@@ -43,6 +44,7 @@
         {% endblock %}
 
         {# SCRIPTS #}
+        {# {{ encore_entry_script_tags('app') }} #}
         <script src="{{ asset('scripts/jquery/jquery-3.1.1.min.js') }}"></script>
         <script src="{{ asset('scripts/plugins/lozad.js') }}"></script>
         {% block script_modules %}{% endblock %}
