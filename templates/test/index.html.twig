@@ -12,7 +12,7 @@
     <h1>Hello {{ name }}! ✅</h1>
 
     This friendly message is coming from:
-    <ul>
+    <ul v-if="wo">
         <li>Your controller at <code><a href="{{ 'C:/Tutorials/PHP/nnotes/src/Controller/TestController.php'|file_link(0) }}">src/Controller/TestController.php</a></code></li>
         <li>Your template at <code><a href="{{ 'C:/Tutorials/PHP/nnotes/templates/test/index.html.twig'|file_link(0) }}">templates/test/index.html.twig</a></code></li>
     </ul>
@@ -27,12 +27,11 @@
         data() {
             return {
                 love: 'Agbasimere, Joshua',
-                lave: 'home'
+                lave: 'home',
+                wo: true
             }
         }
     })
     app.mount('#app')
-     
-    console.log('Working JS');
 </script>
 {% endblock %}

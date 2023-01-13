@@ -384,8 +384,30 @@ function note_light_mode() { // working
 
 $(document).ready(function () {
 
-    notes_new_menu(),
+    // notes_new_menu(),
     $.nt_small_menu(),
     note_light_mode(),
     lozad().observe();
 });
+
+
+const { createApp } = Vue
+const app = createApp({
+    delimiters: ['${', '}$'],
+    data() {
+        return {
+            name: 'Agbasimere, Joshua',
+            place: 23,
+            pat: true
+        }
+    },
+    methods: {
+        app_menu() {
+            console.log('Haya!!')
+            this.plaace++
+        }
+    },
+    computed: {
+        
+    }
+}).mount('#nt_app_menu')

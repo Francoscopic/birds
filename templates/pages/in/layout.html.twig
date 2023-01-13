@@ -40,8 +40,8 @@
                         </a>
                     </div>
                     <div class="plain-right">
-                        <a href="#" class="note-menu-open" title="Show menu">
-                            <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
+                        <a href="#" @click.prevent="place+1" id="nt_app_menu" class="note-menu-open" title="Menu">
+                            <p>${place}$<img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
                         </a>
                         <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
                             <p><i class="fa-regular fa-square-plus"></i></p>
