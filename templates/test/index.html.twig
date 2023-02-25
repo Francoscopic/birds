@@ -6,6 +6,10 @@
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+    .niger {
+        height: 100px;
+    }
 </style>
 
 <div class="example-wrapper">
@@ -16,10 +20,15 @@
         <li>Your controller at <code><a href="{{ 'C:/Tutorials/PHP/nnotes/src/Controller/TestController.php'|file_link(0) }}">src/Controller/TestController.php</a></code></li>
         <li>Your template at <code><a href="{{ 'C:/Tutorials/PHP/nnotes/templates/test/index.html.twig'|file_link(0) }}">templates/test/index.html.twig</a></code></li>
     </ul>
-    <h1 id="app">My name is +{ love }+. Welcome +{lave}+</h1>
+    <h1 id="app">My name is +{ love }+. <br>Welcome +{lave}+</h1>
+
+    <h1>Here is a child component!</h1>
+    <div id="app2">
+        <button-counter v-bind:nomen="nomen"></button-counter>
+    </div>
 </div>
+
 <script src="{{ asset('/scripts/plugins/vue.global.min.js') }}"></script>
-{# <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.45/vue.global.min.js"></script> #}
 <script type="module">
     const { createApp } = Vue
     const app = createApp({
@@ -33,5 +42,20 @@
         }
     })
     app.mount('#app')
+
+    import ButtonCounter from '/scripts/components/ButtonCounter.js'
+    const app2 = createApp({
+        components: {
+            ButtonCounter
+        },
+        data() {
+            return {
+                nomen: {text: 'Joshua', number: 24}
+            }
+        }
+    })
+    app2.mount('#app2')
+    
 </script>
+
 {% endblock %}
