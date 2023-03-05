@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Database\DatabaseAccess;
 use App\Verb\Cookie\RetrieveCookie;
-use App\Function\IndexFunction;
+use App\Vunction\IndexFunction;
 use App\Validation\SigninValidation;
 
 

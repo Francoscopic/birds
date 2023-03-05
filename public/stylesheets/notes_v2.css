@@ -755,19 +755,25 @@
 }
 .plain-center > a > p > img,
 .plain-right > a > p > img {
-    width: 20px;
-    height: 20px;
+    width: 23px;
+    height: 23px;
     display: block;
     margin: 0 auto;
-    background-color: #404040;
+    background-color: #909090;
     
-    border-radius: 50%;
+    -webkit-border-radius: 2px;
+       -moz-border-radius: 2px;
+         -o-border-radius: 2px;
+            border-radius: 2px;
 }
 .plain-right > a > p > i {
-    font-size: 1.2em;
+    font-size: 1.4em;
+}
+.plain-right > a:hover > p > i {
+    color: #202020;
 }
 .plain-right > a:hover > p > img {
-    opacity: 0.8;
+    /* border-color: #202020; */
 }
 .plain-right > label,
 .plain-right > a:not(:first-of-type) {

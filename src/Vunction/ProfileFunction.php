@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Function;
+namespace App\Vunction;
 
 use App\Database\DatabaseAccess;
 use Symfony\Component\HttpFoundation\Response;

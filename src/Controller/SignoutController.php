@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 use App\Database\DatabaseAccess;
-use App\Function\IndexFunction;
+use App\Vunction\IndexFunction;
 
 class SignoutController extends AbstractController
 {

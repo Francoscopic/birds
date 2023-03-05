@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Database\DatabaseAccess;
 use App\Validation\SigninValidation;
 use App\Verb\Cookie\RetrieveCookie;
-use App\Function\IndexFunction;
+use App\Vunction\IndexFunction;
 
 
 class DeskProfile extends AbstractController

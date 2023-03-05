@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use App\Database\DatabaseAccess;
-use App\Function\IndexFunction;
+use App\Vunction\IndexFunction;
 use App\Verb\Cookie\RetrieveCookie;
 
 

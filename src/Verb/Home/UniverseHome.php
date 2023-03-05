@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Verb\Cookie\RetrieveCookie;
-use App\Function\IndexFunction;
+use App\Vunction\IndexFunction;
 
 
 class UniverseHome extends AbstractController

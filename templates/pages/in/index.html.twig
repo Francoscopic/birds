@@ -19,7 +19,7 @@
                 <div class="nts-host-jumbotron-opacity"></div>
                 <div class="nts-host-jumbotron-center">
                     <h1>For the Creators Who Write</h1>
-                    <p>Notes is micro-blogging platform to Share, Educate, and Inspire with writing</p>
+                    <p>Notes is your journal. Share, Educate, and Inspire with writing</p>
                 </div>
             </div>
         {% endif %}
@@ -65,11 +65,15 @@
             </div>
         {% endif %}
 
+        {% block var_menu %}
+            <app-main-menu></app-main-menu>
+        {% endblock %}
+
     {% endblock %}
 {# CONTENT - END #}
 
 
 {% block script_modules %}
-    <script type="module" type="text/javascript" src="{{  asset('scripts/index.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('scripts/grow.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{ asset('scripts/index.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{ asset('scripts/grow.js')}}"></script>
 {% endblock %}

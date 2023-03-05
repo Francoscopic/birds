@@ -390,24 +390,19 @@ $(document).ready(function () {
     lozad().observe();
 });
 
-
+// Vue Environment
 const { createApp } = Vue
-const app = createApp({
+
+// App (Main-Menu)
+import AppMainMenu from '/scripts/components/AppMainMenu.js'
+const appMenu = createApp({
     delimiters: ['${', '}$'],
+    components: {
+        AppMainMenu
+    },
     data() {
         return {
-            name: 'Agbasimere, Joshua',
-            place: 23,
-            pat: true
+            working: 'YES yes'
         }
-    },
-    methods: {
-        app_menu() {
-            console.log('Haya!!')
-            this.plaace++
-        }
-    },
-    computed: {
-        
     }
-}).mount('#nt_app_menu')
+}).mount('#app-menu-jar')

@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use App\Database\DatabaseAccess;
-use App\Function\IndexFunction;
+use App\Vunction\IndexFunction;
 use App\Validation\SigninValidation;
 
 class ArticleController extends AbstractController
