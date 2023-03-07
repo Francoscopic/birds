@@ -7,6 +7,7 @@
         "@symfony/ux-vue": "file:../../../tutorials/php/nnotes/vendor/symfony/ux-vue/assets",
         "@symfony/webpack-encore": "^4.0.0",
         "core-js": "^3.23.0",
+        "jquery": "^3.6.3",
         "regenerator-runtime": "^0.13.9",
         "vue": "^3.0",
         "webpack": "^5.74.0",

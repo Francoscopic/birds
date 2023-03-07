@@ -8,6 +8,7 @@
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 // import '../public/lib/icons/fontawesome6/css/all.min.css';
+
 // mine below
 // import '../public/stylesheets/outside/faq.css';
 // import '../public/stylesheets/outside/functions.css';
@@ -59,3 +60,13 @@ import './bootstrap';
 
 // import { registerVueControllerComponents } from '@symfony/ux-vue';
 // registerVueControllerComponents(require.context('./vue/controllers', true, /\.vue$/));
+
+
+import $ from 'jquery'
+
+import greet from './greet';
+
+$(document).ready(function() {
+    $('body').prepend('<h1>'+greet('jill')+'</h1>');
+});
+

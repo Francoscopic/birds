@@ -71,13 +71,13 @@
     {% endblock %}
 
     {% block block_small_menu %}
-        <div class="notes-small-menu-container" id="app-menu-jar" style="display:block">
+        <div class="notes-small-menu-container" id="app-menu-jar" style="display:none">
             <a href="#" class="note-small-menu-container-close a">
                 <div class="glsmpsm men-cvr"></div>
             </a>
             <div class="nts-host-menu">
                 
-            </div>            
+            </div>
             {% block var_menu %}{% endblock %}
         </div>
     {% endblock %}
@@ -91,25 +91,4 @@
     {% endblock %}
 
     {# {% block footer %}{% endblock %} #}
-    {% block script_others %}
-        <script type="module" type="text/javascript">
-
-            // Vue Environment
-            const { createApp } = Vue
-
-            // App (Main-Menu)
-            import AppMainMenu from '/scripts/components/AppMainMenu.js'
-            const appMenu = createApp({
-                delimiters: ['${', '}$'],
-                components: {
-                    AppMainMenu
-                },
-                data() {
-                    return {
-                        working: 'YES yes'
-                    }
-                }
-            }).mount('#app-menu-jar')
-        </script>
-    {% endblock %}
 {% endblock %}

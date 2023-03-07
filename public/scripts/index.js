@@ -390,19 +390,8 @@ $(document).ready(function () {
     lozad().observe();
 });
 
-// Vue Environment
-const { createApp } = Vue
 
-// App (Main-Menu)
-import AppMainMenu from '/scripts/components/AppMainMenu.js'
-const appMenu = createApp({
-    delimiters: ['${', '}$'],
-    components: {
-        AppMainMenu
-    },
-    data() {
-        return {
-            working: 'YES yes'
-        }
-    }
-}).mount('#app-menu-jar')
+
+/* Vue Environment
+*/
+const { createApp } = Vue
