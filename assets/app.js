@@ -10,6 +10,9 @@ import './styles/app.css';
 // import '../public/lib/icons/fontawesome6/css/all.min.css';
 
 // mine below
+import '../public/stylesheets/framework.css';
+import '../public/stylesheets/notes_v2.css';
+
 // import '../public/stylesheets/outside/faq.css';
 // import '../public/stylesheets/outside/functions.css';
 // import '../public/stylesheets/outside/index.css';
@@ -18,16 +21,15 @@ import './styles/app.css';
 // // |
 // import '../public/stylesheets/articles.css';
 // import '../public/stylesheets/darkmode.css';
-// import '../public/stylesheets/framework.css';
 // import '../public/stylesheets/notes_article.css';
-// import '../public/stylesheets/notes_v2.css';
 // import '../public/stylesheets/thirds.css';
 // import '../public/stylesheets/articles.css';
 // import '../public/stylesheets/write.css';
 
 // JS files
+import '../public/scripts/plugins/lozad.js';
+import '../public/scripts/index.js';
 // import '../public/scripts/grow.js';
-// import '../public/scripts/index.js';
 // import '../public/scripts/saved.js';
 // import '../public/scripts/article/article_verbs.js';
 // import '../public/scripts/article/copy_on_click.js';
@@ -62,11 +64,13 @@ import './bootstrap';
 // registerVueControllerComponents(require.context('./vue/controllers', true, /\.vue$/));
 
 
+// For jQuery
 import $ from 'jquery'
+$(document).ready(function(){
+    alert('Working');
+})
 
-import greet from './greet';
-
-$(document).ready(function() {
-    $('body').prepend('<h1>'+greet('jill')+'</h1>');
-});
+// For Vue.js
+import Vue from 'vue'
+const { createApp } =  Vue
 

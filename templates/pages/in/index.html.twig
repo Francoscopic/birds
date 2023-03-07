@@ -5,7 +5,7 @@
 {# HEADERS #}
     {% block darkmode_stylesheet %}
         {% if canvas.misc.theme_state == true %}
-            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+            <link rel="stylesheet" href="{{ asset('/build/dark.css') }}" watch="theme" />
         {% endif %}
     {% endblock %}
 {# HEADERS - END #}
@@ -23,6 +23,16 @@
                 </div>
             </div>
         {% endif %}
+
+        <div {{ stimulus_controller('say-hello') }}>
+            <input type="text" {{ stimulus_target('say-hello', 'name') }}>
+        
+            <button {{ stimulus_action('say-hello', 'greet') }}>
+                Greet
+            </button>
+        
+            <div {{ stimulus_target('say-hello', 'output') }}></div>
+        </div>
         
         <div class="nts-assembly-description">
             <h1>Latest Picks</h1>

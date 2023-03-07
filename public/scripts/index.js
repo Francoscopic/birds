@@ -1,14 +1,10 @@
 
-import Cookies from '/scripts/plugins/cookies/api.js';
+import Cookies from './plugins/cookies/api';
+// import $ from 'jquery';
 
-$.nt_small_menu = function () // working
-{
+function nt_small_menu() {
 
-    var ellipsis = $('.nts-show-menu'), 
-        isUserAllowed = $(ellipsis).attr('visit'), 
-        close_exit = $('.note-small-menu-container-close'), 
-        small_menu_parent_container = $('.notes-small-menu-container'), 
-        small_menu = $('.nts-host-menu');
+    var ellipsis = $('.nts-show-menu'), isUserAllowed = $(ellipsis).attr('visit'), close_exit = $('.note-small-menu-container-close'), small_menu_parent_container = $('.notes-small-menu-container'), small_menu = $('.nts-host-menu');
 
     function small_container(title, name, link, pid, save_state, like_state, unlike_state) {
         var is_saved = is_done(save_state), is_liked = is_done(like_state), is_unliked = is_done(unlike_state);
@@ -67,7 +63,7 @@ $.nt_small_menu = function () // working
     }
     function call_menu(ele) {
         small_menu.empty(),
-        small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
+            small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
     }
     function tools_contractor(pid, save_ask, like_ask, unlike_ask) {
 
@@ -384,14 +380,8 @@ function note_light_mode() { // working
 
 $(document).ready(function () {
 
-    // notes_new_menu(),
-    $.nt_small_menu(),
+    notes_new_menu(),
+    nt_small_menu(),
     note_light_mode(),
     lozad().observe();
 });
-
-
-
-/* Vue Environment
-*/
-const { createApp } = Vue
