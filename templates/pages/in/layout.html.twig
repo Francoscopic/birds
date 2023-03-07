@@ -40,6 +40,11 @@
                         </a>
                     </div>
                     <div class="plain-right">
+                        <turbo-frame id="nt_menu_frame">
+                            <a href="{{ path('note_write') }}">
+                                <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
+                            </a>
+                        </turbo-frame>
                         <a href="#" id="nt_app_menu" class="note-menu-open" title="Menu">
                             <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
                         </a>

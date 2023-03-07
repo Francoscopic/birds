@@ -74,6 +74,9 @@ Encore
 
     // uncomment if you're having problems with a jQuery plugin
     .autoProvidejQuery()
+
+    // uncomment to enable vue loader
+    .enableVueLoader()
 ;
 
 module.exports = Encore.getWebpackConfig();

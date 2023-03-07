@@ -27,7 +27,7 @@ import '../public/stylesheets/notes_v2.css';
 // import '../public/stylesheets/write.css';
 
 // JS files
-import '../public/scripts/plugins/lozad.js';
+// import '../public/scripts/plugins/lozad.js';
 import '../public/scripts/index.js';
 // import '../public/scripts/grow.js';
 // import '../public/scripts/saved.js';
@@ -67,10 +67,9 @@ import './bootstrap';
 // For jQuery
 import $ from 'jquery'
 $(document).ready(function(){
-    alert('Working');
+    // alert('Working');
 })
 
 // For Vue.js
 import Vue from 'vue'
-const { createApp } =  Vue
 

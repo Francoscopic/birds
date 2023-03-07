@@ -1,4 +1,6 @@
 
+import $ from 'jquery'
+
 function growProfile(){
     var o = 0;
     const e = $("#grow-profile"),
