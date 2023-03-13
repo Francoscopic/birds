@@ -10,7 +10,7 @@
     
     {% block darkmode_stylesheet %}
         {% if canvas.misc.theme_state == true %}
-            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
+            <link rel="stylesheet" href="{{ asset('/build/dark.css') }}" watch="theme" />
         {% endif %}
     {% endblock %}
 {# HEADERS - END #}
@@ -27,7 +27,6 @@
 
 
 {% block script_modules %}
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js') }}"></script>
-    <script type="text/javascript" src="{{  asset('/scripts/plugins/autosize.min.js') }}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/write.js') }}"></script>
+    <script type="text/javascript" src="{{  asset('/scripts/plugins/autosize.min.js') }}" defer></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/write.js') }}" defer></script>
 {% endblock %}

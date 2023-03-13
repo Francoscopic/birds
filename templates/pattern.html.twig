@@ -33,9 +33,6 @@
             <link href="{{ asset('images/logo/favicon.ico') }}" rel="icon" type="image/x-icon" />
             {% block stylesheets %}{% endblock %}
             {% block darkmode_stylesheet %}{% endblock %}
-        {# SCRIPT #}
-            {% block script_modules %}{% endblock %}
-            {{ encore_entry_script_tags('app') }}
     </head>
     <body>
         <input type="hidden" id="page-assistant" />
@@ -43,7 +40,11 @@
             {% block content %}{% endblock %}
         {% endblock %}
 
+        {# SCRIPT #}
+            <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js')}}" defer></script>
+            {{ encore_entry_script_tags('app') }}
+            {% block script_modules %}{% endblock %}
         {# SCRIPTS #}
-        {% block script_others %}{% endblock %}
+            {% block script_others %}{% endblock %}
     </body>
 </html>

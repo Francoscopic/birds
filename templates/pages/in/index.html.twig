@@ -23,20 +23,9 @@
                 </div>
             </div>
         {% endif %}
-
-        <div {{ stimulus_controller('say-hello') }}>
-            <input type="text" {{ stimulus_target('say-hello', 'name') }}>
-        
-            <button {{ stimulus_action('say-hello', 'greet') }}>
-                Greet
-            </button>
-        
-            <div {{ stimulus_target('say-hello', 'output') }}></div>
-        </div>
         
         <div class="nts-assembly-description">
             <h1>Latest Picks</h1>
-            <app-main-menu></app-main-menu>
         </div>
         <div class="nts-host-parent clear-fix">
             {# Articles #}
@@ -76,15 +65,10 @@
             </div>
         {% endif %}
 
-        {% block var_menu %}
-            <app-main-menu></app-main-menu>
-        {% endblock %}
-
     {% endblock %}
 {# CONTENT - END #}
 
 
 {% block script_modules %}
-    <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{ asset('scripts/grow.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{ asset('scripts/grow.js')}}" defer></script>
 {% endblock %}

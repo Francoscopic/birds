@@ -10,9 +10,7 @@
     {% endblock %}
     {% block darkmode_stylesheet %}
         {% if canvas.misc.theme_state == true %}
-            <link rel="stylesheet" href="{{ asset('/stylesheets/darkmode.css') }}" watch="theme" />
-        {% else %}
-            <link rel="stylesheet" href="{{ asset('/stylesheets/lightmode.css') }}" watch="theme" />
+            <link rel="stylesheet" href="{{ asset('/build/dark.css') }}" watch="theme" />
         {% endif %}
     {% endblock %}
 {# HEADERS - END #}
@@ -175,7 +173,6 @@
 
 
 {% block script_modules %}
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/copy_on_click.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/article_verbs.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/copy_on_click.js')}}" defer></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/article/article_verbs.js')}}" defer></script>
 {% endblock %}

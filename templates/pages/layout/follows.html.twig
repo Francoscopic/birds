@@ -112,6 +112,5 @@
 {% endblock follows_header %}
 
 {% block follows_script %}
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/index.js')}}"></script>
-    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/follow-script.js')}}"></script>
+    <script type="module" type="text/javascript" src="{{  asset('/scripts/profile/follow-script.js')}}" defer></script>
 {% endblock follows_script %}
