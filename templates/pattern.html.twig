@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        {# USEFUL VARIABLES #}
+            {% set note_head_logo = '/images/logo/notes.png' %}
         {# META #}
             <meta charset="UTF-8">
             <meta name="viewport" content="initial-scale=1, maximum-scale=1, width=device-width, height=device-height" />
             <meta name="author" content="Netintui Ent. Ajegunle, Lagos" />
             <meta name="application-name" content="Netintui Notes" />
             <meta name="keywords" content="Netintui,Notes,Creativity,Business,Money,Ideas,Innovation,News,Blog,Blogging,Design,Productivity,Passion,Tesla,Apple" />
-            <meta name="robots" content="{% block robots %}{{true}}{% endblock %}" />
-            <meta name="description" content="{% block description %}{% endblock %}" />
+            <meta name="robots" content="{% block robots %}{{canvas.headers.robot}}{% endblock %}" />
+            <meta name="description" content="{% block description %}{{canvas.headers.description|escape}}{% endblock %}" />
 
         {# BEAUTY #}
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:image" content="{% block twitter_image %}{{- absolute_url('images/logo/logo-white-full.png') -}}{% endblock %}" />
             <meta name="twitter:site" content="@netintui" />
             <meta name="twitter:description" content="{{ block('description') }}" />
-            <meta name="twitter:title" content="{% block title %}{% endblock %}" />
+            <meta name="twitter:title" content="{% block title %}{{canvas.headers.title|escape}}{% endblock %}" />
+
             <meta property="og:site_name" content="Netintui" />
             <meta property="og:type" content="website" />
             <meta property="og:locale" content="en_US" />
@@ -28,23 +31,101 @@
             <title>{{ block('title') }} :: Netintui Notes</title>
 
         {# STYLES #}
-            <link href="{{ asset('lib/icons/fontawesome6/css/all.min.css') }}" rel="stylesheet" />
-            {{ encore_entry_link_tags('app') }}
             <link href="{{ asset('images/logo/favicon.ico') }}" rel="icon" type="image/x-icon" />
+            <link href="{{ asset('lib/icons/fontawesome6/css/all.min.css') }}" rel="stylesheet" />
+            {# {{ encore_entry_link_tags('app') }} #}
+            <link rel="stylesheet" href="{{ asset('stylesheets/framework.css') }}" />
+            <link rel="stylesheet" href="{{ asset('stylesheets/notes_v2.css') }}" />
             {% block stylesheets %}{% endblock %}
-            {% block darkmode_stylesheet %}{% endblock %}
-    </head>
-    <body>
-        <input type="hidden" id="page-assistant" />
-        {% block body %}
-            {% block content %}{% endblock %}
-        {% endblock %}
+            {% if canvas.misc.theme_state == true %}
+                <link rel="stylesheet" href="{{ asset('/build/dark.css') }}" watch="theme" />
+            {% endif %}
 
         {# SCRIPT #}
-            <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js')}}" defer></script>
+            <script type="text/javascript" src="{{ asset('scripts/jquery/jquery-3.1.1.min.js') }}" defer data-turbo-track="reload"></script>
+            <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js') }}" defer data-turbo-track="reload"></script>
+            {# {{ encore_entry_script_tags('app') }} #}
+    </head>
+    <body>
+        {% block header %}
+            {% if canvas.profile.visitor_state == true %}
+                <div class="n-header n-header-visitor desktop mobile glsmpsm" id="n-header">
+                    <div class="n-header-one">
+                        <a href="{{ url('note_home') }}" class="a">
+                            <p><img src="{{ asset(note_head_logo) }}" /><br><span>(Beta)</span></p>
+                        </a>
+                    </div>
+                    <div class="n-header-two reception-header">
+                        {% if canvas.misc.outside == true %}
+                                <button>Share. Educate. Inspire.</button>
+                        {% else %}
+                            <a href="{{ url('note_signup') }}" class="a">
+                                <button class="reception-header-signup rad20 trn3-color">Sign up</button>
+                            </a>
+                            <a href="{{ url('note_signin') }}" class="a">
+                                <button class="reception-header-signin rad20 trn3-color">Log in</button>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div><div class="n-header-height n-header-height-visitor"></div>
+            {% else %}
+                <div class="n-header desktop mobile glsmpsm" id="n-header">
+                    <div class="plain">
+                        <div class="plain-left">
+                            <a href="{{ url('note_home') }}">
+                                <p><img src="{{ asset(canvas.misc.theme_logo) }}" alt="Netintui Notes" /><br><span>(Beta)</span></p>
+                            </a>
+                        </div>
+                        <div class="plain-right">
+                            <a href="#" id="nt_app_menu" class="note-menu-open" title="Menu">
+                                <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
+                            </a>
+                            <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
+                                <p><i class="fa-regular fa-square-plus"></i></p>
+                            </a>
+                            <a href="{{ url('note_home') }}" title="From the community">
+                                <p><i class="fa-solid fa-house"></i></p>
+                            </a>
+                        </div>
+                    </div>
+                </div><div class="n-header-height"></div>
+                <div class="n-header n-header-mobile desktop mobile glsmpsm" id="n-header">
+                    <div class="plain">
+                        <div class="plain-center">
+                            <a href="#" class="note-menu-open" title="Show menu">
+                                <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
+                            </a>
+                            <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
+                                <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
+                            </a>
+                            <a href="{{ url('note_home') }}" title="From the community">
+                                <p><i class="fa-solid fa-house"></i><br><span>Home</span></p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        <div class="notes-small-menu-container" id="app-menu-jar" style="display:none">
+            <a href="#" class="note-small-menu-container-close a">
+                <div class="glsmpsm men-cvr"></div>
+            </a>
+            <div class="nts-host-menu">
+            </div>
+        </div>
+
+        <div class="note-div desktop tablet mobile relative" id="note-div">
+            <div id="notes-container" class="home-notes-cover">
+                {% block page_contents %}{% endblock %}
+            </div>
+        </div>
+
+
+        {# SCRIPTS #}
+            {# <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js') }}" defer data-turbo-track="reload"></script> #}
             {{ encore_entry_script_tags('app') }}
             {% block script_modules %}{% endblock %}
-        {# SCRIPTS #}
             {% block script_others %}{% endblock %}
     </body>
 </html>

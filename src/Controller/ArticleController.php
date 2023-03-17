@@ -83,8 +83,9 @@ class ArticleController extends AbstractController
                 $note_views            = IndexFunction::note_views($post_id) ?? 'No';
                 $note_date             = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
 
-                $cover_width           = IndexFunction::imgNomenclature($note_cover)['width'];
-                $cover_height          = IndexFunction::imgNomenclature($note_cover)['height'];
+                $cover_area            = IndexFunction::imgNomenclature($note_cover);
+                $cover_width           = $cover_area['width'];
+                $cover_height          = $cover_area['height'];
 
                 $comment_url           = $this->generateUrl('note_comment', array('post_id'=>$post_id));
 

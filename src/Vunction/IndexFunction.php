@@ -59,8 +59,8 @@ class IndexFunction
 
     public static function imgNomenclature($file): array
     {
-        if(file_exists($file)) {
-            list($width, $height, $type, $attr) = getimagesize($file);
+        if(file_exists(__DIR__.'/../../public'.$file)) {
+            list($width, $height, $type, $attr) = getimagesize(__DIR__.'/../../public'.$file);
             return array('width'=>$width, 'height'=>$height);
         }
         return array(

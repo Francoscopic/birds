@@ -1,3 +1,4 @@
+// import {$ as jQuery} from 'jquery'
 (function($){
   $.fn.copyOnClick = function(options){
     //Initialise opts with defaults and then the provided options

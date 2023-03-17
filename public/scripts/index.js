@@ -1,6 +1,6 @@
 
 import Cookies from './plugins/cookies/api.js';
-import $ from 'jquery';
+// import $ from 'jquery';
 
 function nt_small_menu() {
 
@@ -378,7 +378,7 @@ function note_light_mode() { // working
     }
 }
 
-$(document).ready(function () {
+$(document).ready(function (){
 
     notes_new_menu(),
     nt_small_menu(),

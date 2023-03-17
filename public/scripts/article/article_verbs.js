@@ -1,5 +1,4 @@
-
-import Cookies from '/scripts/plugins/cookies/api.js';
+// import $ from 'jquery';
 
 const page_assistant = $("span#page-assistant"),
     pid  = page_assistant.attr("pid"); //post id
@@ -225,7 +224,7 @@ function monitor_in_share() { // working
     take_action(pid, $trigger_media);
 }
 
-$(document).ready(() => {
+$(() => {
 
     article_verbs(),
     share_comment(),

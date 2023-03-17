@@ -22,6 +22,7 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('dark', './assets/dark.js')
+    // .addEntry('article', './assets/holding/article.js')
 
     // .enableVueLoader()
 

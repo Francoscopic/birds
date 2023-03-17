@@ -113,12 +113,12 @@ function infinite_home() // working
     }
     function trigger_response(trig, trigText='<img src="/images/logo/loader.gif" at="loader" width="15" height="15" />', trigState=true, trigOpas='.7') {
 
-        $(trig).attr('disabled',trigState).css('opacity',trigOpas),
+        $(trig).attr('disabled', trigState).css('opacity', trigOpas),
         $(trig).html(`${trigText}`);
     }
     function trigger_empty_content(trig, msg='That\'s all for now') {
 
-        $(trig).attr('disabled',true).css('opacity','1'),
+        $(trig).attr('disabled', true).css('opacity', '1'),
         $(trig).addClass('nt-infinitescroll-inactive').text(msg);
     }
 }
