@@ -1,5 +1,5 @@
 
-{% extends 'pages/in/layout.html.twig' %}
+{% extends 'pattern.html.twig' %}
 {% use 'pages/layout/desk.html.twig' %}
 
 
@@ -7,12 +7,6 @@
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('/stylesheets/write.css') }}" />
     {% endblock stylesheets %}
-    
-    {% block darkmode_stylesheet %}
-        {% if canvas.misc.theme_state == true %}
-            <link rel="stylesheet" href="{{ asset('/build/dark.css') }}" watch="theme" />
-        {% endif %}
-    {% endblock %}
 {# HEADERS - END #}
 
 

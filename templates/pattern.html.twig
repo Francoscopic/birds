@@ -44,7 +44,9 @@
         {# SCRIPT #}
             <script type="text/javascript" src="{{ asset('scripts/jquery/jquery-3.1.1.min.js') }}" defer data-turbo-track="reload"></script>
             <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js') }}" defer data-turbo-track="reload"></script>
-            {# {{ encore_entry_script_tags('app') }} #}
+            {{ encore_entry_script_tags('app') }}
+            {% block script_modules %}{% endblock %}
+            {% block script_others %}{% endblock %}
     </head>
     <body>
         {% block header %}
@@ -124,8 +126,8 @@
 
         {# SCRIPTS #}
             {# <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js') }}" defer data-turbo-track="reload"></script> #}
-            {{ encore_entry_script_tags('app') }}
+            {# {{ encore_entry_script_tags('app') }}
             {% block script_modules %}{% endblock %}
-            {% block script_others %}{% endblock %}
+            {% block script_others %}{% endblock %} #}
     </body>
 </html>

@@ -9,11 +9,6 @@
         <link rel="stylesheet" href="{{ asset('stylesheets/notes_article.css') }}" >
         {# {{ encore_entry_link_tags('article') }} #}
     {% endblock %}
-    {% block script_modules %}
-        <script type="module" src="{{  asset('/scripts/article/copy_on_click.js')}}" defer data-turbo-track="reload"></script>
-        <script type="module" src="{{  asset('/scripts/article/article_verbs.js')}}" defer data-turbo-track="reload"></script>
-        {# {{ encore_entry_script_tags('article') }} #}
-    {% endblock %}
 {# HEADERS - END #}
 
 
@@ -170,3 +165,9 @@
         {% endfor %}
     </div> 
 {% endblock page_contents %}
+
+{% block script_modules %}
+    <script type="text/javascript" src="{{  asset('/scripts/article/copy_on_click.js')}}" defer data-turbo-track="reload"></script>
+    <script type="text/javascript" src="{{  asset('/scripts/article/article_verbs.js')}}" defer data-turbo-track="reload"></script>
+    {# {{ encore_entry_script_tags('article') }} #}
+{% endblock %}

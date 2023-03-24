@@ -1,4 +1,3 @@
-// import $ from 'jquery';
 
 const page_assistant = $("span#page-assistant"),
     pid  = page_assistant.attr("pid"); //post id
