@@ -25,10 +25,4 @@ class UserController extends AbstractController
 
         $entityManager->flush();
     }
-    // public function index(): Response
-    // {
-    //     return $this->render('user/index.html.twig', [
-    //         'controller_name' => 'UserController',
-    //     ]);
-    // }
 }
