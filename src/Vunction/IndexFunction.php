@@ -246,7 +246,7 @@ class IndexFunction
         $connection_verb = $connection_verb->connect('verb');
 
         // $stmt = $connection_verb->prepare('SELECT DISTINCT(sid) FROM views WHERE pid=? AND uid=? ORDER BY sid DESC');
-        $stmt = $connection_verb->prepare('SELECT DISTINCT(visit_id) FROM visits WHERE post_id=? AND user_id=?');
+        $stmt = $connection_verb->prepare('SELECT DISTINCT(visit_id) FROM visits WHERE pid=? AND uid=?');
         $stmt->bind_param('ss', $note_id, $viewer_id);
         $stmt->execute();
         $get_result = $stmt->get_result();
@@ -659,7 +659,7 @@ class IndexFunction
         {
             $connection_verb = new DatabaseAccess();
             $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare('SELECT DISTINCT(user_id) FROM visits WHERE post_id = ?');
+            $stmt = $connection_verb->prepare('SELECT DISTINCT(uid) FROM visits WHERE pid = ?');
             $stmt->bind_param('s', $id);
             $stmt->execute();
             $ans = ($stmt->get_result())->num_rows;

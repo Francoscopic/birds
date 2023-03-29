@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Visitor;
+use App\Entity\VerbUnlikes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Visitor>
+ * @extends ServiceEntityRepository<VerbUnlikes>
  *
- * @method Visitor|null find($id, $lockMode = null, $lockVersion = null)
- * @method Visitor|null findOneBy(array $criteria, array $orderBy = null)
- * @method Visitor[]    findAll()
- * @method Visitor[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method VerbUnlikes|null find($id, $lockMode = null, $lockVersion = null)
+ * @method VerbUnlikes|null findOneBy(array $criteria, array $orderBy = null)
+ * @method VerbUnlikes[]    findAll()
+ * @method VerbUnlikes[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VisitorRepository extends ServiceEntityRepository
+class VerbUnlikesRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Visitor::class);
+        parent::__construct($registry, VerbUnlikes::class);
     }
 
-    public function save(Visitor $entity, bool $flush = false): void
+    public function save(VerbUnlikes $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class VisitorRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Visitor $entity, bool $flush = false): void
+    public function remove(VerbUnlikes $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class VisitorRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Visitor[] Returns an array of Visitor objects
+//     * @return VerbUnlikes[] Returns an array of VerbUnlikes objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class VisitorRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Visitor
+//    public function findOneBySomeField($value): ?VerbUnlikes
 //    {
 //        return $this->createQueryBuilder('v')
 //            ->andWhere('v.exampleField = :val')
