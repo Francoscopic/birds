@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserController extends AbstractController
 {
     #[Route('/u/user/{uid}/', name: 'app_user')]
-    public function show(ManagerRegistry $doctrine, string $uid): Response
+    public function show1(ManagerRegistry $doctrine, string $uid): Response
     {
         $user = $doctrine->getRepository(BigSur::class)->find($uid);
 

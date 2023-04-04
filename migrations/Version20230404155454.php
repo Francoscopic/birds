@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230329062617 extends AbstractMigration
+final class Version20230404155454 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -50,30 +50,6 @@ final class Version20230329062617 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP TABLE big_sur');
-        $this->addSql('DROP TABLE big_sur_draft');
-        $this->addSql('DROP TABLE big_sur_fkscore');
-        $this->addSql('DROP TABLE big_sur_list');
-        $this->addSql('DROP TABLE big_sur_mute');
-        $this->addSql('DROP TABLE big_sur_subscribes');
-        $this->addSql('DROP TABLE help_articles');
-        $this->addSql('DROP TABLE help_response');
-        $this->addSql('DROP TABLE help_sections');
-        $this->addSql('DROP TABLE user_confirm');
-        $this->addSql('DROP TABLE user_diamond');
-        $this->addSql('DROP TABLE user_onyx');
-        $this->addSql('DROP TABLE user_recover');
-        $this->addSql('DROP TABLE user_sapphire');
-        $this->addSql('DROP TABLE user_secure');
-        $this->addSql('DROP TABLE user_visitor');
-        $this->addSql('DROP TABLE verb_comments');
-        $this->addSql('DROP TABLE verb_comments_list');
-        $this->addSql('DROP TABLE verb_likes');
-        $this->addSql('DROP TABLE verb_report');
-        $this->addSql('DROP TABLE verb_saves');
-        $this->addSql('DROP TABLE verb_shares');
-        $this->addSql('DROP TABLE verb_unlikes');
-        $this->addSql('DROP TABLE verb_visits');
-        $this->addSql('DROP TABLE messenger_messages');
+        // $this->addSql('DROP TABLE big_sur');
     }
 }
