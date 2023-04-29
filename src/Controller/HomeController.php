@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-// use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +16,7 @@ use App\Validation\SigninValidation;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'note_home')]
-    public function index(): Response
+    public function index(Connection $connection): Response
     {
         # Profile data
         $login          = new SigninValidation();
@@ -53,7 +53,7 @@ class HomeController extends AbstractController
         );
 
         # Work
-        $articles_list_home          = $this->articles_list_home($uid);
+        $articles_list_home          = $this->articles_list_home($uid, $connection);
         $canvas['notes']             = $articles_list_home['article'];
         $canvas['misc']['load_more'] = $articles_list_home['more'];
 
@@ -62,11 +62,15 @@ class HomeController extends AbstractController
         ]);
     }
 
-    protected function articles_list_home($uid)
+    protected function articles_list_home($uid, $connection_surr)
     {
         # Database Access
         $connection_sur = new DatabaseAccess();
         $connection_sur = $connection_sur->connect('sur');
+
+        // $connection_sur = new Connection();
+
+        // $stmt = $connection_sur->fetchAllAssociative('SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT 15');
 
         $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY sid DESC LIMIT 15");
         $stmt->execute();
