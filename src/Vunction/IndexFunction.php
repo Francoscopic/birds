@@ -3,6 +3,7 @@
 namespace App\Vunction;
 
 use App\Database\DatabaseAccess;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,33 +28,23 @@ class IndexFunction
         );
     }
 
-    public static function get_user_state($user_id, $visit_state = false): array
+    public static function get_user_state($connection, $user_id, $visit_state = false): array
     {
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
         if( $visit_state == true ) {
             return array(
                 'state' => 0,
                 'logo'  => self::get_path('images').'/logo/notes.png',
             );
         }
-        
-        $stmt = $connection->prepare('SELECT state FROM user_sapphire WHERE uid = ?');
-        $stmt->bind_param('s', $user_id);
-        $stmt->execute();
 
-        # Get the array of data from database
-            $get_state_array = $stmt->get_result();
-            $state_array = $get_state_array->fetch_array(MYSQLI_ASSOC);
-        # Instantiate the variables
-        $state = $state_array['state']; // Dark or Light
+        $state = $connection->fetchOne('SELECT state FROM user_sapphire WHERE uid = ?', [$user_id] );
+
         $theme_logo = ($state == true) ? self::get_path('images').'/logo/notes-white.png' : self::get_path('images').'/logo/notes.png';
 
-        unset($stmt, $connection, $get_state_array, $state_array, $user_id);
+        unset($connection, $user_id, $visit_state);
         return array(
-            'state'=>$state,
-            'logo' => $theme_logo,
+            'state' => $state,
+            'logo'  => $theme_logo,
         );
     }
 
@@ -163,20 +154,18 @@ class IndexFunction
         return $postedMsg;
     }
 
-    public static function get_me($theUid): array
+    public static function get_me($connection, $theUid): array
     {
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
+        $myName = $myUname = null;
+        $stmt = $connection->fetchAssociative(
+            'SELECT name, uname FROM user_sapphire WHERE uid = :userId', ['userId'=>$theUid]
+        );
+        if($stmt == true) {
+            $myName = $stmt['name'];
+            $myUname = $stmt['uname'];
+        }
 
-        $stmt=$connection->prepare("SELECT name, uname FROM user_sapphire WHERE uid = ?");
-        $stmt->bind_param('s', $theUid);
-        $stmt->execute();
-        $theResult = $stmt->get_result();
-        $theResult_row = $theResult->fetch_array(MYSQLI_ASSOC);
-        $myName = $theResult_row['name'];
-        $myUname = $theResult_row['uname'];
-
-        unset($stmt, $connection, $theResult, $theResult_row, $theUid);
+        unset($stmt, $connection, $theUid);
         return array(
             'name'     => $myName,
             'username' => $myUname
@@ -209,27 +198,19 @@ class IndexFunction
         ];
     }
 
-    public static function get_this_note($thePid): array
+    public static function get_this_note($connection, $thePid): array
     {
-
-        # Get the needed information of me.
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        $stmt = $connection_sur->prepare('SELECT title, parags, cover, state, date FROM big_sur_list WHERE pid = ?');
-        $stmt->bind_param('s', $thePid);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-
-        # array
-        $result_array = $get_result->fetch_array(MYSQLI_ASSOC);
-
-        # variables
-        $title            = $result_array['title'];
-        $paragraphs       = $result_array['parags'];
-        $cover            = $result_array['cover'];
-        $article_or_image = $result_array['state'];
-        $date             = $result_array['date'];
+        $title = $paragraphs = $cover = $article_or_image = $date = null;
+        $stmt = $connection->fetchAssociative(
+            'SELECT title, parags, cover, state, date FROM big_sur_list WHERE pid = :pid', ['pid'=>$thePid], []
+        );
+        if($stmt == true) {
+            $title            = $stmt['title'];
+            $paragraphs       = $stmt['parags'];
+            $cover            = $stmt['cover'];
+            $article_or_image = $stmt['state'];
+            $date             = $stmt['date'];
+        }
 
         return array(
             'title'      => $title,
@@ -240,22 +221,14 @@ class IndexFunction
         );
     }
 
-    public static function get_if_views($note_id, $viewer_id): bool
+    public static function get_if_views($connection, $note_id, $viewer_id): bool
     {
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
-        // $stmt = $connection_verb->prepare('SELECT DISTINCT(sid) FROM views WHERE pid=? AND uid=? ORDER BY sid DESC');
-        $stmt = $connection_verb->prepare('SELECT DISTINCT(visit_id) FROM visits WHERE pid=? AND uid=?');
-        $stmt->bind_param('ss', $note_id, $viewer_id);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-
-        if( $get_result->num_rows >= 1 ) {
-            unset($stmt, $connection_verb, $get_result, $note_id, $viewer_id);
+        $stmt = $connection->fetchOne('SELECT COUNT(DISTINCT(visit_id)) AS total FROM verb_visits WHERE pid=:postId AND uid=:userId', ['postId'=>$note_id, 'userId'=>$viewer_id]);
+        if($stmt >= 1) {
             return true;
         }
-        unset($stmt, $connection_verb, $get_result, $note_id, $viewer_id);
+
+        unset($stmt, $note_id, $viewer_id);
         return false;
     }
 
@@ -404,33 +377,25 @@ class IndexFunction
             $st = in_array($size, array('small','sm'));
             return ($st == true) ? 'shk_' : '';
         }
-        public static function small_menu_validations($pid, $viewer_uid): array
+        public static function small_menu_validations($connection, $pid, $viewer_uid): array
         {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            $save_state = $like_state = 0;
+            $save_state = $like_state = $unlike_state = null;
 
-            # SAVES
-            $stmt = $connection_verb->prepare('SELECT sid FROM saves WHERE uid = ? AND pid = ? AND state = 1 ');
-            $stmt->bind_param('ss', $viewer_uid, $pid);
-            $stmt->execute();
-            $save_state = ($stmt->get_result()->num_rows == 1) ? 1 : 0;
+            # SAVE
+            $save_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_saves WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
+            $save_state = ($save_state == 1) ? 1 : 0;
 
             # LIKES
-            $stmt = $connection_verb->prepare('SELECT sid FROM likes WHERE uid = ? AND pid = ? AND state = 1 ');
-            $stmt->bind_param('ss', $viewer_uid, $pid);
-            $stmt->execute();
-            $like_state = ($stmt->get_result()->num_rows == 1) ? 1 : 0;
+            $like_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_likes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
+            $like_state = ($like_state == 1) ? 1 : 0;
 
-            # UN-LIKES
-            $stmt = $connection_verb->prepare('SELECT sid FROM unlikes WHERE uid = ? AND pid = ? AND state = 1 ');
-            $stmt->bind_param('ss', $viewer_uid, $pid);
-            $stmt->execute();
-            $unlike_state = ($stmt->get_result()->num_rows == 1) ? 1 : 0;
+            # UNLIKES
+            $unlike_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_unlikes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
+            $unlike_state = ($unlike_state == 1) ? 1 : 0;
 
             return array(
-                'save' => $save_state,
-                'like' => $like_state,
+                'save'   => $save_state,
+                'like'   => $like_state,
                 'unlike' => $unlike_state
             );
         }

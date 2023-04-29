@@ -30,7 +30,7 @@ class HomeController extends AbstractController
         }
 
         // data
-        $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
+        $theme_data = IndexFunction::get_user_state($connection, $uid, $visitor_state);
 
         $canvas = array(
             'notes' => array(),
@@ -62,42 +62,35 @@ class HomeController extends AbstractController
         ]);
     }
 
-    protected function articles_list_home($uid, $connection_surr)
+    protected function articles_list_home($uid, $connection)
     {
-        # Database Access
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        // $connection_sur = new Connection();
-
-        // $stmt = $connection_sur->fetchAllAssociative('SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT 15');
-
-        $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY sid DESC LIMIT 15");
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        $num_rows = $get_result->num_rows;
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
+        $num_rows = 0;
+        foreach($connection->iterateAssociativeIndexed(
+            'SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT 15', [], []) 
+            as $uid => $data
+        ) {
+            $num_rows++;
             # Get post and my details
-                $the_pid    = $get_rows['pid'];
-                $poster_uid = $get_rows['uid'];
+                $the_pid    = $data['pid'];
+                $poster_uid = $uid;
             #
             # Instantiate acting variables
-                $my_note_row         = IndexFunction::get_this_note($the_pid);
-                $note_title          = stripslashes($my_note_row['title']);
-                $note_parags         = $my_note_row['paragraphs'];
-                $note_cover          = IndexFunction::note_cover($my_note_row['cover'], 'notes');
-                $note_state_is_image = ($my_note_row['state'] == 'art') ? false : true;
-                $note_date           = IndexFunction::timeAgo($my_note_row['date']);
+                $aa                  = IndexFunction::get_this_note($connection, $the_pid);
+                $note_title          = stripslashes($aa['title']);
+                $note_parags         = $aa['paragraphs'];
+                $note_cover          = IndexFunction::note_cover($aa['cover'], 'notes');
+                $note_state_is_image = ($aa['state'] == 'art') ? false : true;
+                $note_date           = IndexFunction::timeAgo($aa['date']);
             #
-            $get_me            = IndexFunction::get_me($poster_uid);
-            $note_poster_name  = $get_me['name'];
-            $note_poster_uname = $get_me['username'];
+            $ab                = IndexFunction::get_me($connection, $poster_uid);
+            $note_poster_name  = $ab['name'];
+            $note_poster_uname = $ab['username'];
             # Get me view details
-                $if_view = IndexFunction::get_if_views($the_pid, $uid);
-                $view_eye = ($if_view === true) ? '*' : '';
+                $if_view = IndexFunction::get_if_views($connection, $the_pid, $uid);
+                $view_eye = ($if_view == true) ? '*' : '';
             #
             # Get small_menu details
-                $small_menu_state = IndexFunction::small_menu_validations($the_pid, $uid);
+                $small_menu_state = IndexFunction::small_menu_validations($connection, $the_pid, $uid);
                 $save_state       = $small_menu_state['save'];
                 $like_state       = $small_menu_state['like'];
                 $unlike_state     = $small_menu_state['unlike'];
@@ -122,7 +115,7 @@ class HomeController extends AbstractController
                 'profile_url'  => $profile_url,
             ];
         }
-        $show_load_more = ($num_rows==15) ? true : false;
+        $show_load_more = ($num_rows == 15) ? true : false;
         return [
             'article' => $content,
             'more'    => $show_load_more
