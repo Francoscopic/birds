@@ -217,42 +217,26 @@ class IndexFunction
         return false;
     }
 
-    public static function get_note_views($note_id): string
+    public static function get_note_views($conn, $note_id): string
     {
-        # Call connection
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
+        $stmt = $conn->fetchOne('SELECT COUNT(id) AS total verb_views WHERE pid=?', [$note_id]);
 
-        $stmt = $connection_verb->prepare('SELECT sid FROM views WHERE pid = ?');
-        $stmt->bind_param('s', $note_id);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        $rows = $get_result->num_rows;
-
-        if( $rows >= 1 ) {
-            unset($connection_verb, $note_id, $stmt, $get_result);
-            return ($rows === 1) ? $rows.' view' : $rows.' views';
+        if( $stmt == true && $stmt >= 1 ) {
+            unset($conn, $note_id, $stmt);
+            return ($stmt === 1) ? $stmt.' view' : $stmt.' views';
         }
-        unset($connection_verb, $note_id, $stmt, $get_result);
-        return 'no view';
+        unset($conn, $note_id, $stmt);
+        return 'no views';
     }
 
-    public static function get_subscribe_state($publisher_id, $customer_id): string
+    public static function get_subscribe_state($conn, $following_id, $follower_id): string
     {
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        $stmt = $connection_sur->prepare('SELECT state FROM subscribes WHERE publisher = ? AND customer = ?');
-        $stmt->bind_param('ss', $publisher_id, $customer_id);
-        $stmt->execute();
-        $get_state_array = $stmt->get_result();
-        # Check if data exists
-        if( $get_state_array->num_rows > 0 ) {
-            $state = $get_state_array->fetch_array(MYSQLI_ASSOC)['state'];
-            unset($stmt, $connection_sur, $publisher_id, $customer_id, $get_state_array);
-            return $state;
+        $stmt = $conn->fetchOne('SELECT state FROM big_sur_subscribes WHERE following=? AND follower=?', [$following_id, $follower_id]);
+        if( $stmt == true ) {
+            unset($stmt, $conn, $following_id, $follower_id);
+            return $stmt;
         }
-        unset($stmt, $connection_sur, $publisher_id, $customer_id, $get_state_array, $state);
+        unset($stmt, $conn, $following_id, $follower_id);
         return 0;
     }
 
@@ -368,15 +352,15 @@ class IndexFunction
 
             # SAVE
             $save_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_saves WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
-            $save_state = ($save_state == 1) ? 1 : 0;
+            $save_state = ($save_state == true && $save_state == 1) ? 1 : 0;
 
             # LIKES
             $like_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_likes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
-            $like_state = ($like_state == 1) ? 1 : 0;
+            $like_state = ($like_state == true && $like_state == 1) ? 1 : 0;
 
             # UNLIKES
             $unlike_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_unlikes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
-            $unlike_state = ($unlike_state == 1) ? 1 : 0;
+            $unlike_state = ($like_state == true && $unlike_state == 1) ? 1 : 0;
 
             return array(
                 'save'   => $save_state,
@@ -389,35 +373,20 @@ class IndexFunction
     # Article
         public static function GET_validate($conn, $get): bool
         { # Is article found
-            // $connection_sur = new DatabaseAccess();
-            // $connection_sur = $connection_sur->connect('sur');
-
-            // $stmt = $connection_sur->prepare('SELECT sid FROM big_sur WHERE pid = ?');
-            // $stmt->bind_param('s', $get);
-            // $stmt->execute();
-            // $result = $stmt->get_result();
-
             $stmt = $conn->fetchAssociative('SELECT COUNT(id) AS total FROM big_sur WHERE pid = ?', [$get]);
-
-            return ( $stmt['total'] > 0 ) ? true : false;
+            
+            return ( $stmt==true && $stmt['total']>0 ) ?true :false;
         }
-        public static function GET_validate_people($get): array
+        public static function GET_validate_people($conn, $get): array
         { # Is GET request name valid
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('');
-            $stmt = $connection->prepare('SELECT uid FROM user_sapphire WHERE uname = ?');
-            $stmt->bind_param('s', $get);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if( $result->num_rows > 0 ) {
-                $row = $result->fetch_array(MYSQLI_ASSOC);
-                $uid = $row['uid'];
-                unset($connection, $stmt, $result, $row);
-                return array($uid, 0);
+            $stmt = $conn->fetchOne('SELECT uid FROM user_sapphire WHERE uname = ?', [$get]);
+            if($stmt == true) {
+                unset($conn, $stmt, $get);
+                return [$stmt, 0];
             }
-            unset($connection, $stmt, $result, $row, $uid);
-            return array('1999', 1);
+
+            unset($conn, $stmt, $get);
+            return ['not-found', 1];
         }
 
         public static function get_my_note($conn, $thePid): array
@@ -454,67 +423,51 @@ class IndexFunction
                 'date'       => $date,
             );
         }
-        public static function get_note_poster($theUid): array
+        public static function get_note_poster($conn, $theUid): array
         {
             if ($theUid == false) {
-                return array('name'=>'John Doe', 'username'=>'john_doe', 'state'=>false, 'display'=>'');
+                return array(
+                    'name' => 'John Doe', 
+                    'username' => 'john_doe', 
+                    'state' => false, 
+                    'display' => ''
+                );
             }
 
-            // Call database
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('');
+            $name = $user_name = $display = null;
 
-            // Search database for the poster's details
-            $stmt = $connection->prepare('SELECT name, uname, display FROM user_sapphire WHERE uid = ?');
-            $stmt->bind_param('s', $theUid);
-            $stmt->execute();
+            $stmt = $conn->fetchAssociative('SELECT name, uname, display FROM user_sapphire WHERE uid = ?', [$theUid]);
+            if($stmt == true) {
+                $name      = $stmt['name'];
+                $user_name = strtolower($stmt['uname']);
+                $display   = self::image_file_paths('profile')['content'] . self::get_size('small') . $stmt['display'];
+            }
 
-            // Get data
-            $get_result   = $stmt->get_result();
-            $result_array = $get_result->fetch_array(MYSQLI_ASSOC);
-
-            // Instantiate variables
-            $name      = $result_array['name'];
-            $user_name = strtolower($result_array['uname']);
-            $display   = self::image_file_paths('profile')['content'] . self::get_size('small') . $result_array['display'];
-
-            // Kill variables
-            unset($stmt, $connection, $result_array, $get_result, $theUid);
-
-            // Return variables
+            unset($stmt, $conn, $theUid);
             return array(
                 'name'     => $name,
                 'username' => $user_name,
                 'display'  => $display
             );
         }
-        public static function get_poster_uid($post_id): array
+        public static function get_poster_uid($conn, $post_id): array
         {
-            // Database Access
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
+            $poster_uid = null;
 
-            $stmt = $connection_sur->prepare('SELECT uid FROM big_sur WHERE pid = ?');
-            $stmt->bind_param('s', $post_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $num_rows = $result->num_rows;
-            $row = $result->fetch_array(MYSQLI_ASSOC);
-            $poster_uid = $row['uid'];
+            $stmt = $conn->fetchOne('SELECT uid FROM big_sur WHERE pid=?', [$post_id]);
+            if($stmt == true) {
+                $poster_uid = $stmt;
+            }
 
             return array(
                 'uid'     => $poster_uid,
                 'message' => 'Get UID with PID',
             );
         }
-        public static function save_like_verb($table, $theUid, $thePosterUid, $thePid, $type, $state = 1): array
+        public static function save_like_verb($conn, $table, $theUid, $thePosterUid, $thePid, $type, $state = 1): array
         {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare("SELECT sid FROM $table WHERE uid = ? AND puid = ? AND pid = ? AND state = ?");
-            $stmt->bind_param('ssss', $theUid, $thePosterUid, $thePid, $state);
-            $stmt->execute();
-            $getResult = $stmt->get_result();
+            $table = 'verb_'.$table;
+            $stmt = $conn->fetchOne("SELECT id FROM $table WHERE uid = ? AND puid = ? AND pid = ? AND state = ?", [$theUid, $thePosterUid, $thePid, $state]);
             # Instantiate the verbs
             $checked = '';
             if($type == 'like') {
@@ -524,7 +477,7 @@ class IndexFunction
             } elseif($type == 'save') {
                 $icon = 'far fa-bookmark';
             }
-            if( $getResult->num_rows > 0 ) {
+            if( $stmt == true ) {
                 # Return handler: true = NOTED
                 $checked = 'checked';
                 if($type == 'like') {
@@ -536,65 +489,50 @@ class IndexFunction
                 if($type == 'save') {
                     $icon = 'fas fa-bookmark';
                 }
-                unset($connection_verb, $stmt, $getResult, $table, $theUid, $thePosterUid, $thePid, $type, $state);
+                unset($conn, $stmt, $table, $theUid, $thePosterUid, $thePid, $type, $state);
                 return array('icon'=>$icon, 'check'=>$checked);
             }
-            unset($connection_verb, $stmt, $getResult, $table, $theUid, $thePosterUid, $thePid, $type, $state);
+            unset($conn, $stmt, $table, $theUid, $thePosterUid, $thePid, $type, $state);
             # Return handler: false = NOT NOTED
             return array(
-                'icon'=>$icon,
-                'check'=>$checked
+                'icon'  => $icon,
+                'check' => $checked
             );
         }
-        public static function renoted($theUid, $thePosterUid, $thePid, $state = 1): array
+        public static function renoted($conn, $theUid, $thePosterUid, $thePid, $state = 1): array
         {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare('SELECT sid FROM renotes WHERE uid = ? AND puid = ? AND pid = ? AND state = ?');
-            $stmt->bind_param('ssss', $theUid, $thePosterUid, $thePid, $state);
-            $stmt->execute();
-            $getResult = $stmt->get_result();
+            $stmt = $conn->fetchOne('SELECT id FROM renotes WHERE uid = ? AND puid = ? AND pid = ? AND state = ?', [$theUid, $thePosterUid, $thePid, $state]);
 
-            # Instantiate the verbs
-            $color = '';
-            $disabled = '';
-
-            # if row is greater than zero.
+            $color = $disabled = null;
+            # if queryObject is true
             # Meaning: you RENOTED this Note (Does that make sense?)
-            if( $getResult->num_rows > 0 ) {
-                # Return handler: true = RENOTED
+            if( $stmt == true ) {
                 $color = 'note-buttons-clicked';
                 $disabled = 'disabled';
-                unset($connection_verb, $stmt, $getResult, $theUid, $thePosterUid, $thePid, $state);
-                return array('color'=>$color, 'state'=>$disabled);
             }
-            unset($connection_verb, $stmt, $getResult, $theUid, $thePosterUid, $thePid, $state);
-            # Return handler: false = NOT RENOTED
+            unset($conn, $stmt, $theUid, $thePosterUid, $thePid, $state);
             return array(
-                $color,
-                $disabled
+                'color' => $color,
+                'state' => $disabled
             );
         }
-        public static function verb_number($thePid, $table, $state = 1): array
+        public static function verb_number($conn, $thePid, $table, $state = 1): array
         {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare("SELECT pid, puid FROM $table WHERE pid = ? AND state = ?");
-            $stmt->bind_param('ss', $thePid, $state);
-            $stmt->execute();
-            $getResult = $stmt->get_result();
-            # Instantiate the verbs
-            $number = $getResult->num_rows;
+            $number = null;
+
+            $table = 'verb_'.$table;
+
+            $stmt = $conn->fetchOne("SELECT COUNT(id) as total FROM $table WHERE pid = ? AND state = ?", [$thePid, $state]);
             # if rows is zero.
-            if( $getResult->num_rows === 0 ) {
+            if($stmt == false) {
                 # Return number of NOTES
                 $number = 'Like';
-                unset($connection_verb, $stmt, $getResult, $thePid, $table, $state);
+                unset($conn, $stmt, $thePid, $table, $state);
                 return array(
                     'number' => $number
                 );
             }
-            unset($connection_verb, $stmt, $getResult, $thePid, $table, $state);
+            unset($conn, $stmt, $thePid, $table, $state);
             # Return handler: false = NOT NOTED
             return array(
                 'number' => $number . ' likes',
@@ -602,103 +540,81 @@ class IndexFunction
         }
         public static function note_views($conn, $id)
         {
-            // $connection_verb = new DatabaseAccess();
-            // $connection_verb = $connection_verb->connect('verb');
-            // $stmt = $connection_verb->prepare('SELECT DISTINCT(uid) FROM visits WHERE pid = ?');
-            // $stmt->bind_param('s', $id);
-            // $stmt->execute();
-            // $ans = ($stmt->get_result())->num_rows;
-
-            $stmt = $conn->fetchAssociative('SELECT COUNT(DISTINCT(uid)) AS total FROM verb_visits WHERE pid = ?', [$id]);
-            $ans = $stmt['total'];
+            $stmt = $conn->fetchOne('SELECT COUNT(DISTINCT(uid)) AS total FROM verb_visits WHERE pid = ?', [$id]);
+            $ans = null;
+            if($stmt == true) {
+                $ans = $stmt;
+            }
 
             unset($conn, $id);
-            return $ans == 0 ? null : $ans;
+            return $ans;
         }
-        public static function get_comment($comment_id): array
+        public static function get_comment($conn, $comment_id): array
         {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-
-            $stmt = $connection_verb->prepare("SELECT comment, date FROM comments_list WHERE cid = ?");
-            $stmt->bind_param("s", $comment_id);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $rows = $result->fetch_array(MYSQLI_ASSOC);
-
-            $comment = $rows['comment'];
-            $date = $rows['date'];
-
-            // Kill the variables
-            unset($connection_verb, $stmt, $result, $rows, $comment_id);
-            return array(
-                'comment'=>$comment,
-                'date'=>$date
-            );
-        }
-        public static function get_comment_poster($commenter_id): array
-        {
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('');
-
-            $stmt = $connection->prepare("SELECT name, uname FROM user_sapphire WHERE uid = ?");
-            $stmt->bind_param("s", $commenter_id);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $rows = $result->fetch_array(MYSQLI_ASSOC);
-
-            $name = $rows['name'];
-            $uname = $rows['uname'];
-
-            // Kill the variables
-            unset($connection, $stmt, $result, $rows, $commenter_id);
-            return array(
-                'name'=>$name,
-                'username'=>$uname
-            );
-        }
-        public static function get_comments_number($note_id, $reason = 'number', $comment_no = 200): array
-        {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            
-            $stmt = $connection_verb->prepare("SELECT sid FROM comments WHERE pid = ?");
-            $stmt->bind_param("s", $note_id);
-            $stmt->execute();
-            $rows_number = ($stmt->get_result())->num_rows;
-
-            if( $rows_number >= $comment_no && $reason === 'more' ) {
-
-                $show_more = '<a href="#" class="notes-more-comments calib a"><p>more <span class="trn3"><i class="sm-i fa fa-arrow-right"></i></span></p></a>';
-                unset($connection_verb, $stmt);
-                return array($show_more);
-            } elseif( $rows_number <= $comment_no && $reason === 'more' ) {
-                unset($connection_verb, $stmt);
-                return array('');
-            } elseif( $rows_number === 0 ) {
-                unset($connection_verb, $stmt);
-                return array('Comment');
-            } else {
-                unset($connection_verb, $stmt);
-                return array($rows_number);
+            $comment = $date = null;
+            $stmt = $conn->fetchAssociative('SELECT comment, date FROM verb_comments_list WHERE cid = ?', [$comment_id]);
+            if($stmt == true) {
+                $comment = $stmt['comment'];
+                $date = $stmt['date'];
             }
-        }
-        public static function last_read_note($uid): array
-        {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare('SELECT pid FROM views WHERE uid = ? ORDER BY sid DESC LIMIT 1');
-            $stmt->bind_param('s', $uid);
-            $stmt->execute();
-            $result=$stmt->get_result();
-            $row = $result->fetch_array(MYSQLI_ASSOC);
 
-            unset($connection_verb, $stmt, $result, $uid);
+            unset($conn, $stmt, $comment_id);
             return array(
-                $row['pid']
+                'comment' => $comment,
+                'date'    => $date
             );
+        }
+        public static function get_comment_poster($conn, $commenter_id): array
+        {
+            $name = $uname = null;
+            $stmt = $conn->fetchAssociative('SELECT name, uname FROM user_sapphire WHERE uid = ?', [$commenter_id]);
+            if($stmt == true) {
+                $name = $stmt['name'];
+                $uname = $stmt['uname'];
+            }
+
+            unset($conn, $stmt, $commenter_id);
+            return array(
+                'name'     => $name,
+                'username' => $uname
+            );
+        }
+        public static function get_comments_number($conn, $note_id, $reason = 'number', $comment_no = 200): array
+        {
+            $stmt = $conn->fetchOne('SELECT COUNT(id) as total FROM comments WHERE pid = ?', [$note_id]);
+
+            if($stmt == true) {
+                if( $stmt >= $comment_no && $reason === 'more' ) {
+
+                    $show_more = '<a href="#" class="notes-more-comments calib a"><p>more <span class="trn3"><i class="sm-i fa fa-arrow-right"></i></span></p></a>';
+                    unset($conn, $stmt);
+                    return [$show_more];
+                } elseif( $stmt <= $comment_no && $reason === 'more' ) {
+
+                    unset($conn, $stmt);
+                    return [''];
+                } elseif( $stmt == 0 ) {
+
+                    unset($conn, $stmt);
+                    return ['Comment'];
+                } else {
+
+                    unset($conn, $stmt);
+                    return [$rows_number];
+                }
+            }
+            return ['something wrong'];
+        }
+        public static function last_read_note($conn, $uid): array
+        {
+            $stmt = $conn->fetchOne('SELECT pid FROM views WHERE uid = ? ORDER BY sid DESC LIMIT 1', [$uid]);
+            if($stmt == true) {
+                return [
+                    $stmt
+                ];
+            }
+            unset($conn, $stmt, $uid);
+            return array(null);
         }
         public static function note_font_family($theFont): string
         {
@@ -725,35 +641,27 @@ class IndexFunction
     #
 
     # Profile
-        public static function profile_user_figures($user_id): array
+        public static function profile_user_figures($conn, $user_id): array
         {
             # This function tends to get the user display image and cover image.
             # The key to finding everything is the session-user-id from *uid*
 
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('');
+            $username = $name = $email = $state = $location = $website = $bio = $cover = $display = null;
 
-            $stmt = $connection_sur->prepare('SELECT uname, name, email, state, location, website, about, cover, display FROM user_sapphire WHERE uid=?');
-            $stmt->bind_param('s', $user_id);
-            $stmt->execute();
+            $stmt = $conn->fetchAssociative('SELECT uname, name, email, state, location, website, about, cover, display FROM user_sapphire WHERE uid=?', [$user_id]);
+            if($stmt == true) {
+                $username = $stmt['uname'];
+                $name     = $stmt['name'];
+                $email    = $stmt['email'];
+                $state    = $stmt['state'];
+                $location = $stmt['location'];
+                $website  = $stmt['website'];
+                $bio      = $stmt['about'];
+                $cover    = self::image_file_paths('profile')['content'] . $stmt['cover'];
+                $display  = self::image_file_paths('profile')['content'] . $stmt['display'];
+            }
 
-            # Get the array of data from database
-            $get_figures_array = $stmt->get_result();
-            $figures_array = $get_figures_array->fetch_array(MYSQLI_ASSOC);
-
-            # Instantiate the variables
-            $username = $figures_array['uname'];
-            $name     = $figures_array['name'];
-            $email    = $figures_array['email'];
-            $state    = $figures_array['state'];
-            $location = $figures_array['location'];
-            $website  = $figures_array['website'];
-            $bio      = $figures_array['about'];
-            $cover    = self::image_file_paths('profile')['content'] . $figures_array['cover'];
-            $display  = self::image_file_paths('profile')['content'] . $figures_array['display'];
-
-            unset($connection_sur, $stmt, $get_figures_array, $figures_array, $user_id);
-            # Send them to page
+            unset($conn, $stmt, $user_id);
             return array(
                 'username' => $username,
                 'name'     => $name,
@@ -795,28 +703,21 @@ class IndexFunction
             ];
             return $content;
         }
-        public static function profile_check_username($user_name): array
+        public static function profile_check_username($conn, $user_name): array
         {
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('');
-
-            $stmt = $connection->prepare('SELECT uid FROM user_sapphire WHERE uname = ?');
-            $stmt->bind_param('s', $user_name);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $rows = $result->num_rows;
+            $stmt = $conn->fetchOne('SELECT uid FROM user_sapphire WHERE uname = ?', [$user_name]);
             
-            if($rows == 1 ) {
+            if($stmt == true) {
                 $data = $result->fetch_array(MYSQLI_ASSOC);
                 return array(
                     'state'   => true,
                     'message' => 'found',
-                    'uid'     => $data['uid'],
+                    'uid'     => $stmt,
                 );
             }
             return array(
                 'state'   => false,
-                'message' => 'Not found',
+                'message' => 'not-found',
                 'uid'     => null,
             );
         }
@@ -832,26 +733,24 @@ class IndexFunction
             unset($text);
             return ($bomb1 > $bomb2) ? count($bomb1) : count($bomb2);
         }
-        public static function get_drafted_data_for_edit($draft_pid, $user_uid): array
+        public static function get_drafted_data_for_edit($conn, $draft_pid, $user_uid): array
         {
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
-            $stmt = $connection_sur->prepare('SELECT title, body FROM big_sur_draft WHERE pid=? AND uid = ?');
-            $stmt->bind_param('ss', $draft_pid, $user_uid);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            $stmt = $conn->fetchAssociative('SELECT title, body FROM big_sur_draft WHERE pid=? AND uid = ?', [$draft_pid, $user_uid]);
 
-            if ($result->num_rows > 0) {
-                $data = $result->fetch_array(MYSQLI_ASSOC);
-                $title = $data['title'];
-                $body = $data['body'];
-                unset($connection_sur, $stmt, $result, $data, $draft_pid, $user_uid);
-                return array('title'=>$title, 'body'=>$body);
+            if ($stmt == true) {
+                $title = $stmt['title'];
+                $body = $stmt['body'];
+
+                unset($conn, $stmt, $draft_pid, $user_uid);
+                return array(
+                    'title' => $title,
+                    'body'  => $body
+                );
             }
-            unset($connection_sur, $stmt, $result, $draft_pid, $user_uid);
+            unset($conn, $stmt, $draft_pid, $user_uid);
             return array(
-                'title'=>'',
-                'body'=>''
+                'title' => null,
+                'body'  => null
             );
         }
     #
