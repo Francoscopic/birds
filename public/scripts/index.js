@@ -1,5 +1,5 @@
 
-import Cookies from './plugins/cookies/api.js';
+// import Cookies from './plugins/cookies/api.js';
 // import $ from 'jquery';
 
 function nt_small_menu() {

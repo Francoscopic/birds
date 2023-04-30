@@ -27,17 +27,18 @@ class UserController extends AbstractController
         // return new Response('Result of query: '.$values);
 
 
-        $stmt = $connection->fetchAssociative(
+        $stmt = $connection->fetchOne(
             'SELECT title, parags, cover, state, date FROM big_sur_list WHERE pid = :pid', ['pid'=>'a9wuAXy51654521835tmS0SEm9h'], []
         );
         if($stmt == true) {
-            $title            = $stmt['title'];
-            $paragraphs       = $stmt['parags'];
-            $cover            = $stmt['cover'];
-            $article_or_image = $stmt['state'];
-            $date             = $stmt['date'];
+            // $title            = $stmt['title'];
+            // $paragraphs       = $stmt['parags'];
+            // $cover            = $stmt['cover'];
+            // $article_or_image = $stmt['state'];
+            // $date             = $stmt['date'];
+            $name = $stmt;
         }
-        return new Response('Result of query: '.$title);
+        return new Response('Result of query: '.$name);
 
     }
 

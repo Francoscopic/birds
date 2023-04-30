@@ -1,5 +1,5 @@
 
-import $ from 'jquery'
+// import $ from 'jquery'
 
 function growProfile(){
     var o = 0;

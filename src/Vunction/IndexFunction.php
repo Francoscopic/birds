@@ -28,7 +28,7 @@ class IndexFunction
         );
     }
 
-    public static function get_user_state($connection, $user_id, $visit_state = false): array
+    public static function get_user_state($conn, $user_id, $visit_state = false): array
     {
         if( $visit_state == true ) {
             return array(
@@ -37,11 +37,11 @@ class IndexFunction
             );
         }
 
-        $state = $connection->fetchOne('SELECT state FROM user_sapphire WHERE uid = ?', [$user_id] );
+        $state = $conn->fetchOne('SELECT state FROM user_sapphire WHERE uid = ?', [$user_id] );
 
         $theme_logo = ($state == true) ? self::get_path('images').'/logo/notes-white.png' : self::get_path('images').'/logo/notes.png';
 
-        unset($connection, $user_id, $visit_state);
+        unset($conn, $user_id, $visit_state);
         return array(
             'state' => $state,
             'logo'  => $theme_logo,
@@ -60,9 +60,9 @@ class IndexFunction
         );
     }
 
-    public static function retrieve_details($user_id): array
+    public static function retrieve_details($conn, $user_id): array
     {
-        if ($user_id === false) {
+        if ($user_id == false) {
             return array(
                 'name'          => 'John Doe',
                 'username'      => 'john_doe',
@@ -72,24 +72,18 @@ class IndexFunction
             );
         }
 
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
+        $username = $name = $state = $display = $display_small = null;
 
-        $stmt = $connection->prepare('SELECT uname, name, state, display FROM user_sapphire WHERE uid = ? OR uname = ? OR name = ? ');
-        $stmt->bind_param('sss', $user_id, $user_id, $user_id);
-        $stmt->execute();
-        // Get the array of data from database
-        $the_result = $stmt->get_result();
-        $result_array = $the_result->fetch_array(MYSQLI_ASSOC);
+        $stmt = $conn->fetchAssociative('SELECT uname, name, state, display FROM user_sapphire WHERE uid=:uId OR uname=:uId OR name=:uId', ['uId'=>$user_id]);
+        if($stmt == true) {
+            $username       = $stmt['uname'];
+            $name           = $stmt['name'];
+            $state          = $stmt['state'];
+            $display        = self::image_file_paths('profile')['content'] . $stmt['display'];
+            $display_small  = self::image_file_paths('profile')['content'] . 'shk_' . $stmt['display'];
+        }
 
-        // Instantiate the variables
-        $username       = $result_array['uname'];
-        $name           = $result_array['name'];
-        $state          = $result_array['state'];
-        $display        = self::image_file_paths('profile')['content'] . $result_array['display'];
-        $display_small  = self::image_file_paths('profile')['content'] . 'shk_' . $result_array['display'];
-
-        unset($stmt, $connection, $user_id, $the_result, $result_array);
+        unset($stmt, $conn, $user_id);
         // Send them to page
         return array(
             'username'      => $username,
@@ -154,47 +148,37 @@ class IndexFunction
         return $postedMsg;
     }
 
-    public static function get_me($connection, $theUid): array
+    public static function get_me($conn, $theUid): array
     {
         $myName = $myUname = null;
-        $stmt = $connection->fetchAssociative(
-            'SELECT name, uname FROM user_sapphire WHERE uid = :userId', ['userId'=>$theUid]
+        $stmt = $conn->fetchAssociative(
+            'SELECT name, uname FROM user_sapphire WHERE uid=?', [$theUid]
         );
         if($stmt == true) {
             $myName = $stmt['name'];
             $myUname = $stmt['uname'];
         }
 
-        unset($stmt, $connection, $theUid);
+        unset($stmt, $conn, $theUid);
         return array(
             'name'     => $myName,
             'username' => $myUname
         );
     }
 
-    public static function get_profile_uid($the_username=''): array 
+    public static function get_profile_uid($conn, $the_username=''): array 
     {
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
-
-        $stmt=$connection->prepare("SELECT uid FROM user_sapphire WHERE uname = ?");
-        $stmt->bind_param('s', $the_username);
-        $stmt->execute();
-        $theResult = $stmt->get_result();
-
-        if($theResult->num_rows == 0) {
+        $stmt = $conn->fetchOne('SELECT uid FROM user_sapphire WHERE uname=?', [$the_username]);
+        if($stmt == true) {
             return [
-                'message' => 'not-found',
-                'uid'    => null,
+                'message' => 'found',
+                'uid'     => $stmt
             ];
         }
 
-        $theResult_row = $theResult->fetch_array(MYSQLI_ASSOC);
-        $my_uid = $theResult_row['uid'];
-
         return [
-            'message' => 'found',
-            'uid'    => $my_uid,
+            'message' => 'not-found',
+            'uid'     => null,
         ];
     }
 
@@ -221,10 +205,11 @@ class IndexFunction
         );
     }
 
-    public static function get_if_views($connection, $note_id, $viewer_id): bool
+    public static function get_if_views($conn, $note_id, $viewer_id): bool
     {
-        $stmt = $connection->fetchOne('SELECT COUNT(DISTINCT(visit_id)) AS total FROM verb_visits WHERE pid=:postId AND uid=:userId', ['postId'=>$note_id, 'userId'=>$viewer_id]);
-        if($stmt >= 1) {
+        $stmt = $conn->fetchOne('SELECT COUNT(DISTINCT(visit_id)) AS total FROM verb_visits WHERE pid=? AND uid=?', [$note_id, $viewer_id]);
+        if($stmt == true && $stmt >= 1) {
+            unset($stmt, $note_id, $viewer_id);
             return true;
         }
 
@@ -402,17 +387,19 @@ class IndexFunction
     #
 
     # Article
-        public static function GET_validate($get): bool
+        public static function GET_validate($conn, $get): bool
         { # Is article found
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
+            // $connection_sur = new DatabaseAccess();
+            // $connection_sur = $connection_sur->connect('sur');
 
-            $stmt = $connection_sur->prepare('SELECT sid FROM big_sur WHERE pid = ?');
-            $stmt->bind_param('s', $get);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            // $stmt = $connection_sur->prepare('SELECT sid FROM big_sur WHERE pid = ?');
+            // $stmt->bind_param('s', $get);
+            // $stmt->execute();
+            // $result = $stmt->get_result();
 
-            return ( $result->num_rows > 0 ) ? true : false;
+            $stmt = $conn->fetchAssociative('SELECT COUNT(id) AS total FROM big_sur WHERE pid = ?', [$get]);
+
+            return ( $stmt['total'] > 0 ) ? true : false;
         }
         public static function GET_validate_people($get): array
         { # Is GET request name valid
@@ -433,35 +420,28 @@ class IndexFunction
             return array('1999', 1);
         }
 
-        public static function get_my_note($thePid): array
+        public static function get_my_note($conn, $thePid): array
         {
-            // Get the needed information of me.
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
+            $title = $note = $cover = $cover_lg = $extensions = $date = $note_poster_id = null;
 
-            $stmt = $connection_sur->prepare('SELECT bs.uid, bsl.title,
-                                                    bsl.note, bsl.cover, bsl.cover_extension, bsl.date
-                                                    FROM big_sur bs INNER JOIN big_sur_list bsl
-                                                    ON bs.pid = bsl.pid
-                                                    WHERE bs.pid = ?');
-            $stmt->bind_param('s', $thePid);
-            $stmt->execute();
-            $get_result = $stmt->get_result();
-
-            // Get the array of data from database
-            $result_array = $get_result->fetch_array(MYSQLI_ASSOC);
+            $stmt = $conn->fetchAssociative('SELECT bs.uid, bsl.title,
+                bsl.note, bsl.cover, bsl.cover_extension, bsl.date
+                FROM big_sur bs INNER JOIN big_sur_list bsl
+                ON bs.pid = bsl.pid
+                WHERE bs.pid = ?', [$thePid]);
 
             // Instantiate the variables
-            $title      = $result_array['title'];
-            $note       = $result_array['note'];
-            $cover      = self::image_file_paths('note')['content'] . self::get_size('small') . $result_array['cover'];
-            $cover_lg   = self::image_file_paths('note')['content'] . $result_array['cover'];
-            $extensions = $result_array['cover_extension'];
-            $date       = $result_array['date'];
+            if($stmt == true) {
+                $note_poster_id = $stmt['uid'];
+                $title      = $stmt['title'];
+                $note       = $stmt['note'];
+                $cover      = self::image_file_paths('note')['content'] . self::get_size('small') . $stmt['cover'];
+                $cover_lg   = self::image_file_paths('note')['content'] . $stmt['cover'];
+                $extensions = $stmt['cover_extension'];
+                $date       = $stmt['date'];
+            }
 
-            $note_poster_id = $result_array['uid'];
-
-            unset($connection_sur, $stmt, $get_result, $result_array);
+            unset($conn, $stmt);
             // Send them to page
             return array(
                 'poster_id'  => $note_poster_id,
@@ -620,16 +600,20 @@ class IndexFunction
                 'number' => $number . ' likes',
             );
         }
-        public static function note_views($id)
+        public static function note_views($conn, $id)
         {
-            $connection_verb = new DatabaseAccess();
-            $connection_verb = $connection_verb->connect('verb');
-            $stmt = $connection_verb->prepare('SELECT DISTINCT(uid) FROM visits WHERE pid = ?');
-            $stmt->bind_param('s', $id);
-            $stmt->execute();
-            $ans = ($stmt->get_result())->num_rows;
-            unset($connection_verb, $stmt, $id);
-            return $ans === 0 ? null : $ans;
+            // $connection_verb = new DatabaseAccess();
+            // $connection_verb = $connection_verb->connect('verb');
+            // $stmt = $connection_verb->prepare('SELECT DISTINCT(uid) FROM visits WHERE pid = ?');
+            // $stmt->bind_param('s', $id);
+            // $stmt->execute();
+            // $ans = ($stmt->get_result())->num_rows;
+
+            $stmt = $conn->fetchAssociative('SELECT COUNT(DISTINCT(uid)) AS total FROM verb_visits WHERE pid = ?', [$id]);
+            $ans = $stmt['total'];
+
+            unset($conn, $id);
+            return $ans == 0 ? null : $ans;
         }
         public static function get_comment($comment_id): array
         {
@@ -734,9 +718,9 @@ class IndexFunction
             $transformed = filter_var($data, FILTER_UNSAFE_RAW);
             return $transformed;
         }
-        public static function article_validate_post_id($post_id)
+        public static function article_validate_post_id($conn, $post_id)
         {
-            return ( self::GET_validate($post_id) === true ) ? true : false;
+            return ( self::GET_validate($conn, $post_id) === true ) ? true : false;
         }
     #
 

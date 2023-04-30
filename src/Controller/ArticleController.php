@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-// use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +20,7 @@ class ArticleController extends AbstractController
     private string $article_message = 'Found article';
 
     #[Route('/a/{post_id}/', name: 'note_posts')]
-    public function article_start(string $post_id, Request $request): Response
+    public function article_start(string $post_id, Connection $conn): Response
     {
         // Profile data
         $login = new SigninValidation();
@@ -31,8 +31,8 @@ class ArticleController extends AbstractController
 
         // data
         $link = $this->generateUrl('note_posts', ['post_id'=>$post_id], UrlGeneratorInterface::ABSOLUTE_URL);
-        $this->article_found = IndexFunction::article_validate_post_id($post_id);
-        $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
+        $this->article_found = IndexFunction::article_validate_post_id($conn, $post_id);
+        $theme_data = IndexFunction::get_user_state($conn, $uid, $visitor_state);
 
         if( $intruder_state == true ) {
             $this->redirectToRoute('note_home');
@@ -73,17 +73,17 @@ class ArticleController extends AbstractController
 
         # WORK
             # Details for the Note, itself: FUNCTION = GET_MY_NOTE()
-                $get_note_result_array = IndexFunction::get_my_note($post_id);
+                $get_note_result_array = IndexFunction::get_my_note($conn, $post_id);
                 $uid_poster            = $get_note_result_array['poster_id']; # uid
                 $note_title            = stripslashes($get_note_result_array['title']); # title
                 $note_note             = IndexFunction::cleanRead($get_note_result_array['note']); # note
                 $note_description      = IndexFunction::ShowMore($note_note); # note
                 $note_cover            = $get_note_result_array['cover_full'];
                 $note_extensions       = IndexFunction::note_cover_extensions($get_note_result_array['cover'], $get_note_result_array['extensions'])['images'];
-                $note_views            = IndexFunction::note_views($post_id) ?? 'No';
+                $note_views            = IndexFunction::note_views($conn, $post_id) ?? 'No';
                 $note_date             = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
 
-                $cover_area            = IndexFunction::imgNomenclature($note_cover);
+                $cover_area            = IndexFunction::imgNomenclature($note_cover.'/abs.jpg');
                 $cover_width           = $cover_area['width'];
                 $cover_height          = $cover_area['height'];
 
@@ -187,7 +187,7 @@ class ArticleController extends AbstractController
                 $canvas['notes']['comment'] = $this->article_block_comments($post_id);
             #
             # MORE 
-                $canvas['notes']['note_more'] =  $this->article_block_readmore($uid, $post_id);
+                $canvas['notes']['note_more'] =  $this->article_block_readmore($conn, $uid, $post_id);
             #
 
             // Divide 2
@@ -211,7 +211,7 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    protected function article_block_comments($pid_note): array
+    protected function article_block_comments($conn, $pid_note): array
     {
         $content = array();
 
@@ -252,36 +252,27 @@ class ArticleController extends AbstractController
         return $content;
     }
 
-    protected function article_block_readmore($uid, $post_id)
+    protected function article_block_readmore($conn, $uid, $post_id)
     {
         $content = array();
 
-        # Database Access
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        // $stmt = $connection_verb->prepare("SELECT DISTINCT(pid) FROM views WHERE access=1 AND uid = ? ORDER BY sid DESC LIMIT 1, 10");
-        $stmt = $connection_sur->prepare("SELECT pid FROM big_sur WHERE access = 1 AND pid != ? ORDER BY sid DESC LIMIT 10");
-        $stmt->bind_param("s", $post_id);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) )
+        foreach(
+            $conn->iterateKeyValue('SELECT id, pid FROM big_sur WHERE access = 1 AND pid != ? ORDER BY id DESC LIMIT 10', [$post_id]) 
+            as $id => $the_pid
+        )
         {
-            # Get post and my details
-                $the_pid = $get_rows['pid'];
-            #
             # Instantiate acting variables
-                $my_note_row = IndexFunction::get_this_note($the_pid);
-                $note_parags = $my_note_row['paragraphs'];
+                $rows1 = IndexFunction::get_this_note($conn, $the_pid);
+                $note_parags = $rows1['paragraphs'];
 
-                $get_note_result_array = IndexFunction::get_my_note($the_pid);
-                $poster_uid = $get_note_result_array['poster_id']; # uid
-                $note_title = IndexFunction::ShowMore(stripslashes($get_note_result_array['title']), 14); # title
-                $note_cover = $get_note_result_array['cover'];
+                $rows2 = IndexFunction::get_my_note($conn, $the_pid);
+                $poster_uid = $rows2['poster_id']; # uid
+                $note_title = IndexFunction::ShowMore(stripslashes($rows2['title']), 14); # title
+                $note_cover = $rows2['cover'];
             #
-            $note_poster_name = IndexFunction::get_me($poster_uid)['name'];
+            $note_poster_name = IndexFunction::get_me($conn, $poster_uid)['name'];
             # View details
-                $if_view  = IndexFunction::get_if_views($the_pid, $uid);
+                $if_view  = IndexFunction::get_if_views($conn, $the_pid, $uid);
                 $view_eye = ($if_view == true) ? '' : '*';
             #
             $article_url = $this->generateUrl('note_posts', array('post_id'=>$the_pid));
