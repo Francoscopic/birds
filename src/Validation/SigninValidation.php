@@ -2,6 +2,7 @@
 
 namespace App\Validation;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -18,10 +19,11 @@ class SigninValidation
     private $request;
     private $connection;
 
-    public function __construct()
+    public function __construct($conn)
     {
-        $this->connection = new DatabaseAccess();
-        $this->connection = $this->connection->connect('');
+        // $this->connection = new DatabaseAccess();
+        // $this->connection = $this->connection->connect('');
+        $this->connection = $conn;
 
         $this->session_cell = new Session();
         // $this->session_cell->start();
@@ -97,23 +99,27 @@ class SigninValidation
 
     protected function validate_sesh_login($userId, $isSignedIn, $sessionId): bool
     {
-        $stmt=$this->connection->prepare("SELECT seshkey FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY sid DESC LIMIT 1");
-        $stmt->bind_param('ss', $userId, $sessionId);
-        $stmt->execute();
-        $checkSeshKey=$stmt->get_result();
-        $seshrow = $checkSeshKey->fetch_array(MYSQLI_ASSOC);
+        // $stmt=$this->connection->prepare("SELECT seshkey FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY sid DESC LIMIT 1");
+        // $stmt->bind_param('ss', $userId, $sessionId);
+        // $stmt->execute();
+        // $checkSeshKey=$stmt->get_result();
+        // $seshrow = $checkSeshKey->fetch_array(MYSQLI_ASSOC);
 
-        if($checkSeshKey->num_rows == 0 || $seshrow == 0) {
+        $stmt = $this->connection->fetchOne('SELECT id FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY id DESC LIMIT 1', [$userId, $sessionId]);
+
+        // if($checkSeshKey->num_rows == 0 || $seshrow == 0) {
+        if($stmt == false) {
             return false;
         }
 
-        $savedSesh = $seshrow['seshkey'];
+        // $savedSesh = $seshrow['seshkey'];
+        $savedSesh = $sessionId;
 
         if ($isSignedIn == true && $sessionId == $savedSesh) {
 
             // Check if user has been logged in already from signin.php page -from Aquamarine folder
             // echo 'Give them access with their *uid*';
-            unset($stmt, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
+            unset($stmt, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return true;
         } else if($isSignedIn != true && $sessionId == $savedSesh) {
 
@@ -121,11 +127,11 @@ class SigninValidation
             // $_SESSION['uid'] = $userId;
             $this->session_cell->set('uid', $userId);
             
-            unset($stmt, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
+            unset($stmt, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return true;
         } else {
             // Just take the person to the signin page. Login is not *true*
-            unset($stmt, $checkSeshKey, $seshrow, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
+            unset($stmt, $savedSesh, $userId, $sessionId, $isSignedIn); //clear memory
             return false;
         }
     }
@@ -137,13 +143,14 @@ class SigninValidation
     }
     protected function add_visitor($visitor_id): void
     {
-        $stmt = $this->connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
-        $stmt->bind_param('s', $visitor_id);
-        $stmt->execute();
-        unset($stmt, $visitor_id);
+        // $stmt = $this->connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
+        // $stmt->bind_param('s', $visitor_id);
+        // $stmt->execute();
+        $this->connection->insert('user_visitor', ['v_id'=>$visitor_id, 'visits'=>'visits + 1']);
+        unset($visitor_id);
     }
 
-     public function alright($page_state)
+    public function alright($page_state)
     {
         $uid = $path = '';
         $intruder = false;
@@ -156,7 +163,7 @@ class SigninValidation
                 'uid'      => $uid,
                 'visit'    => false,
                 'intruder' => $intruder,
-                'user'     => IndexFunction::user_profile_state($uid),
+                'user'     => IndexFunction::user_profile_state($this->connection, $uid),
             );
         } else {
 
@@ -196,7 +203,7 @@ class SigninValidation
                 'uid'      => $uid, 
                 'visit'    => true,
                 'intruder' => $intruder,
-                'user'     => IndexFunction::user_profile_state(false),
+                'user'     => IndexFunction::user_profile_state($this->connection, false),
             );
         }
         return array(
@@ -204,7 +211,7 @@ class SigninValidation
             'uid'      => $uid,
             'visit'    => true,
             'intruder' => $intruder,
-            'user'     => IndexFunction::user_profile_state(false),
+            'user'     => IndexFunction::user_profile_state($this->connection, false),
         );
     }
 }

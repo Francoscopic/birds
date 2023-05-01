@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class IndexFunction
 {
-    public static function user_profile_state($uid): array
+    public static function user_profile_state($conn, $uid): array
     {
-        $user_file = self::retrieve_details($uid);
+        $user_file = self::retrieve_details($conn, $uid);
 
         $username       = strtolower($user_file['username']);
         $name           = stripslashes($user_file['name']);
@@ -756,79 +756,67 @@ class IndexFunction
     #
 
     # People
-        public static function get_user_figures($user_id): array
+        public static function get_user_figures($conn, $user_id): array
         {
             # This function tends to get the user display image and cover image.
             # The key to finding everything is the session-user-id from *uid*
 
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('');
-            $stmt = $connection->prepare('SELECT uname,name,location,website,about,cover,display FROM user_sapphire WHERE uid=?');
-            $stmt->bind_param('s', $user_id);
-            $stmt->execute();
+            $username = $name = $location = $website = $bio = $cover = $display = $display_shrink = null;
 
-            # Get the array of data from database
-            $get_figures_array = $stmt->get_result();
-            $figures_array = $get_figures_array->fetch_array(MYSQLI_ASSOC);
-
-            # Instantiate the variables
-            $username = $figures_array['uname'];
-            $name     = $figures_array['name'];
-            $location = $figures_array['location'];
-            $website  = $figures_array['website'];
-            $bio      = $figures_array['about'];
-            $cover    = $figures_array['cover'];
-            $display  = $figures_array['display'];
-            $display_shrink = str_replace('profile', 'profile/shrink', $display);
+            $stmt = $conn->fetchAssociative('SELECT uname, name, location, website, about, cover, display FROM user_sapphire WHERE uid=?', [$user_id]); 
+            if($stmt == true) {
+                $username = $stmt['uname'];
+                $name     = $stmt['name'];
+                $location = $stmt['location'];
+                $website  = $stmt['website'];
+                $bio      = $stmt['about'];
+                $cover    = $stmt['cover'];
+                $display  = $stmt['display'];
+                $display_shrink = str_replace('profile', 'profile/shrink', $display);
+            }
 
             # Send them to page
-            unset($stmt, $connection, $get_figures_array, $figures_array, $user_id);
+            unset($stmt, $conn, $user_id);
             return array(
-                'username'=>$username,
-                'name'=>$name,
-                'location'=>$location,
-                'website'=>$website,
-                'bio'=>$bio,
-                'cover'=>$cover,
-                'display_small'=>$display_shrink,
-                'display'=>$display
+                'username' => $username,
+                'name'     => $name,
+                'location' => $location,
+                'website'  => $website,
+                'bio'      => $bio,
+                'cover'    => $cover,
+                'display_small' => $display_shrink,
+                'display'  => $display
             );
         }
 
-        public static function get_number_of_notes($uid)
+        public static function get_number_of_notes($conn, $uid)
         {
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
-            $stmt = $connection_sur->prepare('SELECT COUNT(sid) FROM big_sur WHERE uid = ?');
-            $stmt->bind_param('s', $uid);
-            $stmt->execute();
-            $get_no_of_notes_array = $stmt->get_result();
-            $notes_number = $get_no_of_notes_array->fetch_array(MYSQLI_ASSOC)['COUNT(sid)'];
+            $notes_number = null;
 
-            unset($connection, $stmt, $get_no_of_notes_array);
-            return ($notes_number != 0) ? $notes_number : null;
+            $stmt = $conn->fetchOne('SELECT COUNT(id) AS total FROM big_sur WHERE uid = ?', [$uid]);
+            if($stmt == true && $stmt != 0) {
+                $notes_number = $stmt;
+            }
+
+            unset($conn, $stmt, $uid);
+            return $notes_number;
         }
     #
 
     # Follow / Following
-        public static function subscribes($uid, $select = 'followers')
+        public static function subscribes($conn, $uid, $select = 'follower')
         {
-            $select_array = ['followers'=>'publisher', 'following'=>'customer'];
-            $attribute = $select_array[$select];
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
-            $stmt = $connection_sur->prepare("SELECT COUNT(sid) FROM subscribes WHERE $attribute = ? AND state = 1");
-            $stmt->bind_param('s', $uid);
-            $stmt->execute();
-            $get_subs_no_array = $stmt->get_result();
-            $subs_number = $get_subs_no_array->fetch_array(MYSQLI_ASSOC)['COUNT(sid)'];
-            if($subs_number != 0) {
-                unset($stmt, $connection_sur, $get_subs_no_array, $uid, $attribute);
-                return $subs_number;
+            $subs_number = null;
+
+            $stmt = $conn->fetchOne("SELECT COUNT(id) AS total FROM big_sur_subscribes WHERE $select = ? AND state = 1", [$uid]);
+            if($stmt == true && $stmt != 0) {
+                $subs_number = $stmt;
             }
-            unset($stmt, $connection_sur, $get_subs_no_array, $uid, $attribute);
-            return null;
+
+            unset($stmt, $conn, $uid, $select);
+            return $subs_number;
         }
+
         public static function subscribe_but($uid_poster, $uid): array
         {   # Get the subscribe state between the user and people
             $subscribe_state = self::get_subscribe_state($uid_poster, $uid);
@@ -845,49 +833,36 @@ class IndexFunction
     #
 
     # Write
-        public static function get_profile_data_for_edit($post_pid, $user_uid): array
+        public static function get_profile_data_for_edit($conn, $post_id, $user_id): array
         {
-            $connection_sur = new DatabaseAccess();
-            $connection_sur = $connection_sur->connect('sur');
-            $stmt = $connection_sur->prepare('SELECT bsl.title, bsl.note FROM big_sur_list bsl INNER JOIN big_sur bs ON bsl.pid = bs.pid WHERE bs.uid=? AND bs.pid=?');
-            $stmt->bind_param('ss', $user_uid, $post_pid);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            $title = $body = null;
 
-            if ($result->num_rows > 0) {
-                $data = $result->fetch_array(MYSQLI_ASSOC);
-                $title = $data['title'];
-                $body = $data['note'];
-                unset($connection_sur, $stmt, $result, $data, $draft_pid, $user_uid);
-                return array(
-                    'title'=>$title,
-                    'body'=>$body
-                );
+            $stmt = $conn->fetchAssociative('SELECT bsl.title, bsl.note FROM big_sur_list bsl INNER JOIN big_sur bs ON bsl.pid = bs.pid WHERE bs.uid=? AND bs.pid=?', [$user_id, $post_id]);
+            if($stmt == true) {
+                $title = $stmt['title'];
+                $body  = $stmt['note'];
             }
-            unset($connection_sur, $stmt, $result, $draft_pid, $user_uid);
+
+            unset($conn, $stmt, $post_id, $user_id);
             return array(
-                'title'=>'',
-                'body'=>''
+                'title' => $title,
+                'body'  => $body
             );
         }
     #
 
     # Help
-        public static function help_GET_validate($get): array
+        public static function help_GET_validate($conn, $get): array
         {
-            $connection_help = new DatabaseAccess();
-            $connection_help = $connection_help->connect('help');
-            $stmt = $connection_help->prepare('SELECT hid FROM help_articles WHERE hid = ?');
-            $stmt->bind_param('s', $get);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if( $result->num_rows > 0 ) {
-                return array(
-                    'action'=>0
-                );
+            $action = 1;
+
+            $stmt = $conn->fetchOne('SELECT hid FROM help_articles WHERE hid = ?', [$get]);
+            if($stmt == true) {
+                $action = 0;
             }
+
             return array(
-                'action'=>1
+                'action' => $action
             );
         }
     #
@@ -901,9 +876,10 @@ class IndexFunction
         
         public static function validateInput($var)
         {
-            $connection = new DatabaseAccess();
-            $connection = $connection->connect('sur');
-            return $connection->real_escape_string($var);
+            // $connection = new DatabaseAccess();
+            // $connection = $connection->connect('sur');
+            // return $connection->real_escape_string($var);
+            return $var;
         }
 
         public static function nPhoto_square($photoTmp, $file_size, $file_type, $savePhoto, $square_size)
@@ -1076,8 +1052,8 @@ class IndexFunction
             $for_dark = (trim($state) === 'darkmode') ? 'bcg-e' : '';
             $for_light = (trim($state) === 'lightmode') ? 'bcg-e' : '';
             return array(
-                'dark'=>$for_dark, 
-                'light'=>$for_light
+                'dark'  => $for_dark, 
+                'light' => $for_light
             );
         }
 

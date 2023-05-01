@@ -19,7 +19,7 @@ class HomeController extends AbstractController
     public function index(Connection $connection): Response
     {
         # Profile data
-        $login          = new SigninValidation();
+        $login          = new SigninValidation($connection);
         $login_state    = $login->alright($login->page_state);
         $uid            = $login_state['uid'];
         $visitor_state  = $login_state['visit'];
@@ -62,10 +62,10 @@ class HomeController extends AbstractController
         ]);
     }
 
-    protected function articles_list_home($uid, $connection)
+    protected function articles_list_home($uid, $conn)
     {
         $num_rows = 0;
-        foreach($connection->iterateAssociativeIndexed(
+        foreach($conn->iterateAssociativeIndexed(
             'SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT 15', [], []) 
             as $uid => $data
         ) {
@@ -75,22 +75,22 @@ class HomeController extends AbstractController
                 $poster_uid = $uid;
             #
             # Instantiate acting variables
-                $aa                  = IndexFunction::get_this_note($connection, $the_pid);
+                $aa                  = IndexFunction::get_this_note($conn, $the_pid);
                 $note_title          = stripslashes($aa['title']);
                 $note_parags         = $aa['paragraphs'];
                 $note_cover          = IndexFunction::note_cover($aa['cover'], 'notes');
                 $note_state_is_image = ($aa['state'] == 'art') ? false : true;
                 $note_date           = IndexFunction::timeAgo($aa['date']);
             #
-            $ab                = IndexFunction::get_me($connection, $poster_uid);
+            $ab                = IndexFunction::get_me($conn, $poster_uid);
             $note_poster_name  = $ab['name'];
             $note_poster_uname = $ab['username'];
             # Get me view details
-                $if_view = IndexFunction::get_if_views($connection, $the_pid, $uid);
+                $if_view = IndexFunction::get_if_views($conn, $the_pid, $uid);
                 $view_eye = ($if_view == true) ? '*' : '';
             #
             # Get small_menu details
-                $small_menu_state = IndexFunction::small_menu_validations($connection, $the_pid, $uid);
+                $small_menu_state = IndexFunction::small_menu_validations($conn, $the_pid, $uid);
                 $save_state       = $small_menu_state['save'];
                 $like_state       = $small_menu_state['like'];
                 $unlike_state     = $small_menu_state['unlike'];
