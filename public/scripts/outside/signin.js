@@ -28,7 +28,7 @@ function signIn() {
 
                 sign_in_marshal(data);
             }).fail(function(_jqXhr, _textStatus, errorThrown){
-                console.error(_jqXhr.responseText);
+                // console.error(_jqXhr.responseText);
             })
         } else {
             happening(loaderArrow, false, '1');

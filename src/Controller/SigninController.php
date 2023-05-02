@@ -13,22 +13,31 @@ use App\Database\DatabaseAccess;
 use App\Vunction\IndexFunction;
 use App\Validation\SigninValidation;
 
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
 class SigninController extends AbstractController
 {
 
     #[Route('/o/signin/', name: 'note_signin')]
-    public function signin(): Response
+    // public function signin(): Response
+    public function signin(AuthenticationUtils $authenticationUtils): Response
     {
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
         $canvas = array(
-            'notes' => array(),
+            'notes'   => array(),
             'profile' => array(
-                'username' => 'signin-visitor',
+                'username'      => 'signin-visitor',
                 'visitor_state' => true,
             ),
             'misc' => array(
-                'outside' => true,
+                'outside'     => true,
                 'theme_state' => '',
-                'theme_logo' => '',
+                'theme_logo'  => '',
             ),
             'headers' => array(
                 'title' => 'Login',
@@ -39,6 +48,8 @@ class SigninController extends AbstractController
 
         return $this->render('pages/in/signin.html.twig', [
             'canvas' => $canvas,
+            'last_username' => $lastUsername,
+            'error'         => $error,
         ]);
     }
 }

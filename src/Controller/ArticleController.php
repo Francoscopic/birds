@@ -83,7 +83,7 @@ class ArticleController extends AbstractController
                 $note_views            = IndexFunction::note_views($conn, $post_id) ?? 'No';
                 $note_date             = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
 
-                $cover_area            = IndexFunction::imgNomenclature($note_cover.'/abs.jpg');
+                $cover_area            = IndexFunction::imgNomenclature($note_cover);
                 $cover_width           = $cover_area['width'];
                 $cover_height          = $cover_area['height'];
 
@@ -122,12 +122,12 @@ class ArticleController extends AbstractController
             #
 
             # Details of Viewer
-                $viewer_array        = ($visitor_state == true) ? IndexFunction::get_note_poster(false) : IndexFunction::get_note_poster($uid);
+                $viewer_array        = ($visitor_state == true) ? IndexFunction::get_note_poster($conn, false) : IndexFunction::get_note_poster($conn, $uid);
                 $name                = $viewer_array['name'];
                 $username            = $viewer_array['username'];
                 $display             = $viewer_array['display'];
-                $note_posted         = IndexFunction::get_number_of_notes($uid_poster); # Get the number of NOTES posted
-                $subscribe_followers = IndexFunction::subscribes($uid_poster, 'followers'); # Get the number of subscribers Author has
+                $note_posted         = IndexFunction::get_number_of_notes($conn, $uid_poster); # Get the number of NOTES posted
+                $subscribe_followers = IndexFunction::subscribes($conn, $uid_poster, 'followers'); # Get the number of subscribers Author has
 
                 $canvas['notes']['viewer'] = [
                     'name'        => $name,
@@ -142,28 +142,28 @@ class ArticleController extends AbstractController
 
             # VERBS
                 # Save
-                    $get_noted = IndexFunction::save_like_verb('saves', $uid, $uid_poster, $post_id, 'save');
+                    $get_noted = IndexFunction::save_like_verb($conn, 'saves', $uid, $uid_poster, $post_id, 'save');
                     $save_icon = $get_noted['icon'];
                     $save_checked = $get_noted['check'];
                 #
                 # Like
-                    $get_like = IndexFunction::save_like_verb('likes', $uid, $uid_poster, $post_id, 'like');
+                    $get_like = IndexFunction::save_like_verb($conn, 'likes', $uid, $uid_poster, $post_id, 'like');
                     $like_icon = $get_like['icon'];
                     $like_checked = $get_like['check'];
                 #
                 # Liked Number
-                    $liked_number = IndexFunction::verb_number($post_id, 'likes')['number'];
+                    $liked_number = IndexFunction::verb_number($conn, $post_id, 'likes')['number'];
                 #
                 # Subscribe
                     # Get the subscribe state between the user and people
-                    $subscribe_state = IndexFunction::get_subscribe_state($uid_poster, $uid);
+                    $subscribe_state = IndexFunction::get_subscribe_state($conn, $uid_poster, $uid);
                     $state_variables = IndexFunction::subscribe_state_variables($subscribe_state);
                     $subs_text  = $state_variables['title'];
                     $subs_state = $state_variables['state'];
                 #
                 # Comments
                     // Let's get the number of comments
-                    $comment_number = IndexFunction::get_comments_number($post_id, 'number')[0];
+                    $comment_number = IndexFunction::get_comments_number($conn, $post_id, 'number')[0];
                 #
 
                 $canvas['notes']['reaction'] = [
@@ -184,7 +184,7 @@ class ArticleController extends AbstractController
             // Divide
             
             # COMMENT
-                $canvas['notes']['comment'] = $this->article_block_comments($post_id);
+                $canvas['notes']['comment'] = $this->article_block_comments($conn, $post_id);
             #
             # MORE 
                 $canvas['notes']['note_more'] =  $this->article_block_readmore($conn, $uid, $post_id);
