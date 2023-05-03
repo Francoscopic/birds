@@ -2,12 +2,12 @@
 
 namespace App\Verb\Home;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
 use App\Validation\SigninValidation;
 use App\Verb\Cookie\RetrieveCookie;
 use App\Vunction\IndexFunction;
@@ -16,17 +16,35 @@ use App\Vunction\IndexFunction;
 class ArticleLikeHome extends AbstractController
 {
 
+    private $request;
+    private $get_cookie;
+    private $user_id;
+    private $conn;
+
+    public function __construct(Connection $connection)
+    {
+        $this->request = Request::createFromGlobals();
+
+        $this->conn = $connection;
+
+        $this->get_cookie = new RetrieveCookie();
+        $this->user_id = $this->get_cookie->get_netintui_user_id()['user_id'];
+    }
+
     public function verbs(): JsonResponse
     {
         $get_cookie = new RetrieveCookie();
         $viewer_id = $get_cookie->get_netintui_user_id()['user_id'];
 
-        if( isset( $_POST['thePid'], $_POST['theReason'] ) )
+        if( $this->request->request->has('thePid') &&
+            $this->request->request->has('theReason')
+        )
+        // if( isset( $_POST['thePid'], $_POST['theReason'] ) )
         {
-            $pid    = $_POST['thePid'];
+            $pid    = $this->request->request->get('thePid');
             $puid   = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
             $uid    = $viewer_id;
-            $reason = $_POST['theReason'];
+            $reason = $this->request->request->get('theReason');
     
             if( trim($reason) == 'save' )
             {
@@ -54,166 +72,94 @@ class ArticleLikeHome extends AbstractController
             ]);
         }
         return $this->json([
-            'message' => '[500]Something bad happened',
+            'message' => '[500] Something bad happened',
         ]);
     }
 
-    protected function note($thePid, $thePUid, $theUid, $state = 1) 
+    protected function note($thePid, $thePUid, $theUid, $state = 1): void
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
+        $thisID = IndexFunction::randomKey(9);
 
-        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM verb_saves WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
 
-        $stmt = $connection_verb->prepare('SELECT state FROM saves WHERE uid = ? AND puid = ? AND pid = ?');
-        $stmt->bind_param('sss', $theUid, $thePUid, $thePid);
-        $stmt->execute();
-        $getResult = $stmt->get_result();
-
-        // if getResult is not greater than zero.
+        // if result is not greater than zero.
         // Meaning you haven't saved this before/ INSERT into database
-        if( !( $getResult->num_rows > 0 ) ) {
+        if( !( $stmt['rows'] > 0 ) ) {
             // Nothing found. Save new
-            $stmt = $connection_verb->prepare('INSERT INTO saves (pid, puid, uid, bid, state) VALUES(?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssss', $thePid, $thePUid, $theUid, $thisID, $state);
-            $stmt->execute();
+            $this->conn->insert('verb_saves', ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid, 'bid'=>$thisID, 'state'=>$state]);
         } else {
             # Found something. UPDATE
-            $current_state = $getResult->fetch_array(MYSQLI_ASSOC)['state'];
+            $current_state = $stmt['state'];
             if($current_state == 0) {
                 // If state is 0 (unsaved), make it 1 (save)
-                $stmt = $connection_verb->prepare('UPDATE saves SET state = 1 WHERE pid = ? AND puid = ? AND uid = ?');
-                $stmt->bind_param('sss', $thePid, $thePUid, $theUid);
-                $stmt->execute();
+                $this->conn->update('verb_saves', ['state'=>1], ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid]);
             } else {
                 // If state is 1 (saved), make it 0 (unsave)
-                $stmt = $connection_verb->prepare('UPDATE saves SET state = 0 WHERE pid = ? AND puid = ? AND uid = ?');
-                $stmt->bind_param('sss', $thePid, $thePUid, $theUid);
-                $stmt->execute();
+                $this->conn->update('verb_saves', ['state'=>0], ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid]);
             }
         }
-        unset($connection_verb, $stmt, $thePid, $thePUid, $theUid, $state, $thisID, $getResult);
+        unset($thePid, $thePUid, $theUid, $state, $thisID);
     }
 
     protected function like($thePid, $thePUid, $theUid, $state = 1) 
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
+        $thisID = IndexFunction::randomKey(9);
 
-        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM verb_likes WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
 
-        $stmt = $connection_verb->prepare('SELECT state FROM likes WHERE uid = ? AND puid = ? AND pid = ?');
-        $stmt->bind_param('sss', $theUid, $thePUid, $thePid);
-        $stmt->execute();
-        $getResult = $stmt->get_result();
-
-        // if getResult is not greater than zero.
+        // if result is not greater than zero.
         // Meaning you haven't saved this before/ INSERT into database
-        if( !( $getResult->num_rows > 0 ) ) {
+        if( !( $stmt['rows'] > 0 ) ) {
             # Nothing found. INSERT
-            $stmt = $connection_verb->prepare('INSERT INTO likes (pid, puid, uid, lid, state) VALUES(?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssss', $thePid, $thePUid, $theUid, $thisID, $state);
-            $stmt->execute();
+            $this->conn->insert('verb_likes', ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid, 'lid'=>$thisID, 'state'=>$state]);
         } else {
             # Found something. UPDATE
-            $current_state = $getResult->fetch_array(MYSQLI_ASSOC)['state'];
+            $current_state = $stmt['state'];
             if($current_state == 0) {
                 // If state is 0 (unliked), make it 1 (like)
-                $stmt = $connection_verb->prepare('UPDATE likes SET state = 1 WHERE pid = ? AND puid = ? AND uid = ?');
-                $stmt->bind_param('sss', $thePid, $thePUid, $theUid);
-                $stmt->execute();
+                $this->conn->update('verb_likes', ['state'=>1], ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid]);
                 echo 0;
             } else {
                 // If state is 1 (liked), make it 0 (unlike)
-                $stmt = $connection_verb->prepare('UPDATE likes SET state = 0 WHERE pid = ? AND puid = ? AND uid = ?');
-                $stmt->bind_param('sss', $thePid, $thePUid, $theUid);
-                $stmt->execute();
+                $this->conn->update('verb_likes', ['state'=>0], ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid]);
                 echo 1;
             }
         }
-        unset($connection_verb, $stmt, $thePid, $thePUid, $theUid, $state, $thisID, $getResult);
+        unset($stmt, $thePid, $thePUid, $theUid, $state, $thisID);
     }
 
     protected function unlike($thePid, $thePUid, $theUid, $state = 0) 
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
+        $thisID = IndexFunction::randomKey(9);
 
-        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
-
-        $stmt = $connection_verb->prepare('SELECT state FROM unlikes WHERE uid = ? AND puid = ? AND pid = ?');
-        $stmt->bind_param('sss', $theUid, $thePUid, $thePid);
-        $stmt->execute();
-        $getResult = $stmt->get_result();
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM verb_unlikes WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
 
         // if getResult is not greater than zero.
         // Meaning you haven't saved this before/ INSERT into database
-        if( !( $getResult->num_rows > 0 ) ) {
+        if( !( $stmt['rows'] > 0 ) ) {
             # Nothing found. INSERT
-            $stmt = $connection_verb->prepare('INSERT INTO unlikes (pid, puid, uid, lid, state) VALUES(?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssss', $thePid, $thePUid, $theUid, $thisID, $state);
-            $stmt->execute();
+            $this->conn->insert('verb_unlikes', ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid, 'lid'=>$thisID, 'state'=>$state]);
         } else {
             # Found something. UPDATE
-            $current_state = $getResult->fetch_array(MYSQLI_ASSOC)['state'];
+            $current_state = $stmt['state'];
             if($current_state == 0) {
                 // If state is 0 (unliked), make it 1 (like)
-                $stmt = $connection_verb->prepare('UPDATE unlikes SET state = 1 WHERE pid = ? AND puid = ? AND uid = ?');
-                $stmt->bind_param('sss', $thePid, $thePUid, $theUid);
-                $stmt->execute();
+                $this->conn->update('verb_unlikes', ['state'=>1], ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid]);
                 echo 0;
             } else {
                 // If state is 1 (liked), make it 0 (unlike)
-                $stmt = $connection_verb->prepare('UPDATE unlikes SET state = 0 WHERE pid = ? AND puid = ? AND uid = ?');
-                $stmt->bind_param('sss', $thePid, $thePUid, $theUid);
-                $stmt->execute();
+                $this->conn->update('verb_unlikes', ['state'=>0], ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid]);
                 echo 1;
             }
         }
-        unset($connection_verb, $stmt, $thePid, $thePUid, $theUid, $state, $thisID, $getResult);
-    }
-
-    protected function renote($thePid, $thePUid, $theUid, $state = 1) 
-    {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
-        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
-
-        $stmt = $connection_verb->prepare('SELECT sid FROM renotes WHERE uid = ? AND puid = ? AND pid = ? AND state = ?');
-        $stmt->bind_param('ssss', $theUid, $thePUid, $thePid, $state);
-        $stmt->execute();
-        $getResult = $stmt->get_result();
-
-        // if getResult is not greater than zero.
-        // Meaning you haven't note this before/ INSERT into database
-        if( !( $getResult->num_rows > 0 ) ) {
-            // Nothing found. Save new
-            $stmt = $connection_verb->prepare('INSERT INTO renotes (pid, puid, uid, rid, state) VALUES(?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssss', $thePid, $thePUid, $theUid, $thisID, $state);
-            $stmt->execute();
-            // echo Saved to database;
-        }
-            // ELSE: The result is greater than zero
-            // Meaning you have note this before.
-
-        unset($connection_verb, $stmt, $thePid, $thePUid, $theUid, $state, $thisID, $getResult);
+        unset($stmt, $thePid, $thePUid, $theUid, $state, $thisID);
     }
 
     protected function report($thePid, $theUid, $theReportData_asPUid) 
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-        $thisID = rand(99, 9999).round(microtime(true)) . IndexFunction::randomKey(7);
+        $thisID = IndexFunction::randomKey(9);
 
-        $stmt = $connection_verb->prepare('INSERT INTO report (pid, uid, rid, sitch) VALUES(?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $thePid, $theUid, $thisID, $theReportData_asPUid);
-        $stmt->execute();
-        unset($connection_verb, $stmt, $thisID, $thePid, $theReportData_asPUid, $theUid);
+        $this->conn->insert('verb_report', ['pid'=>$thePid, 'uid'=>$theUid, 'rid'=>$theUid, 'sitch'=>$theReportData_asPUid]);
+        unset($thisID, $thePid, $theReportData_asPUid, $theUid);
     }
 }

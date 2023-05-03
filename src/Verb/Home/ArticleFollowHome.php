@@ -2,12 +2,13 @@
 
 namespace App\Verb\Home;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
+// use App\Database\DatabaseAccess;
 use App\Validation\SigninValidation;
 use App\Verb\Cookie\RetrieveCookie;
 use App\Vunction\IndexFunction;
@@ -17,8 +18,10 @@ class ArticleFollowHome extends AbstractController
 {
     private $request;
     private $get_cookie;
-    public function __construct()
+    private $conn;
+    public function __construct(Connection $connection)
     {
+        $this->conn = $connection;
         $this->request = Request::createFromGlobals();
 
         $this->get_cookie = new RetrieveCookie();
@@ -30,10 +33,11 @@ class ArticleFollowHome extends AbstractController
         if( isset( $_POST['thePid'], $_POST['theReason'] ) )
         {
             $pid    = $_POST['thePid'];
-            $puid   = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
+            $puid   = IndexFunction::get_poster_uid($this->conn, $pid)['uid']; // poster-user_id
             $uid    = $viewer_id;
             $reason = $_POST['theReason'];
             $this->work($puid, $uid, $reason);
+
             return $this->json([
                 'message' => 'Data saved',
             ]);
@@ -42,9 +46,10 @@ class ArticleFollowHome extends AbstractController
             $this->request->request->has('reason')
         )
         {
-            $puid = IndexFunction::get_profile_uid($this->request->request->get('publisher_uname'))['uid'];
+            $puid = IndexFunction::get_profile_uid($this->conn, $this->request->request->get('publisher_uname'))['uid'];
             $reason = $this->request->request->get('reason');
             $this->work($puid, $viewer_id, $reason);
+
             return $this->json([
                 'message' => 'Data saved',
             ]);
@@ -54,7 +59,7 @@ class ArticleFollowHome extends AbstractController
         ]);
     }
 
-    protected function work($puid, $uid, $reason)
+    protected function work($puid, $uid, $reason): bool
     {
         $has_follow_history = $this->validate_subscribe($puid, $uid);
     
@@ -65,32 +70,21 @@ class ArticleFollowHome extends AbstractController
         return true;
     }
 
-    protected function subscribe_me($pub_uid, $cusm_uid)
+    protected function subscribe_me($pub_uid, $cusm_uid): void
     {
-        // Database Access
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        $stmt = $connection_sur->prepare('INSERT INTO subscribes (publisher, customer, state) VALUES(?, ?, 1)');
-        $stmt->bind_param('ss', $pub_uid, $cusm_uid);
-        $stmt->execute();
         # Close variables, free memory
-        unset($stmt, $connection_sur, $pub_uid, $cusm_uid);
+        $this->conn->insert('user_subscribes', ['following'=>$pub_uid, $customer=>$cusm_uid, 'state'=>1]);
+        unset($pub_uid, $cusm_uid);
     }
 
     protected function validate_subscribe($pub_uid, $cusm_uid): bool
     {
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
+        $handle = false;
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM user_subscribes WHERE following = ? AND follower = ?', [$pub_uid, $cusm_]);
 
-        $stmt = $connection_sur->prepare('SELECT state FROM subscribes WHERE publisher = ? AND customer = ?');
-        $stmt->bind_param('ss', $pub_uid, $cusm_uid);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-
-        if( $get_result->num_rows >= 1 ) {
+        if($stmt == true && $stmt['rows'] >= 1) {
             # Is a subscriber or unsubscriber
-            $state = $get_result->fetch_array(MYSQLI_ASSOC)['state'];
+            $state = $stmt['state'];
             if($state == 1) {
                 # Then, unsubscribe
                 $this->unsubscribe_me($pub_uid, $cusm_uid);
@@ -98,21 +92,16 @@ class ArticleFollowHome extends AbstractController
                 # re-SUBSCRIBE
                 $this->unsubscribe_me($pub_uid, $cusm_uid, 1);
             }
-            unset($connection_sur, $stmt, $pub_uid, $cusm_uid, $get_result, $state);
-            return true;
+            $handle = true;
         }
-        return false; // no follow history
+        unset($stmt, $pub_uid, $cusm_uid, $state);
+        return $handle; // no follow history
     }
 
-    protected function unsubscribe_me($pub_uid, $cusm_uid, $state = 0)
+    protected function unsubscribe_me($pub_uid, $cusm_uid, $state = 0): void
     {
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        $stmt = $connection_sur->prepare('UPDATE subscribes SET state = ? WHERE publisher = ? AND customer = ?');
-        $stmt->bind_param('sss', $state, $pub_uid, $cusm_uid);
-        $stmt->execute();
+        $this->conn->update('user_subscribes', ['state'=>$state], ['following'=>$pub_uid, 'follower'=>$cusm_uid]);
         # Close variables, free memory
-        unset($stmt, $connection_sur, $pub_uid, $cusm_uid);
+        unset($pub_uid, $cusm_uid, $state);
     }
 }

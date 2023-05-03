@@ -2,13 +2,15 @@
 
 namespace App\Vunction;
 
-use App\Database\DatabaseAccess;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 class ProfileFunction
 {
-    public function notes_profile($uid): array
+    private $conn;
+    
+    public function notes_profile($uid, Connection $connection): array
     {
         $content = array();
 

@@ -2,6 +2,7 @@
 
 namespace App\Verb\Home;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,12 @@ class UniverseHome extends AbstractController
 {
 
     private $menu_canvas; // Menu (array)
+    private $conn;
+
+    public function __construct(Connection $connection)
+    {
+        $this->conn = $connection;
+    }
 
     public function menu(): JsonResponse
     {
@@ -34,13 +41,13 @@ class UniverseHome extends AbstractController
 
     protected function get_content_menu($uid)
     {
-        $details = IndexFunction::profile_user_figures($uid);
+        $details = IndexFunction::profile_user_figures($this->conn, $uid);
 
         $name     = $details['name'];
         $username = $details['username'];
         $display  = $details['display'];
 
-        $theme_state   = IndexFunction::get_user_state($uid)['state'];
+        $theme_state   = IndexFunction::get_user_state($this->conn, $uid)['state'];
         $theme_checked = ($theme_state == 1) ? 'checked' : '';
         $get_theme     = IndexFunction::light_mode_response($theme_state);
         $theme_icon    = $get_theme['icon'];

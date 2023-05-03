@@ -56,12 +56,10 @@ class ArticleCommentHome extends AbstractController
 
     protected function submit_comment($pid, $puid, $uid, $comment)
     {
-        $conn = $this->connection;
-
         $thisID = IndexFunction::randomKey(11);
 
-        $conn->insert('verb_comments', ['pid'=>$pid, 'puid'=>$puid, 'uid'=>$uid, 'cid'=>$thisID]);
-        $conn->insert('verb_comments_list', ['cid'=>$thisID, 'comment'=>$comment]);
+        $this->connection->insert('verb_comments', ['pid'=>$pid, 'puid'=>$puid, 'uid'=>$uid, 'cid'=>$thisID]);
+        $this->connection->insert('verb_comments_list', ['cid'=>$thisID, 'comment'=>$comment]);
 
         unset($pid, $puid, $uid, $comment, $thisID);
     }

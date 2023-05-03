@@ -2,12 +2,12 @@
 
 namespace App\Verb\Home;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
 use App\Vunction\IndexFunction;
 use App\Verb\Cookie\RetrieveCookie;
 
@@ -17,10 +17,13 @@ class ArticleViewsHome extends AbstractController
     private $request;
     private $get_cookie;
     private $user_visitor_id;
+    private $conn;
     
-    public function __construct()
+    public function __construct(Connection $connection)
     {
         $this->request = Request::createFromGlobals();
+
+        $this->conn = $connection;
 
         $this->get_cookie = new RetrieveCookie();
         $this->user_visitor_id = $this->get_cookie->get_netintui_user_id()['user_id'];
@@ -77,37 +80,19 @@ class ArticleViewsHome extends AbstractController
 
     protected function save_outshares($share_id, $post_id, $user_id, $media)
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
-        $stmt = $connection_verb->prepare('INSERT INTO shares (share_id, post_id, user_id, media) VALUES(?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $share_id, $post_id, $user_id, $media);
-        $stmt->execute();
-        unset($connection_verb, $stmt, $share_id, $post_id, $user_id, $media);
+        $this->conn->insert('verb_shares', ['share_id'=>$share_id, 'post_id'=>$post_id, 'user_id'=>$user_id, 'media'=>$media]);
+        unset($share_id, $post_id, $user_id, $media);
     }
     
     protected function save_inshares($share_id, $post_id, $user_id, $media)
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
-        $stmt = $connection_verb->prepare('INSERT INTO visits (visit_id, post_id, user_id, media, state) VALUES(?, ?, ?, ?, 1)');
-        $stmt->bind_param('ssss', $share_id, $post_id, $user_id, $media);
-        $stmt->execute();
-        unset($connection_verb, $stmt, $share_id, $post_id, $user_id, $media);
+        $this->conn->insert('verb_visits', ['visit_id'=>$share_id, 'post_id'=>$post_id, 'user_id'=>$user_id, 'media'=>$media]);
+        unset($share_id, $post_id, $user_id, $media);
     }
 
     protected function remove_views($pid, $uid)
     {
-        // Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
-        $stmt = $connection_verb->prepare('UPDATE visits SET state=0 WHERE post_id=? AND user_id=?');
-        $stmt->bind_param('ss', $pid, $uid);
-        $stmt->execute();
-        unset($connection_verb, $stmt, $pid, $uid);
+        $this->conn->update('verb_visits', ['state'=>0], ['post_id'=>$pid, 'user_id'=>$uid]);
+        unset($pid, $uid);
     }
 }

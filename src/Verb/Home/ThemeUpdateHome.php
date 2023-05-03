@@ -2,13 +2,13 @@
 
 namespace App\Verb\Home;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
 use App\Validation\SigninValidation;
 use App\Verb\Cookie\RetrieveCookie;
 use App\Vunction\IndexFunction;
@@ -18,9 +18,9 @@ class ThemeUpdateHome extends AbstractController
 {
     private $request;
     private $uid;
-    private $connection;
+    private $conn;
 
-    public function __construct()
+    public function __construct(Connection $connection)
     {
         // get user_id
         $get_cookie = new RetrieveCookie();
@@ -30,8 +30,7 @@ class ThemeUpdateHome extends AbstractController
         $this->request = Request::createFromGlobals();
 
         // connection
-        $this->connection = new DatabaseAccess();
-        $this->connection = $this->connection->connect('');
+        $this->conn = $connection;
     }
 
     public function update(): JsonResponse
@@ -49,16 +48,13 @@ class ThemeUpdateHome extends AbstractController
     protected function update_theme($uid)
     {
         $the_state = $this->request->request->get('state');
-        $the_uid   = $this->uid;
-        $state     = null;
-
-        $stmt = $this->connection->prepare("UPDATE user_sapphire SET state = ? WHERE uid = ?");
-        $stmt->bind_param('ss', $state, $the_uid);
+        $state     = ($the_state == 'dark') ? 1 : 0;
 
         // validate
-        ($the_state == 'dark') ? $state = 1 : $state = 0;
-        $stmt->execute();
+        $state = ($the_state == 'dark') ? 1 : 0;
+        // update
+        $this->conn->update('user_sapphire', ['state'=>$state], ['uid'=>$uid]);
 
-        unset($the_state, $the_uid, $state);
+        unset($the_state, $state, $uid);
     }
 }
