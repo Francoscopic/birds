@@ -21,8 +21,6 @@ class SigninValidation
 
     public function __construct($conn)
     {
-        // $this->connection = new DatabaseAccess();
-        // $this->connection = $this->connection->connect('');
         $this->connection = $conn;
 
         $this->session_cell = new Session();
@@ -99,20 +97,12 @@ class SigninValidation
 
     protected function validate_sesh_login($userId, $isSignedIn, $sessionId): bool
     {
-        // $stmt=$this->connection->prepare("SELECT seshkey FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY sid DESC LIMIT 1");
-        // $stmt->bind_param('ss', $userId, $sessionId);
-        // $stmt->execute();
-        // $checkSeshKey=$stmt->get_result();
-        // $seshrow = $checkSeshKey->fetch_array(MYSQLI_ASSOC);
-
         $stmt = $this->connection->fetchOne('SELECT id FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY id DESC LIMIT 1', [$userId, $sessionId]);
 
-        // if($checkSeshKey->num_rows == 0 || $seshrow == 0) {
         if($stmt == false) {
             return false;
         }
 
-        // $savedSesh = $seshrow['seshkey'];
         $savedSesh = $sessionId;
 
         if ($isSignedIn == true && $sessionId == $savedSesh) {
@@ -143,9 +133,6 @@ class SigninValidation
     }
     protected function add_visitor($visitor_id): void
     {
-        // $stmt = $this->connection->prepare('INSERT INTO visitor (v_id, visits) VALUES(?, visits + 1)');
-        // $stmt->bind_param('s', $visitor_id);
-        // $stmt->execute();
         $this->connection->insert('user_visitor', ['v_id'=>$visitor_id, 'visits'=>'visits + 1']);
         unset($visitor_id);
     }

@@ -23,7 +23,7 @@ class ArticleController extends AbstractController
     public function article_start(string $post_id, Connection $conn): Response
     {
         // Profile data
-        $login = new SigninValidation();
+        $login = new SigninValidation($conn);
         $login_state = $login->alright($login->page_state);
         $uid = $login_state['uid'];
         $visitor_state  = $login_state['visit'];
@@ -106,7 +106,7 @@ class ArticleController extends AbstractController
             #
 
             # Details of the Noter, themselves: FUNCTION = GET_NOTE_POSTER()
-                $get_note_poster = IndexFunction::get_note_poster($uid_poster);
+                $get_note_poster = IndexFunction::get_note_poster($conn, $uid_poster);
 
                 $note_poster_name                 = $get_note_poster['name'];
                 $note_poster_username             = $get_note_poster['username'];
@@ -127,7 +127,7 @@ class ArticleController extends AbstractController
                 $username            = $viewer_array['username'];
                 $display             = $viewer_array['display'];
                 $note_posted         = IndexFunction::get_number_of_notes($conn, $uid_poster); # Get the number of NOTES posted
-                $subscribe_followers = IndexFunction::subscribes($conn, $uid_poster, 'followers'); # Get the number of subscribers Author has
+                $subscribe_followers = IndexFunction::subscribes($conn, $uid_poster, 'follower'); # Get the number of subscribers Author has
 
                 $canvas['notes']['viewer'] = [
                     'name'        => $name,
@@ -215,28 +215,24 @@ class ArticleController extends AbstractController
     {
         $content = array();
 
-        # Database Access
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
-        $stmt = $connection_verb->prepare('SELECT co.uid, co.cid, cl.date FROM comments co INNER JOIN comments_list cl WHERE co.cid=cl.cid AND co.pid = ? ORDER BY sid DESC LIMIT 7');
-        $stmt->bind_param("s", $pid_note);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-
-        while( $get_result_row = $get_result->fetch_array(MYSQLI_ASSOC) ) {
+        foreach($conn->iterateAssociativeIndexed(
+            'SELECT co.id, co.uid, co.cid, cl.date FROM verb_comments co 
+            INNER JOIN verb_comments_list cl WHERE co.cid=cl.cid 
+            AND co.pid = ? ORDER BY id DESC LIMIT 7', [$pid_note]) 
+            as $id => $data
+        ) {
 
             # Instantiate the variables.
-                $comment_id         = $get_result_row['cid'];
-                $comment_poster_uid = $get_result_row['uid'];
-                $comment_date       = IndexFunction::timeAgo($get_result_row['date']);
+                $comment_id         = $data['cid'];
+                $comment_poster_uid = $data['uid'];
+                $comment_date       = IndexFunction::timeAgo($data['date']);
             #
             # Get the user i.e. commenter
-                $commenter_row = IndexFunction::get_comment_poster($comment_poster_uid);
+                $commenter_row = IndexFunction::get_comment_poster($conn, $comment_poster_uid);
                 $comment_poster = $commenter_row['name'];
             #
             # Get the comment
-                $comments_row    = IndexFunction::get_comment($comment_id);
+                $comments_row    = IndexFunction::get_comment($conn, $comment_id);
                 $comment_comment = htmlspecialchars_decode($comments_row['comment']);
                 $comment_url     = $this->generateUrl('note_comment', array('post_id'=>$pid_note));
             #

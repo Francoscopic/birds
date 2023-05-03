@@ -2,7 +2,6 @@
 
 namespace App\Vunction;
 
-use App\Database\DatabaseAccess;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -233,7 +232,7 @@ class IndexFunction
     {
         $stmt = $conn->fetchOne('SELECT state FROM big_sur_subscribes WHERE following=? AND follower=?', [$following_id, $follower_id]);
         if( $stmt == true ) {
-            unset($stmt, $conn, $following_id, $follower_id);
+            unset($conn, $following_id, $follower_id);
             return $stmt;
         }
         unset($stmt, $conn, $following_id, $follower_id);
@@ -581,7 +580,7 @@ class IndexFunction
         }
         public static function get_comments_number($conn, $note_id, $reason = 'number', $comment_no = 200): array
         {
-            $stmt = $conn->fetchOne('SELECT COUNT(id) as total FROM comments WHERE pid = ?', [$note_id]);
+            $stmt = $conn->fetchOne('SELECT COUNT(id) as total FROM verb_comments WHERE pid = ?', [$note_id]);
 
             if($stmt == true) {
                 if( $stmt >= $comment_no && $reason === 'more' ) {

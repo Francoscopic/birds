@@ -2,6 +2,7 @@
 
 namespace App\Process;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +17,7 @@ class SigninProcess extends AbstractController
     private $session;
     private $connection;
 
-    public function sign_in(Request $request): JsonResponse
+    public function sign_in(Request $request, Connection $conn): JsonResponse
     {
         // Procedure
             # 1. Validate good input (check)
@@ -29,28 +30,27 @@ class SigninProcess extends AbstractController
         // $session->start();
 
         # Database Access
-        $this->connection = new DatabaseAccess();
-        $this->connection = $this->connection->connect('');
+        $this->connection = $conn;
 
         if( isset($request->request) ) {
 
             $user = $request->request->get('clt');
             $pass = $request->request->get('psw');
-            $mySeshKey = round(microtime(true)) . IndexFunction::randomKey(rand(3, 10));
+            $mySeshKey = round(microtime(true)) . IndexFunction::randomKey(7);
     
             $one_ = $this->validate_user_input($user, $pass);
             if($one_['handle'] === true) {
     
-                $two_ = $this->validate_details_exist($user);
+                $two_ = $this->validate_details_exist($conn, $user);
                 if($two_['handle'] === true) {
     
-                    $three_ = $this->validate_correct_details($user, $pass);
+                    $three_ = $this->validate_correct_details($conn, $user, $pass);
                     if($three_['handle'] == true) {
     
                         $uid = $three_['uid'];
     
                         $four_ = $this->set_cookie_variables($uid, $mySeshKey);
-                        if($this->update_session_key($uid, $mySeshKey) == true) {
+                        if($this->update_session_key($conn, $uid, $mySeshKey) == true) {
     
                             # Create session
                             $this->session->set('sesh', $mySeshKey);
@@ -64,7 +64,7 @@ class SigninProcess extends AbstractController
                             ]);
                         }
                         return $this->json([
-                            'message' => '[500] Bite refused you access. Refresh page',
+                            'message' => '[4500] Bite refused you access. Seek support',
                             'status' => $four_,
                         ]);
                     }
@@ -93,16 +93,16 @@ class SigninProcess extends AbstractController
     {
         $valid_email = filter_var($email, FILTER_VALIDATE_EMAIL);
         $handle = true;
-        $message = '';
+        $message = '[10] Error occured';
         $status = '10';
         if( $email == '' && $pass == '' ) {
 
-            $message = 'Enter details';
+            $message = '[11] Enter details';
             $handle = false;
             $status = '11';
         } elseif( !$valid_email ) {
             
-            $message = 'Email incorrect';
+            $message = '[12] Email incorrect';
             $handle = false;
             $status = '12';
         }
@@ -114,48 +114,32 @@ class SigninProcess extends AbstractController
         );
     }
 
-    protected function validate_details_exist($email): array 
+    protected function validate_details_exist($conn, $email): array 
     {
-        $message = $status = '20';
+        $message = '[20] Indentity/password incorrect';
+        $status = '20';
         $handle = true;
 
-        $stmt = $this->connection->prepare("SELECT ud.confirmed, us.sid
-                                        FROM user_sapphire us INNER JOIN user_diamond ud
-                                        ON us.uid = ud.uid
-                                        WHERE us.email = ? OR us.uname = ?");
-        $stmt->bind_param("ss", $email, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->num_rows;
-        
-        if( $row != 1 || $row == 0 ) {
+        $stmt = $conn->fetchAssociative('SELECT ud.confirmed, us.id
+            FROM user_sapphire us INNER JOIN user_diamond ud
+            ON us.uid = ud.uid
+            WHERE us.email = :userInput OR us.uname = :userInput', ['userInput'=>$email]);
+
+        if($stmt == false) {
             // no account found
-            $message = 'User Credentials Unavailable';
+            $message = '[21] Identity/password incorrect';
             $status = '21';
             $handle = false;
-
-            unset($stmt, $result, $row, $email);
-            return array(
-                'message' => $message,
-                'handle'  => $handle,
-                'status'  => $status,
-            );
         }
-        if($result->fetch_array(MYSQLI_ASSOC)['confirmed'] == 0) {
+
+        if($stmt == true && $stmt['confirmed'] == 0) {
             // account confirmation required
-            $message = 'Account Confirmation Required';
+            $message = '[22] Account confirmation required';
             $status = '22';
             $handle = false;
-
-            unset($stmt, $result, $row, $email);
-            return array(
-                'message' => $message,
-                'handle'  => $handle,
-                'status'  => $status,
-            );
         }
 
-        unset($stmt, $result, $row, $email);
+        unset($stmt, $email);
         return array(
             'message' => $message,
             'handle'  => $handle,
@@ -163,35 +147,34 @@ class SigninProcess extends AbstractController
         );
     }
 
-    protected function validate_correct_details($email, $pass): array 
+    protected function validate_correct_details($conn, $email, $pass): array 
     {
-        $message = $status = '30';
+        $message = '[30] Indentity/password incorrect';
+        $status = '30';
         $handle = true;
 
-        $stmt = $this->connection->prepare("SELECT ud.password, us.uid
-                                        FROM user_sapphire us, user_diamond ud
-                                        WHERE (us.email = ? AND ud.confirmed = 1) OR (us.uname=? AND ud.confirmed=1) LIMIT 1");
-        $stmt->bind_param("ss", $email, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_array(MYSQLI_ASSOC);
-        $hashed_pass = $row['password'];
-        $uid = $row['uid'];
+        $stmt = $conn->fetchAssociative('SELECT ud.password, us.uid
+            FROM user_sapphire us, user_diamond ud
+            WHERE (us.email=:userInput AND ud.confirmed=1) OR (us.uname=:userInput AND ud.confirmed=1) LIMIT 1', ['userInput'=>$email]);
 
-        if($this->validate_user_access($uid) != true) {
-            # Exceeded login trial
-            $status = '31';
-            $handle = false;
-            $message = 'Account locked out. Please contact #Support';
-        } elseif ($this->validate_password($email, $pass) != true) {
-            # password incorrect
-            $this->update_login_passcount($uid);   # Do security.
-            $status = '32';
-            $handle = false;
-            $message = 'User Credentials Incomplete';
+        $hashed_pass = $stmt['password'];
+        $uid = $stmt['uid'];
+        if($stmt == true) {
+            if($this->validate_user_access($conn, $stmt['uid']) != true) {
+                # Exceeded login trial
+                $status = '31';
+                $handle = false;
+                $message = '[31] Account held temporarily. #Support can help';
+            } elseif ($this->validate_password($conn, $email, $pass) != true) {
+                # password incorrect
+                $this->update_login_passcount($conn, $uid);   # Do security.
+                $status = '32';
+                $handle = false;
+                $message = '[32] Indentity/password incorrect';
+            }
         }
 
-        unset($stmt, $result, $row, $email, $pass, $hashed_pass);
+        unset($stmt, $email, $pass, $hashed_pass);
         return array(
             'message' => $message,
             'handle'  => $handle,
@@ -200,19 +183,18 @@ class SigninProcess extends AbstractController
         );
     }
 
-    protected function validate_user_access($uid): bool
+    protected function validate_user_access($conn, $uid): bool
     {
+        $passcount = 0;
         $handle = true;
 
-        $stmt = $this->connection->prepare("SELECT uid, passcount FROM user_secure WHERE uid = ?");
-        $stmt->bind_param("s", $uid);
-        $stmt->execute();
-        $secure = $stmt->get_result();
-        $secure_row = $secure->fetch_array(MYSQLI_ASSOC);
-        $passcount = $secure_row['passcount'];
+        $stmt = $conn->fetchAssociative('SELECT id, passcount FROM user_secure WHERE uid = ?', [$uid]);
+        if($stmt == true) {
+            $passcount = $stmt['passcount'];
+        }
         $handle = ($passcount >= 5) ? false : true;
 
-        unset($stmt, $uid, $secure, $secure_row, $passcount);
+        unset($stmt, $conn, $uid, $passcount);
         return $handle;
     }
 
@@ -238,47 +220,36 @@ class SigninProcess extends AbstractController
         return $handle;
     }
 
-    protected function update_session_key($uid, $mySeshKey): bool
+    protected function update_session_key($conn, $uid, $mySeshKey): bool
     {
         $handle = true;
 
-        $stmt = $this->connection->prepare("INSERT INTO user_onyx (uid, seshkey) VALUES(?, ?)");
-        $stmt->bind_param("ss", $uid, $mySeshKey);
-        if( $stmt->execute() ) {
-            # Update passcount to '0'
-            $stmt = $this->connection->prepare("UPDATE user_secure SET passcount = 0 WHERE uid = ?");
-            $stmt->bind_param("s", $uid);
-            $stmt->execute();
-        } else {
-            # Weird error
-            $handle = false;
-        }
-        unset($stmt, $uid, $mySeshKey);
+        $handle = $conn->insert('user_onyx', ['uid' => $uid, 'seshkey' => $mySeshKey]);
+        $handle = $conn->update('user_secure', ['passcount' => 0], ['uid' => $uid]);
+
+        unset($conn, $uid, $mySeshKey);
         return $handle;
     }
 
-    protected function update_login_passcount($uid)
+    protected function update_login_passcount($conn, $uid)
     {
-        $stmt = $this->connection->prepare("UPDATE user_secure SET passcount = passcount + 1 WHERE uid = ?");
-        $stmt->bind_param("s", $uid);
-        $stmt->execute();
-        unset($stmt, $uid);
+        $conn->update('user_secure', ['passcount' => 'passcount + 1'], ['uid' => $uid]);
+        unset($conn, $uid);
     }
 
-    protected function validate_password($email, $pass): bool 
+    protected function validate_password($conn, $email, $pass): bool 
     {
-        $stmt = $this->connection->prepare("SELECT ud.password, ud.uid
-                                        FROM user_diamond ud
-                                        INNER JOIN user_sapphire us
-                                        ON ud.uid=us.uid
-                                        WHERE us.email = ? OR us.uname=?");
-        $stmt->bind_param('ss', $email, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_array(MYSQLI_ASSOC);
-        $password = $row['password'];
+        $stmt = $conn->fetchAssociative('SELECT ud.password
+            FROM user_diamond ud
+            INNER JOIN user_sapphire us
+            ON ud.uid=us.uid
+            WHERE us.email = :userInput OR us.uname = :userInput', ['userInput'=>$email]);
+        if($stmt == false) {
+            return false;
+        }
+        $password = $stmt['password'];
 
-        unset($stmt, $result, $row);
+        unset($stmt, $conn);
         return password_verify($pass, $password);
     }
 }
