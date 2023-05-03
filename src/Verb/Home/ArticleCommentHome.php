@@ -2,6 +2,7 @@
 
 namespace App\Verb\Home;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,10 +19,13 @@ class ArticleCommentHome extends AbstractController
     private $request;
     private $get_cookie;
     private $user_id;
+    private $connection;
 
-    public function __construct()
+    public function __construct(Connection $conn)
     {
         $this->request = Request::createFromGlobals();
+
+        $this->connection = $conn;
 
         $this->get_cookie = new RetrieveCookie();
         $this->user_id = $this->get_cookie->get_netintui_user_id()['user_id'];
@@ -34,7 +38,7 @@ class ArticleCommentHome extends AbstractController
         )
         {
             $pid     = $this->request->request->get('com_pid');
-            $puid    = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
+            $puid    = IndexFunction::get_poster_uid($this->connection, $pid)['uid']; // poster-user_id
             $uid     = $this->user_id;
             $comment = IndexFunction::test_input($this->request->request->get('com'));
 
@@ -46,29 +50,19 @@ class ArticleCommentHome extends AbstractController
             ]);
         }
         return $this->json([
-            'message' => '[500]Something bad happened',
+            'message' => '[500] Something bad happened',
         ]);
     }
 
     protected function submit_comment($pid, $puid, $uid, $comment)
     {
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
+        $conn = $this->connection;
 
-        $thisID = rand(600, 999) . IndexFunction::randomKey(5);
+        $thisID = IndexFunction::randomKey(11);
 
-        # INSERT into comments
-        $stmt = $connection_verb->prepare('INSERT INTO comments (pid, puid, uid, cid) VALUES(?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $pid, $puid, $uid, $thisID);
+        $conn->insert('verb_comments', ['pid'=>$pid, 'puid'=>$puid, 'uid'=>$uid, 'cid'=>$thisID]);
+        $conn->insert('verb_comments_list', ['cid'=>$thisID, 'comment'=>$comment]);
 
-        # INSERT into comments_list
-        $stmt2 = $connection_verb->prepare('INSERT INTO comments_list (cid, comment) VALUES(?, ?)');
-        $stmt2->bind_param('ss', $thisID, $comment);
-
-        # Execute INSERT
-        $stmt->execute();
-        $stmt2->execute();
-
-        unset($connection_verb, $stmt, $stmt2, $pid, $puid, $uid, $thisID, $comment);
+        unset($pid, $puid, $uid, $comment, $thisID);
     }
 }
