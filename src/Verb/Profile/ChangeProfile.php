@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
+use Doctrine\DBAL\Connection;
 use App\Validation\SigninValidation;
 use App\Verb\Cookie\RetrieveCookie;
 use App\Vunction\IndexFunction;
@@ -19,9 +19,9 @@ class ChangeProfile extends AbstractController
     private $request;
     private $uid;
     private $file_path;
-    private $connection;
+    private $conn;
 
-    public function __construct()
+    public function __construct(Connection $connection)
     {
         // get user_id
         $get_cookie = new RetrieveCookie();
@@ -34,8 +34,7 @@ class ChangeProfile extends AbstractController
         $this->file_path = dirname(__DIR__).'/../../public/images/community/profiles/';
 
         // access database
-        $this->connection = new DatabaseAccess();
-        $this->connection = $this->connection->connect('');
+        $this->conn = $connection;
     }
 
     public function index(): JsonResponse
@@ -72,7 +71,6 @@ class ChangeProfile extends AbstractController
 
     protected function change_bio($uid)
     {
-        $connection = $this->connection;
         // User office first
         $name = trim($this->request->request->get('change_name'));
         $bio  = trim($this->request->request->get('change_bio'));
@@ -100,16 +98,15 @@ class ChangeProfile extends AbstractController
             ];
         } else {
             // Check if you're giving me the same thing.
-            $stmt = $connection->prepare("SELECT name, about, location FROM user_sapphire WHERE uid = ?");
-            $stmt->bind_param("s", $uid);
-            $stmt->execute();
-            $check = $stmt->get_result();
-            $check_row = $check->fetch_array(MYSQLI_ASSOC);
+            $name_saved = $bio_saved = $loc_saved = null;
 
-            // Get values
-            $name_saved = stripslashes($check_row['name']);
-            $bio_saved  = stripslashes($check_row['about']);
-            $loc_saved  = stripslashes($check_row['location']);
+            $stmt = $this->conn->fetchAssociative('SELECT id, name, about, location FROM user_sapphire WHERE uid = ?', [$uid]);
+
+            if($stmt == true) {
+                $name_saved = stripslashes($stmt['name']);
+                $bio_saved  = stripslashes($stmt['about']);
+                $loc_saved  = stripslashes($stmt['location']);
+            }
 
             // Validate if same
             $same = ( $name==$name_saved && $bio==$bio_saved && $loc==$loc_saved );
@@ -131,7 +128,7 @@ class ChangeProfile extends AbstractController
 
                 # Success
                 // Unset varaiables to free memory
-                unset($connection, $stmt, $name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
+                unset($stmt, $name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
                 return [
                     'message' => 'Success',
                     'status'  => 200,
@@ -142,7 +139,6 @@ class ChangeProfile extends AbstractController
 
     protected function change_cover($uid)
     {
-        $connection = $this->connection;
         $file_path  = $this->file_path;
 
         // Get the file components
@@ -154,7 +150,7 @@ class ChangeProfile extends AbstractController
 
         // Set-up the necessary image changes
         $format    = explode('.', $file_name);
-        $new_name  = round(microtime(true)).rand(13,53478).IndexFunction::randomKey(4).'.'.end($format);
+        $new_name  = IndexFunction::randomKey(9).'.'.end($format);
 
         // Initiate the image changes
         $saveImage = $file_path.$new_name;
@@ -180,12 +176,11 @@ class ChangeProfile extends AbstractController
 
                 if(!IndexFunction::nPhoto_resize($file_tmp, $file_size, $file_type, $saveImage)) {
 
-                    $stmt=$connection->prepare('UPDATE user_sapphire SET cover = ?, date = ? WHERE uid = ?');
-                    $stmt->bind_param('sss', $new_name, $date, $uid);
-                    $stmt->execute();
+                    // update database
+                    $this->conn->update('user_sapphire', ['cover'=>$new_name, 'date'=>$date], ['uid'=>$uid]);
 
                     // free-up memory
-                    unset($connection, $stmt, $uid, $file_path, $saveImage, $valid_types, $format, $new_name, $file_error, $file_type, $file_size, $file_tmp, $file_name);
+                    unset($uid, $file_path, $saveImage, $valid_types, $format, $new_name, $file_error, $file_type, $file_size, $file_tmp, $file_name);
                     return [
                         'message' => 'Success',
                         'status'  => 200,
@@ -208,7 +203,6 @@ class ChangeProfile extends AbstractController
 
     protected function change_display($uid)
     {
-        $connection = $this->connection;
         $file_path  = $this->file_path;
 
         // Get the file components
@@ -220,7 +214,7 @@ class ChangeProfile extends AbstractController
 
         // Set-up the necessary image changes
         $format    = explode('.', $file_name);
-        $new_name  = round(microtime(true)).rand(13,53478).IndexFunction::randomKey(4).'.'.end($format);
+        $new_name  = IndexFunction::randomKey(9).'.'.end($format);
 
         // Initiate the image changes
         $saveImage   = $file_path.$new_name;
@@ -246,15 +240,11 @@ class ChangeProfile extends AbstractController
 
                 if(!IndexFunction::nPhoto_square( $file_tmp, $file_size, $file_type, $saveImage, 200 ) && !IndexFunction::nPhoto_square( $file_tmp, $file_size, $file_type, $saveShrink, 50 )) {
 
-                    $stmt=$connection->prepare('UPDATE user_sapphire SET display = ? WHERE uid = ?');
-                    $stmt->bind_param('ss', $new_name, $uid);
-                    $stmt->execute();
+                    // update database
+                    $this->conn->update('user_sapphire', ['display'=>$new_name], ['uid'=>$uid]);
 
                     // Unset variables to free-up memory
-                    unset($connection, $stmt, $uid, $file_path);
-                    unset($file_error, $file_type, $file_size, $file_tmp, $file_name);
-                    unset($format, $new_name);
-                    unset($saveImage, $saveShrink, $valid_types);
+                    unset($uid, $file_path, $file_error, $file_type, $file_size, $file_tmp, $file_name, $format, $new_name, $saveImage, $saveShrink, $valid_types);
 
                     // Upload success.
                     return [
