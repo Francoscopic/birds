@@ -1,5 +1,4 @@
 
-// import $ from 'jquery'
 
 function growProfile(){
     var o = 0;
@@ -63,8 +62,8 @@ function infinite_home() // working
 
             ((data.content.notes).length < 1) ? trigger_empty_content(trigger) : serve_more_content(data.content.notes, data);
         }).fail(function(o, e, n){
-            trigger_response(trigger, 'Error. Please, retry', false, '1'),
-            console.error(o.reponseText);
+            trigger_response(trigger, 'Error. Please, retry', false, '1')
+            // console.error(o.reponseText);
         }),
         position += 15;
     }
