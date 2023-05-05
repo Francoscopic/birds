@@ -36,9 +36,10 @@ class IndexFunction
             );
         }
 
-        $state = $conn->fetchOne('SELECT state FROM user_sapphire WHERE uid = ?', [$user_id] );
+        $state = $conn->fetchAssociative('SELECT state FROM user_sapphire WHERE uid = ?', [$user_id] );
 
-        $theme_logo = ($state == true) ? self::get_path('images').'/logo/notes-white.png' : self::get_path('images').'/logo/notes.png';
+        // 0 => dark, 1 => light
+        $theme_logo = ($state == true && $state['state']==1) ? self::get_path('images').'/logo/notes.png' : self::get_path('images').'/logo/notes-white.png';
 
         unset($conn, $user_id, $visit_state);
         return array(

@@ -17,12 +17,12 @@
             <div class="write-header-features">
                 <div class="write-header-features-tools">
                     <ul class="ul">
-                        <a href="#" class="feature-tools-selector a" title="Type text">
-                            <p class="write-selector-text feature-tools-selector-active" type="text"><i class="fa-solid fa-i-cursor"></i><br><span>Text</span></p>
+                        <a href="#" class="feature-tools-selector a" title="Everyone will see">
+                            <p class="write-selector-public feature-tools-selector-active" type="public"><i class="fa-solid fa-earth-africa"></i><br><span>Public</span></p>
                         </a>
-                        {# <a href="#" class="feature-tools-selector a" title="Share photos">
-                            <p class="write-selector-photo" type="photo"><i class="fa-solid fa-camera-retro"></i><br><span>Photo</span></p>
-                        </a> #}
+                        <a href="#" class="feature-tools-selector a" title="Make private">
+                            <p class="write-selector-private" type="private"><i class="fa-solid fa-lock"></i><br><span>Private</span></p>
+                        </a>
                         <a class="a"><p><span>|</span></p></a>
                         <a href="#" class="feature-tools-draft a" title="Save to continue later">
                             <p><i class="fa-solid fa-file"></i><br><span>Save</span></p>
@@ -53,8 +53,6 @@
                 </div>
             </div>
 
-            <input type="hidden" name="line" value="$uid" />
-
             <div class="wrt-parags-div">
                 <button id="focusForNotes" disabled="true" class="write-active-top-line"></button>
                 <textarea id="wrt-parags-edit" class="wrt-parags-edit nt-ft-robt rad4 ft-sect" name="notes" placeholder="What's on your mind?"></textarea>
@@ -64,15 +62,6 @@
                         <p id="wrt-editor-err" class="write-title-textarea-error-span parag-error ft-sect">7 Paragraphs</p>
                     </div>
                 </div>
-            </div>
-
-            <div class="wrt-photos-div hd">
-                <input id="write-images-input" class="hd ft-sect" type="file" name="images[]" multiple />
-                <div class="wrt-photos-gallery">
-                    <span></span>
-                </div>
-
-                <button class="wrt-select-photos-but nt-ui-rad10">Add Photos<p>(As much as 7 photos)</p></button>
             </div>
 
             <div class="write-submit-div clear-fix">

@@ -80,11 +80,11 @@ class ArticleLikeHome extends AbstractController
     {
         $thisID = IndexFunction::randomKey(9);
 
-        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM verb_saves WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total, state FROM verb_saves WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
 
         // if result is not greater than zero.
         // Meaning you haven't saved this before/ INSERT into database
-        if( !( $stmt['rows'] > 0 ) ) {
+        if( !( $stmt['total'] > 0 ) ) {
             // Nothing found. Save new
             $this->conn->insert('verb_saves', ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid, 'bid'=>$thisID, 'state'=>$state]);
         } else {
@@ -105,11 +105,11 @@ class ArticleLikeHome extends AbstractController
     {
         $thisID = IndexFunction::randomKey(9);
 
-        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM verb_likes WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total, state FROM verb_likes WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
 
         // if result is not greater than zero.
         // Meaning you haven't saved this before/ INSERT into database
-        if( !( $stmt['rows'] > 0 ) ) {
+        if( !( $stmt['total'] > 0 ) ) {
             # Nothing found. INSERT
             $this->conn->insert('verb_likes', ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid, 'lid'=>$thisID, 'state'=>$state]);
         } else {
@@ -132,11 +132,11 @@ class ArticleLikeHome extends AbstractController
     {
         $thisID = IndexFunction::randomKey(9);
 
-        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM verb_unlikes WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total, state FROM verb_unlikes WHERE uid = ? AND puid = ? AND pid = ?', [$theUid, $thePUid, $thePid]);
 
         // if getResult is not greater than zero.
         // Meaning you haven't saved this before/ INSERT into database
-        if( !( $stmt['rows'] > 0 ) ) {
+        if( !( $stmt['total'] > 0 ) ) {
             # Nothing found. INSERT
             $this->conn->insert('verb_unlikes', ['pid'=>$thePid, 'puid'=>$thePUid, 'uid'=>$theUid, 'lid'=>$thisID, 'state'=>$state]);
         } else {

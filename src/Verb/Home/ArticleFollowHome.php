@@ -80,9 +80,9 @@ class ArticleFollowHome extends AbstractController
     protected function validate_subscribe($pub_uid, $cusm_uid): bool
     {
         $handle = false;
-        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS rows, state FROM user_subscribes WHERE following = ? AND follower = ?', [$pub_uid, $cusm_]);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total, state FROM user_subscribes WHERE following = ? AND follower = ?', [$pub_uid, $cusm_]);
 
-        if($stmt == true && $stmt['rows'] >= 1) {
+        if($stmt == true && $stmt['total'] >= 1) {
             # Is a subscriber or unsubscriber
             $state = $stmt['state'];
             if($state == 1) {

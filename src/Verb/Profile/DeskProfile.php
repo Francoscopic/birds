@@ -64,9 +64,9 @@ class DeskProfile extends AbstractController
         $body  = $this->request->request->get('desk_save_body');
         $pid   = $this->request->request->get('desk_save_pid');
 
-        $stmt = $this->conn->fetchOne('SELECT COUNT(id) AS rows FROM big_sur_draft WHERE uid = ? AND pid = ? AND access=1 ORDER BY sid DESC LIMIT 1', [$uid, $pid]);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total FROM big_sur_draft WHERE uid = ? AND pid = ? AND access=1 ORDER BY id DESC LIMIT 1', [$uid, $pid]);
         if($stmt == true) {
-            if( $stmt['rows'] > 0  ) {
+            if( $stmt['total'] > 0  ) {
                 $this->conn->update('big_sur_draft', ['title'=>$title, 'body'=>$body], ['uid'=>$uid, 'pid'=>$pid]);
                 
                 unset($stmt, $title, $body, $pid, $uid);
@@ -88,10 +88,11 @@ class DeskProfile extends AbstractController
     protected function desk_save_selector($uid)
     {
         $notes_save_handle = 0;   # 0 for articles, 1 for images.
-        $image_extensions  = '';
 
+        $articlePrivacy = $this->request->request->get('prv');
         $title = IndexFunction::validateInput($this->request->request->get('ttl'));
-        $body  = $this->request->request->get('nt');
+        $body  = IndexFunction::validateInput(trim($this->request->request->get('nt')));
+        $paragraphs        = IndexFunction::count_paragraphs($body);
         $pid   = IndexFunction::randomKey(9);
 
         #
@@ -106,48 +107,16 @@ class DeskProfile extends AbstractController
 
             # Initiate the image changes
             $save_cover_image   = $this->file_path.$cover_new_name_ext;
-
-            $image_extensions .= end($cover_format);
         #
-
-        if(
-            $this->request->request->has('editor')
-            &&
-            $this->request->request->get('editor') == 1
-        )
-        { // images
-            $number_of_images = count($_FILES['images']['name']);
-            for( $i=0; $i<$number_of_images; $i++ ) {
-                $image_tmp      = $_FILES['images']['tmp_name'][$i];
-                $image_name     = IndexFunction::validateInput($_FILES['images']['name'][$i]);
-                $image_format   = explode('.', $image_name);
-                $image_new_name = $cover_new_name .'-'. $i .'.'.end($image_format);
-
-                move_uploaded_file($image_tmp, $this->file_path.$image_new_name);
-                $image_extensions .= ','.end($image_format);
-            }
-            $notes_save_handle = 1;
-        } else { //article
-            $body              = IndexFunction::validateInput(trim($body));
-            $paragraphs        = IndexFunction::count_paragraphs($body);
-            $notes_save_handle = 0;
-        }
 
         if($notes_save_handle == 0) { # Save article
 
             $cover_upload = !IndexFunction::nPhoto_resize( $cover_tmp, $cover_size, $cover_type, $save_cover_image );
             if($cover_upload) {
-                $res = $this->desk_save($uid, $pid, $title, $body, $paragraphs, $cover_new_name_ext, 'art', '');
-                return [
-                    'message' => $res['message'],
-                    'status'  => $res['status'],
-                ];
-            }
-        } else { # Save images
 
-            $cover_upload = !IndexFunction::nPhoto_resize( $cover_tmp, $cover_size, $cover_type, $save_cover_image );
-            if($cover_upload) {
-                $res = $this->desk_save($uid, $pid, $title, '', $number_of_images, $cover_new_name_ext, 'img', $image_extensions);
+                $res = $this->desk_save($uid, $pid, $title, $body, $paragraphs, $cover_new_name_ext, 'art', $articlePrivacy);
+
+                unset($title, $notes, $uid, $paragraph_array, $first_paragraph, $paragraphs, $pid, $file_type, $file_size, $file_tmp, $file_name, $format, $new_name, $saveImage, $valid_types);
                 return [
                     'message' => $res['message'],
                     'status'  => $res['status'],
@@ -155,34 +124,39 @@ class DeskProfile extends AbstractController
             }
         }
 
-        unset($title, $notes, $uid);
-        unset($paragraph_array, $first_paragraph, $paragraphs, $pid);
-        unset($file_type, $file_size, $file_tmp, $file_name, $format, $new_name, $saveImage, $valid_types);
+        unset($title, $notes, $uid, $paragraph_array, $first_paragraph, $paragraphs, $pid, $file_type, $file_size, $file_tmp, $file_name, $format, $new_name, $saveImage, $valid_types);
+        return [
+            'message' => '[500] Bad response',
+            'status'  => 500,
+        ];
     }
 
-    protected function desk_save($uid, $pid, $title, $notes, $paragraphs, $img, $which_editor, $extensions)
+    protected function desk_save($uid, $pid, $title, $notes, $paragraphs, $img, $which_editor, $notePrivacy)
     {
         # Note scoring
             # Score = Flesch-Kincaid
             $score = 0;
             (string) $note_score = $this->desk_score_algo($score);
         #
+        # Note privacy
+            $privacy = ($notePrivacy == 0) ? 1 : 2; // 2 = private
+        #
 
-        $stmt = $this->conn->insert('big_sur', ['access'=>1, 'uid'=>$uid, 'pid'=>$pid]);
+        $stmt = $this->conn->insert('big_sur', ['access'=>$privacy, 'uid'=>$uid, 'pid'=>$pid]);
 
         if($stmt == true)
         {
-            $this->conn->insert('big_sur_list', ['access'=>1, 'state'=>$which_editor, 'pid'=>$pid, 'title'=>$title, 'note'=>$notes, 'parags'=>$paragraphs, 'cover'=>$img, 'cover_extension'=>$extensions]);
+            $this->conn->insert('big_sur_list', ['state'=>$which_editor, 'pid'=>$pid, 'title'=>$title, 'note'=>$notes, 'parags'=>$paragraphs, 'cover'=>$img]);
 
             // $this->conn->insert('big_sur_fkscore', []);
 
-            unset($uid, $pid, $title, $notes, $paragraphs, $img);
+            unset($uid, $pid, $title, $notes, $paragraphs, $img, $which_editor, $notePrivacy);
             return [
                 'message' => 'Success',
                 'status'  => 200,
             ];
         }
-        unset($uid, $pid, $title, $body, $paragraphs, $img);
+        unset($uid, $pid, $title, $body, $paragraphs, $img, $which_editor, $notePrivacy);
         return [
             'message' => 'Error encountered',
             'status'  => 500,

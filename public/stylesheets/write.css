@@ -74,8 +74,8 @@
     text-transform: capitalize;
 }
 .feature-tools-selector-active > i {
-    background-color: chocolate;
-    color: #f0f0f0;
+    background-color: #d8b068;
+    color: #202020;
 }
 
 

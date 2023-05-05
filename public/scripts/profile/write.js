@@ -4,9 +4,7 @@ var submitHandle   = 0,
     coverSelected  = 0,
     validateHandle = 0,
     submitButton   = $("#write-submit");
-var imagesAdded         = 0,
-    numberOfAddedImages = 0;
-var whichEditor = 0; // 0 == Text, 1 == Photos
+var privateNote = 0; // 0 == public, 1 == private
 
 function writeCover(){
     var e=$("#cover-response"),
@@ -142,53 +140,6 @@ function writeIdea(){
     }),
     k()
 }
-function writeImages() {
-
-    var image_selector = $('.wrt-select-photos-but'),
-        images_input = $('#write-images-input');
-    const resParagraph = $(image_selector).children('p'),
-        images_container = $('.wrt-photos-gallery');
-
-    function a(msg, col='#404040') {
-        resParagraph.text(msg).css('color',`${col}`)
-    }
-    function r(e){
-        var n = e.target.result;
-        imagesAdded=1,
-        submit_handle(1),
-        images_container.append(`<div class='gallery-photos'>
-                                    <img src='${n}' alt='' class='nt-ui-rad10'>
-                                </div>`),
-        a(`${numberOfAddedImages} Loaded`)
-    }
-    $(image_selector).on('click', function(e){
-        e.preventDefault();
-
-        a('Opening to select..');
-        $(images_input).click()
-    })
-    jQuery(function(){
-        $(images_input).change(function(){
-            var a = ['image/jpeg','image/png','image/jpg','image/gif'];
-            images_container.html(''); //clean the container
-            for(var i=0; i<this.files.length; i++) {
-                var b = this.files[i],
-                    c = b.type;
-                if((c===a[0] || c===a[1] || c===a[2] || c===a[3]) && this.files.length <= 7) {
-                    $(resParagraph).text('Loading image(s)..');
-                    var o = new FileReader;
-                    o.onload = r,
-                    o.readAsDataURL(b)
-                }
-                else {
-                    $(resParagraph).text('Image error/Exceeded 7').css('color','tomato');
-                    return
-                }
-            }
-            numberOfAddedImages = this.files.length
-        })
-    })
-}
 
 
 function tools(){
@@ -204,14 +155,14 @@ function tools(){
             var nt_title = $("#write-title").val(),
                 nt_body = $("#wrt-parags-edit").val();
             
-            (nt_title.trim()=='' && nt_body.trim()=='') ? alert('Nothing to save') : (save_draft_now(nt_title, nt_body), alert('Success'));
+            (nt_title.trim()=='' && nt_body.trim()=='') ? alert('Nothing to save') : (save_draft_now(nt_title, nt_body));
         });
 
         function save_draft_now(nt_title, nt_body) {
-            $.post(write_url, { desk_save_draft:'', desk_save_pid:nt_draft_id, desk_save_title:nt_title, desk_save_body:nt_body }, () => {
-                // (500 === res.status) ? alert(`${res.message}`) : alert(`${res.message}`)
+            $.post(write_url, { desk_save_draft:'', desk_save_pid:nt_draft_id, desk_save_title:nt_title, desk_save_body:nt_body }, (res) => {
+                (500 === res.status) ? alert(`${res.message}`) : alert(`${res.message}`)
             }).fail((a, b, c) => {
-                console.error(c)
+                console.error('Error occured')
             });
         }
     }
@@ -274,6 +225,36 @@ function tools(){
 }
 
 //Outsider
+function select_privacy(){
+
+    var featureHandle = $('a.feature-tools-selector');
+
+    function a(handle) {
+        // return the type of Article: Public/Private
+        var theButton      = $(handle).children('p'),
+            theButtonPublic  = $('.write-selector-public'),
+            theButtonPrivate = $('.write-selector-private');
+                
+        (theButton.attr('type') == 'public') 
+            ? ( c(theButtonPublic, theButtonPrivate), privateNote=0) 
+            : ( c(theButtonPrivate, theButtonPublic), privateNote=1);
+    }
+
+    function c(but1, but2) {
+        // Make the transition to appropriate button.
+        $(but1).addClass('feature-tools-selector-active'),
+        $(but2).removeClass('feature-tools-selector-active')
+    }
+
+    selectType_Master();
+    function selectType_Master() {
+        $(featureHandle).on('click', function (e) {
+            e.preventDefault();
+
+            a(this);
+        });
+    }
+}
 function preview_note(){
     const e=$("#write-submit"),
         t = $("#write-save-submit"),
@@ -303,7 +284,7 @@ function submit_handle(e=null){
     var t = $("#wrt-parags-edit").val(),
         n = $("#write-title").val();
     function a(e,a=null){
-        (t.length > e && "" != n && 1 == coverSelected && null == a) || (''!=n && 1==coverSelected && 1==imagesAdded && null==a) ? i(!1,1) : i(!0, .5)
+        (t.length > e && "" != n && 1 == coverSelected && null == a) ? i(!1,1) : i(!0, .5)
     }
     function i(e,t){
         submitButton.attr("disabled", e).css("opacity",`${t}`)
@@ -333,16 +314,15 @@ function saveEditing(){
     }
     $(e).on("click",function(i){
         t(!0,".5"); // !0 == true, !1 == false
-        var o = function(e,t,k,l) {
+        var o = function(e,t,k) {
             var n = $("form").get(0),
                 a = new FormData(n);
                 return a.append("nt",e),
                 a.append("ttl",t),
-                a.append('images',k),
-                a.append('editor',l),
+                a.append('prv',k),
                 a.append('mydesk',''),
                 a
-        }($("#wrt-parags-edit").val(), $("#write-title").val(), imagesAdded, whichEditor);
+        }($("#wrt-parags-edit").val(), $("#write-title").val(), privateNote);
         
         $.ajax({
             url: write_url,
@@ -380,8 +360,8 @@ $(document).ready(function(){
     writeCover(),
     writeIdea(),
     preview_note(),
-    writeImages(),
-    saveEditing();
+    saveEditing(),
+    select_privacy();
 
     tools();
 });
