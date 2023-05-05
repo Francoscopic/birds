@@ -47,7 +47,7 @@ class ArticleLikeHome extends AbstractController
     
             if( trim($reason) == 'save' )
             {
-                $this->note($pid, $puid, $uid);
+                $this->save($pid, $puid, $uid);
             }
             if( trim($reason) == 'like' )
             {
@@ -57,9 +57,9 @@ class ArticleLikeHome extends AbstractController
             {
                 $this->unlike($pid, $puid, $uid);
             }
-            if( trim($reason == 'share') )
+            if( trim($reason == 'mute') )
             {
-                // Coming soon
+                $this->mute($puid, $uid);
             }
             if( trim($reason) == 'report' )
             {
@@ -75,7 +75,7 @@ class ArticleLikeHome extends AbstractController
         ]);
     }
 
-    protected function note($thePid, $thePUid, $theUid, $state = 1): void
+    protected function save($thePid, $thePUid, $theUid, $state = 1): void
     {
         $thisID = IndexFunction::randomKey(9);
 
@@ -160,5 +160,14 @@ class ArticleLikeHome extends AbstractController
 
         $this->conn->insert('verb_report', ['pid'=>$thePid, 'uid'=>$theUid, 'report_id'=>$thisID, 'sitch'=>$theReportData_asPUid]);
         unset($thisID, $thePid, $theReportData_asPUid, $theUid);
+    }
+
+    protected function mute($thePUid, $theUid)
+    {
+        if($thePUid == $theUid) {
+            return;
+        }
+        $this->conn->insert('big_sur_mute', ['follower'=>$theUid, 'following'=>$thePUid, 'state'=>1]);
+        unset($thePUid, $theUid);
     }
 }

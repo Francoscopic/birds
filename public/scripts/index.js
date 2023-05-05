@@ -66,7 +66,7 @@ function nt_small_menu() {
         small_menu.empty(),
             small_menu.html(`<div class="nts-host-menu-plate">${ele}</div>`);
     }
-    function tools_contractor(pid, save_ask, like_ask, unlike_ask) {
+    function tools_contractor(pid, save_ask, like_ask, unlike_ask, clicker_elem) {
 
         function tools_response(t, ask) {
             var ia = $(t).find('i');
@@ -86,14 +86,19 @@ function nt_small_menu() {
         function flip_value(the_value) {
             return (the_value == 1) ? 0 : 1;
         }
+        function hide_canvas(elem) {
+             var $parent = $(elem).parents('.nts-host');
+             $parent.fadeOut();
+        }
 
         // MUTE
         var mute_trigger = $('.mute-this-note');
         $(mute_trigger).on('click', function(e){
             e.preventDefault();
 
-            // s(pid, 'mute'),
-            close_all_menu()
+            s(pid, 'mute'),
+            close_all_menu(),
+            hide_canvas(clicker_elem);
         });
 
         // SAVE
@@ -245,7 +250,7 @@ function nt_small_menu() {
             ? (
                 small_menu_parent_container.fadeIn(),
                 tools_contractor(post_id, save_state,
-                    like_state, unlike_state)
+                    like_state, unlike_state, this)
             ) : null;
     }),
 
