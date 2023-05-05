@@ -77,7 +77,7 @@ function infinite_home() // working
             const if_img = iterator.note_is_img ? '<div class="nts-host-display-type nt-ui-rad4 ft-sect"><span>photo</span></div>' : '';
             more_content += `
             <div class="nts-host relative">
-                <span id="page-assistant" class="hd" pid="${iterator.pid}" read="${iterator.post_url}" title="${iterator.title}" poster="${iterator.poster_name}" save_state="${iterator.save}" like_state="${iterator.like}" unlike_state="${iterator.unlike}"></span>
+                <span id="page-assistant" class="hd" pid="${iterator.pid}" read="${iterator.post_url}" save_state="${iterator.save}" like_state="${iterator.like}" unlike_state="${iterator.unlike}"></span>
                 <a href="${iterator.post_url}" class="nts-host-anchor a">
                     <div class="nts-host-display lozad bck relative" data-background-image="${iterator.cover}">
                         ${if_img}

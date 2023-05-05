@@ -10,7 +10,6 @@ const page_assistant = $("span#page-assistant"),
     function small_container_visit(){
         const ele = `
         <div class="login_to_connect">
-            <div><img src="/images/support/7.png" alt="Netintui Notes" /></div>
             <p class="nt-ft-calib" message="">Log in to interact with the world on Notes.</p>
             <p class="nt-ft-robt" action="">
                 <a href="/o/signin/?pg=article&pid=${pid}" class="a">
@@ -195,17 +194,17 @@ function monitor_out_share() { // working
         take_action(pid, 'link');
     })
 
-    click_to_copy_link();
-    function click_to_copy_link(){
+    // click_to_copy_link();
+    // function click_to_copy_link(){
 
-        $('#share_link').copyOnClick({
-            // disable/enable the feedback
-            confirmShow: false
-        }),
-        $('#share_link').on('click', function(){
-            alert('Copied to clipboard');
-        })
-    }
+    //     $('#share_link').copyOnClick({
+    //         // disable/enable the feedback
+    //         confirmShow: false
+    //     }),
+    //     $('#share_link').on('click', function(){
+    //         alert('Copied to clipboard');
+    //     })
+    // }
 }
 function monitor_in_share() { // working
 

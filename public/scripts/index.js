@@ -1,43 +1,45 @@
 
 // import Cookies from './plugins/cookies/api.js';
-// import $ from 'jquery';
 
 function nt_small_menu() {
 
-    var ellipsis = $('.nts-show-menu'), isUserAllowed = $(ellipsis).attr('visit'), close_exit = $('.note-small-menu-container-close'), small_menu_parent_container = $('.notes-small-menu-container'), small_menu = $('.nts-host-menu');
+    var ellipsis = $('.nts-show-menu'), 
+        isUserAllowed = $(ellipsis).attr('visit'), 
+        close_exit = $('.note-small-menu-container-close'), 
+        small_menu_parent_container = $('.notes-small-menu-container'), 
+        small_menu = $('.nts-host-menu');
 
-    function small_container(title, name, link, pid, save_state, like_state, unlike_state) {
-        var is_saved = is_done(save_state), is_liked = is_done(like_state), is_unliked = is_done(unlike_state);
+    function small_container(link, pid, save_state, like_state, unlike_state) {
+        var is_saved = is_done(save_state), 
+            is_liked = is_done(like_state), 
+            is_unliked = is_done(unlike_state);
         const ele = `
         <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
-        <div class="nts-host-menu-post_details">
-            <a class="a" href="${link}">
-                <h1>${title}</h1>
-                <p>${name}</p>
-            </a>
-        </div>
         <div class="nts-host-menu-post-response">
-            <a href="#" class="save-this-note"><p><i class="${is_saved} fa-bookmark"></i> Save for later</p></a>
-            <a href="#" class="report-this-note"><p><i class="far fa-flag"></i> Report content</p></a>
+            <a href="#" class="report-this-note nt-colr-2"><p>Report content</p></a>
+            <a href="${link}" class=""><p>Go to article</p></a>
+            <a href="#" id="share_link" data-copy-on-click="${link}" class=""><p>Copy article link</p></a>
+            <a href="#" class="mute-this-note"><p>Mute this account</p></a>
             <div class="two-clicks">
-                <a href="#" class="like-this-note">
-                    <p>
-                        <i class="${is_liked} fa-thumbs-up" action-icon></i>
-                        <span response-text>Like</span>
-                    </p>
-                </a>
-                <a>
-                    <p>|</p>
-                </a>
                 <a href="#" class="unlike-this-note">
                     <p>
                         <i class="${is_unliked} fa-thumbs-down" action-icon></i>
                         <span response-text>Dislike</span>
                     </p>
                 </a>
+                <a class="two-clicks-middle">
+                    <p>|</p>
+                </a>
+                <a href="#" class="save-this-note">
+                    <p>
+                        <i class="${is_saved} fa-bookmark" action-icon></i>
+                        <span response-text>Save</span>
+                    </p>
+                </a>
             </div>
         </div>`;
         call_menu(ele);
+        click_to_copy_link();
         return true;
 
         function is_done(state) {
@@ -47,13 +49,12 @@ function nt_small_menu() {
     function small_container_visit() {
         const ele = `
         <div class="login_to_connect">
-            <div><img src="/images/support/7.png" alt="Netintui Notes" /></div>
             <p class="nt-ft-calib" message="">Log in to interact with the world on Notes.</p>
             <p class="nt-ft-robt" action="">
-                <a href="/signin" class="a">
+                <a href="/o/signin/" class="a">
                     <button>Log in</button>
                 </a>
-                <a href="/signup" class="a">
+                <a href="/o/signup/" class="a">
                     <button>Sign up</button>
                 </a>
             </p>
@@ -79,12 +80,21 @@ function nt_small_menu() {
             $.post("/ajax/verb/home/article_like/", { thePid: t, theReason: e, other: other }, function () {
                 // alert(data.message)
             }).fail(function (t, i, n) {
-                console.error(n);
+                // console.error(n);
             });
         }
         function flip_value(the_value) {
             return (the_value == 1) ? 0 : 1;
         }
+
+        // MUTE
+        var mute_trigger = $('.mute-this-note');
+        $(mute_trigger).on('click', function(e){
+            e.preventDefault();
+
+            // s(pid, 'mute'),
+            close_all_menu()
+        });
 
         // SAVE
         var save_trigger = $('.save-this-note');
@@ -122,30 +132,34 @@ function nt_small_menu() {
                 <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
                 <div class="nts-host-menu-post_details">
                     <a class="a">
-                        <h1>Report image or title</h1>
+                        <h1>Report</h1>
                         <p></p>
                     </a>
                 </div>
                 <div class="nts-host-menu-post-response">
                     <label class="small-report-issue">
-                        <input type="radio" name="report_issue" value="sc" class="hd" />
-                        <p><i class="far fa-flag"></i> Sexual content</p>
+                        <input type="radio" name="report_issue" value="sexual" class="hd" />
+                        <p>Sexual content</p>
                     </label>
                     <label class="small-report-issue">
-                        <input type="radio" name="report_issue" value="vrc" class="hd" />
-                        <p><i class="far fa-flag"></i> Violent or repulsive content</p>
+                        <input type="radio" name="report_issue" value="violent or repulsive" class="hd" />
+                        <p>Violent or repulsive content</p>
                     </label>
                     <label class="small-report-issue">
-                        <input type="radio" name="report_issue" value="hac" class="hd" />
-                        <p><i class="far fa-flag"></i> Hateful or abusive content</p>
+                        <input type="radio" name="report_issue" value="hateful or abusive" class="hd" />
+                        <p>Hateful or abusive content</p>
                     </label>
                     <label class="small-report-issue">
-                        <input type="radio" name="report_issue" value="sm" class="hd" />
-                        <p><i class="far fa-flag"></i> Spam or misleading</p>
+                        <input type="radio" name="report_issue" value="spam or misleading" class="hd" />
+                        <p>Spam or misleading</p>
                     </label>
                     <label class="small-report-issue">
-                        <input type="radio" name="report_issue" value="ca" class="hd" />
-                        <p><i class="far fa-flag"></i> Child abuse</p>
+                        <input type="radio" name="report_issue" value="child or abuse" class="hd" />
+                        <p>Child abuse</p>
+                    </label>
+                    <label class="small-report-issue">
+                        <input type="radio" name="report_issue" value="others" class="hd" />
+                        <p>Others</p>
                     </label>
                     <div class="two-clicks">
                         <a href="#" class="small-report-cancel">
@@ -154,13 +168,13 @@ function nt_small_menu() {
                                 <span response-text>Cancel</span>
                             </p>
                         </a>
-                        <a>
+                        <a class="two-clicks-middle">
                             <p>|</p>
                         </a>
                         <a href="#" class="small-report-send">
                             <p>
                                 <i class="fas fa-arrow-right" action-icon></i>
-                                <span response-text>Report</span>
+                                <span response-text>Send</span>
                             </p>
                         </a>
                     </div>
@@ -171,10 +185,10 @@ function nt_small_menu() {
             function report_tools_response(t, ask) {
                 var ia = $(t).find('i');
 
-                function e(t, i, n) {
-                    $(t).removeClass(i).addClass(n);
+                function e(t, i) {
+                    $(t).css('text-decoration', i)
                 }
-                (ask == true) ? e(ia, "far", "fas") : e(ia, "fas", "far");
+                (ask == true) ? e(t, 'line-through 4px red') : e(t, 'none');
             }
             function report_actions() {
 
@@ -220,11 +234,11 @@ function nt_small_menu() {
             return;
         }
 
-        var $assistant = $(this).parents('.nts-host').children('#page-assistant'), post_id = $assistant.attr('pid'), article_link = $assistant.attr('link'), title = $assistant.attr('title'), poster = $assistant.attr('poster'), save_state = $assistant.attr('save_state'), like_state = $assistant.attr('like_state'), unlike_state = $assistant.attr('unlike_state');
+        var $assistant = $(this).parents('.nts-host').children('#page-assistant'), post_id = $assistant.attr('pid'), article_link = $assistant.attr('link'), save_state = $assistant.attr('save_state'), like_state = $assistant.attr('like_state'), unlike_state = $assistant.attr('unlike_state');
 
         (
             small_container(
-                title, poster, article_link, post_id,
+                article_link, post_id,
                 save_state, like_state, unlike_state
             ) == true
         )
@@ -237,8 +251,12 @@ function nt_small_menu() {
 
     close_exit.on('click', function (e) {
         e.preventDefault();
-        small_menu_parent_container.fadeOut();
+        close_all_menu();
     });
+
+    function close_all_menu() {
+        small_menu_parent_container.fadeOut();
+    }
 }
 
 function notes_new_menu() { // Working
@@ -337,8 +355,8 @@ function notes_new_menu() { // Working
         small_menu.html(ele)
     }
 
-    t.click(function (t) {
-        t.preventDefault();
+    t.on('click', function (e) {
+        e.preventDefault();
 
         call_loader();
         small_menu_parent_container.fadeIn();
@@ -378,10 +396,23 @@ function note_light_mode() { // working
     }
 }
 
+// COPY LINK
+function click_to_copy_link(){
+
+    $('#share_link').copyOnClick({
+        // disable/enable the feedback
+        confirmShow: false
+    }),
+    $('#share_link').on('click', function(){
+        alert('Copied to clipboard');
+    })
+}
+
 $(document).ready(function (){
 
     notes_new_menu(),
     nt_small_menu(),
     note_light_mode(),
+    click_to_copy_link(),
     lozad().observe();
 });

@@ -7,16 +7,10 @@ function saved_menu() {
         small_menu_parent_container = $('.notes-small-menu-container'),
         small_menu_container        = $('.nts-host-menu');
 
-    function small_container(title, name, pid) {
+    function small_container(pid) {
         const ele = `
         <section class="nts-host-menu-plate">
             <span id="small-menu-assistant" class="hd" pid="${pid}"></span>
-            <div class="nts-host-menu-post_details">
-                <a class="a">
-                    <h1>${title}</h1>
-                    <p>${name}</p>
-                </a>
-            </div>
             <div class="nts-host-menu-post-response">
                 <a href="#" class="nts-remove-on-saved"><p><span class="fa-solid fa-bookmark"></span> Click to remove bookmark</p></a>
             </div>
@@ -52,11 +46,9 @@ function saved_menu() {
         e.preventDefault();
 
         var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
-            post_id      = $assistant.attr('pid'),
-            title        = $assistant.attr('title'),
-            poster       = $assistant.attr('poster');
+            post_id      = $assistant.attr('pid');
 
-        (small_container(title, poster, post_id) == true) ? small_menu_parent_container.fadeIn() : null;
+        (small_container(post_id) == true) ? small_menu_parent_container.fadeIn() : null;
         removeSaved(this, post_id)
     }),
     close_exit.on('click', function(e){

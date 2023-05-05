@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use App\Database\DatabaseAccess;
@@ -96,6 +97,7 @@ class HomeController extends AbstractController
                 $unlike_state     = $small_menu_state['unlike'];
             #
             $article_url = $this->generateUrl('note_posts', array('post_id'=>$the_pid));
+            $article_url_absolute = $this->generateUrl('note_posts', ['post_id'=>$the_pid], UrlGeneratorInterface::ABSOLUTE_URL);
             $profile_url = $this->generateUrl('note_profile', array('user_name'=>$note_poster_uname));
 
             $content[] = [
@@ -112,6 +114,7 @@ class HomeController extends AbstractController
                 'like'         => $like_state,
                 'unlike'       => $unlike_state,
                 'post_url'     => $article_url,
+                'post_link'    => $article_url_absolute,
                 'profile_url'  => $profile_url,
             ];
         }

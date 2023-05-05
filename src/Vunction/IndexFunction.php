@@ -394,7 +394,7 @@ class IndexFunction
             $title = $note = $cover = $cover_lg = $extensions = $date = $note_poster_id = null;
 
             $stmt = $conn->fetchAssociative('SELECT bs.uid, bsl.title,
-                bsl.note, bsl.cover, bsl.cover_extension, bsl.date
+                bsl.note, bsl.cover, bsl.date
                 FROM big_sur bs INNER JOIN big_sur_list bsl
                 ON bs.pid = bsl.pid
                 WHERE bs.pid = ?', [$thePid]);
@@ -406,7 +406,6 @@ class IndexFunction
                 $note       = $stmt['note'];
                 $cover      = self::image_file_paths('note')['content'] . self::get_size('small') . $stmt['cover'];
                 $cover_lg   = self::image_file_paths('note')['content'] . $stmt['cover'];
-                $extensions = $stmt['cover_extension'];
                 $date       = $stmt['date'];
             }
 
@@ -419,7 +418,6 @@ class IndexFunction
                 'note'       => $note,
                 'cover'      => $cover,
                 'cover_full' => $cover_lg,
-                'extensions' => $extensions,
                 'date'       => $date,
             );
         }

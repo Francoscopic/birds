@@ -79,10 +79,8 @@ class ArticleController extends AbstractController
                 $note_note             = IndexFunction::cleanRead($get_note_result_array['note']); # note
                 $note_description      = IndexFunction::ShowMore($note_note); # note
                 $note_cover            = $get_note_result_array['cover_full'];
-                $note_extensions       = IndexFunction::note_cover_extensions($get_note_result_array['cover'], $get_note_result_array['extensions'])['images'];
                 $note_views            = IndexFunction::note_views($conn, $post_id) ?? 'No';
                 $note_date             = IndexFunction::timeAgo($get_note_result_array['date']); # date posted of article
-
                 $cover_area            = IndexFunction::imgNomenclature($note_cover);
                 $cover_width           = $cover_area['width'];
                 $cover_height          = $cover_area['height'];
@@ -97,7 +95,6 @@ class ArticleController extends AbstractController
                     'cover'        => $note_cover,
                     'cover_width'  => $cover_width,
                     'cover_height' => $cover_height,
-                    'extensions'   => $note_extensions,
                     'views'        => $note_views,
                     'date'         => $note_date,
                     'comment_url'  => $comment_url,

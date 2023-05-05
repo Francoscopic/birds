@@ -39,10 +39,9 @@ class ArticleLikeHome extends AbstractController
         if( $this->request->request->has('thePid') &&
             $this->request->request->has('theReason')
         )
-        // if( isset( $_POST['thePid'], $_POST['theReason'] ) )
         {
             $pid    = $this->request->request->get('thePid');
-            $puid   = IndexFunction::get_poster_uid($pid)['uid']; // poster-user_id
+            $puid   = IndexFunction::get_poster_uid($this->conn, $pid)['uid']; // poster-user_id
             $uid    = $viewer_id;
             $reason = $this->request->request->get('theReason');
     
@@ -159,7 +158,7 @@ class ArticleLikeHome extends AbstractController
     {
         $thisID = IndexFunction::randomKey(9);
 
-        $this->conn->insert('verb_report', ['pid'=>$thePid, 'uid'=>$theUid, 'rid'=>$theUid, 'sitch'=>$theReportData_asPUid]);
+        $this->conn->insert('verb_report', ['pid'=>$thePid, 'uid'=>$theUid, 'report_id'=>$thisID, 'sitch'=>$theReportData_asPUid]);
         unset($thisID, $thePid, $theReportData_asPUid, $theUid);
     }
 }

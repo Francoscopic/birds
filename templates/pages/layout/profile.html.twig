@@ -37,7 +37,7 @@
     {% block profile_articles %}
         {% for board in canvas.notes.articles %}
             <div class="nts-host relative">
-                <span id="page-assistant" class="hd" title="{{board.title}}" pid="{{board.pid}}"></span>
+                <span id="page-assistant" class="hd" pid="{{board.pid}}"></span>
                 <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
                     <div class="nts-host-banner relative">
                         <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
@@ -76,7 +76,7 @@
             {% for board in canvas.notes.articles %}
                 {% if board.access == 1 %}
                     <div class="nts-host relative">
-                        <span id="page-assistant" class="hd" title="{{board.title}}"></span>
+                        <span id="page-assistant" class="hd"></span>
                         <a href="{{ path('note_posts', {'post_id':board.pid}) }}" class="vw-anchor nts-host-anchor a">
                             <div class="nts-host-banner relative">
                                 <div class="nts-host-display lozad rad2 bck" data-background-image="{{board.cover}}">
@@ -244,7 +244,7 @@
             {% if canvas.notes.articles.content != null %}
                 {% for row in canvas.notes.articles.content %}
                     <div class="nts-host relative">
-                        <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
+                        <span id="page-assistant" class="hd" pid="{{row.pid}}"></span>
                         <a href="{{path('note_posts', {'post_id':row.pid})}}" class="nts-host-anchor a">
                             <div class="nts-host-banner relative">
                                 <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">
@@ -349,7 +349,7 @@
         {% if canvas.notes.articles != null %}
             {% for row in canvas.notes.articles %}
                 <div class="nts-host relative">
-                    <span id="page-assistant" class="hd" pid="{{row.pid}}" title="{{row.title}}" poster="{{row.name}}"></span>
+                    <span id="page-assistant" class="hd" pid="{{row.pid}}"></span>
                     <a href="{{ path('note_posts', {'post_id':row.pid}) }}" class="vw-anchor nts-host-anchor a">
                         <div class="nts-host-banner relative">
                             <div class="nts-host-display lozad rad2 bck" data-background-image="{{row.cover}}">

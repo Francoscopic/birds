@@ -410,26 +410,13 @@
     height: auto;
     text-align: center;
 }
-.login_to_connect > div {
-    width: calc(100% - 80px); /* 20px on both sides */
-    height: 100px;
-    margin: 0 auto;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-.login_to_connect > div img {
-    width: 80px;
-    height: auto;
-}
 .login_to_connect p[message] {
-    font-size: 1em;
-    font-weight: normal;
+    font-size: 1.3em;
+    font-weight: 600;
     text-align: center;
     width: calc(100% - 80px); /* 40px on both sides */
     margin: 0 auto;
+    margin-top: 40px;
 }
 .login_to_connect p[action] button {
     width: calc(100% - 40px);
@@ -1269,7 +1256,7 @@ div.profile-user-navigation .profile-tab-active {
 }
 /*  */
 .nts-host-menu-post-response {
-    width: calc(100% - var(--std-margin-dob));
+    width: 100%;
     margin: var(--std-margin) auto var(--std-margin) auto;
     font-family: var(--nt-ft-lato);
 }
@@ -1280,23 +1267,20 @@ div.profile-user-navigation .profile-tab-active {
 .nts-host-menu-post-response > div.two-clicks a,
 .nts-host-menu-post-response > a {
     text-decoration: none;
-    color: var(--text-subheader-color);
+    color: var(--text-header-color);
 }
 .nts-host-menu-post-response > div.two-clicks a i[action-icon] {
     font-size: var(--nt-txt-nom);
 }
-.nts-host-menu-post-response > label:hover p,
-.nts-host-menu-post-response > div.two-clicks a:hover p,
-.nts-host-menu-post-response > a:hover > p {
-    color: var(--text-header-color);
-}
 .nts-host-menu-post-response > label p,
 .nts-host-menu-post-response > a p {
-    margin: 1px 0;
+    margin: 0;
+    border-bottom: 1px solid var(--nt-border-color);
     padding: var(--std-margin-half) 0;
+    text-align: center;
 
     font-size: var(--child-text-08);
-    font-weight: 500;
+    font-weight: 600;
 }
 .nts-host-menu-post-response > label i,
 .nts-host-menu-post-response > a i {
@@ -1319,6 +1303,9 @@ div.profile-user-navigation .profile-tab-active {
 .nts-host-menu-post-response > div.two-clicks a p {
     width: 50%;
     text-align: center;
+}
+.nts-host-menu-post-response > div.two-clicks a.two-clicks-middle {
+    width: 10%;
 }
 .nts-host-menu-post-response > div.two-clicks a {
     width: 50%;

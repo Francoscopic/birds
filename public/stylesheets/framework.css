@@ -236,7 +236,8 @@ button.nt-right-header-std {
 .nt-colr-2 button,
 .nt-colr-2 a,
 .nt-colr-2 {
-    color: tomato !important;
+    /* color: tomato !important; */
+    color: red !important;
 }
 .nt-colr-a a,
 .nt-colr-a {

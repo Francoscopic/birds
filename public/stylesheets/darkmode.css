@@ -190,8 +190,7 @@ body, html {
     }
     .menu-august-profile-mixt > label > div h1,
     .menu-august-profile-mixt > a > div h1,
-    .menu-august-profile > a > div[prof-text] h1,
-    .nts-host-menu-post_details a {
+    .menu-august-profile > a > div[prof-text] h1 {
         color: var(--text-dark-header-color);
     }
     .menu-august-pages > ul > a,
