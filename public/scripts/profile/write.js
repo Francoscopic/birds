@@ -274,46 +274,6 @@ function tools(){
 }
 
 //Outsider
-function select_Editor(){
-
-    var featureHandle = $('a.feature-tools-selector');
-
-    function a(handle) {
-        // return the type of Article: Text/Photo
-        var textDiv        = $('.wrt-parags-div'),
-            photoDiv       = $('.wrt-photos-div'),
-            theButton      = $(handle).children('p'),
-            theButtonText  = $('.write-selector-text'),
-            theButtonPhoto = $('.write-selector-photo');
-
-                
-        (theButton.attr('type') == 'text') 
-            ? (b(photoDiv, textDiv), c(theButtonText, theButtonPhoto), d(true), whichEditor=0) 
-            : (b(textDiv, photoDiv), c(theButtonPhoto, theButtonText), d(false), whichEditor=1);
-    }
-    function b(selector1, selector2) {
-        // bring out the elements for the article type
-        $(selector1).fadeOut(),
-        $(selector2).fadeIn()
-    }
-    function c(but1, but2) {
-        // Make the transition to appropriate button.
-        $(but1).addClass('feature-tools-selector-active'),
-        $(but2).removeClass('feature-tools-selector-active')
-    }
-    function d(draft_allow) {
-        var draft_selector = $('.feature-tools-draft');
-        (draft_allow == true) ? draft_selector.fadeIn() : draft_selector.fadeOut();
-    }
-    selectType_Master();
-    function selectType_Master() {
-        $(featureHandle).on('click', function (e) {
-            e.preventDefault();
-
-            a(this);
-        });
-    }
-}
 function preview_note(){
     const e=$("#write-submit"),
         t = $("#write-save-submit"),
@@ -421,8 +381,7 @@ $(document).ready(function(){
     writeIdea(),
     preview_note(),
     writeImages(),
-    saveEditing(),
-    select_Editor();
+    saveEditing();
 
     tools();
 });

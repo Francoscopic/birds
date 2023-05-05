@@ -6,10 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
-use App\Validation\SigninValidation;
+use Doctrine\DBAL\Connection;
 use App\Verb\Cookie\RetrieveCookie;
 use App\Vunction\IndexFunction;
 
@@ -19,9 +17,9 @@ class DeskProfile extends AbstractController
     private $request;
     private $uid;
     private $file_path;
-    private $connection_sur;
+    private $conn;
 
-    public function __construct()
+    public function __construct(Connection $connection)
     {
         // get user_id
         $get_cookie = new RetrieveCookie();
@@ -34,8 +32,7 @@ class DeskProfile extends AbstractController
         $this->file_path = dirname(__DIR__).'/../../public/images/community/notes/';
 
         // access database
-        $this->connection_sur = new DatabaseAccess();
-        $this->connection_sur = $this->connection_sur->connect('sur');
+        $this->conn = $connection;
     }
 
     public function index(): JsonResponse
@@ -67,27 +64,21 @@ class DeskProfile extends AbstractController
         $body  = $this->request->request->get('desk_save_body');
         $pid   = $this->request->request->get('desk_save_pid');
 
-        $stmt = $this->connection_sur->prepare('SELECT sid FROM big_sur_draft WHERE uid = ? AND pid = ? AND access=1 ORDER BY sid DESC LIMIT 1');
-        $stmt->bind_param('ss', $uid, $pid);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $rows = $result->num_rows;
-        if( $rows > 0  ) {
-            $stmt = $this->connection_sur->prepare('UPDATE big_sur_draft SET title=?, body=? WHERE uid=? AND pid=?');
-            $stmt->bind_param('ssss', $title, $body, $uid, $pid);
-            $stmt->execute();
-            
-            unset($stmt, $rows, $result, $title, $body, $pid, $uid);
-            return [
-                'message' => 'Updated',
-                'status'  => 200,
-            ];
+        $stmt = $this->conn->fetchOne('SELECT COUNT(id) AS rows FROM big_sur_draft WHERE uid = ? AND pid = ? AND access=1 ORDER BY sid DESC LIMIT 1', [$uid, $pid]);
+        if($stmt == true) {
+            if( $stmt['rows'] > 0  ) {
+                $this->conn->update('big_sur_draft', ['title'=>$title, 'body'=>$body], ['uid'=>$uid, 'pid'=>$pid]);
+                
+                unset($stmt, $title, $body, $pid, $uid);
+                return [
+                    'message' => 'Updated',
+                    'status'  => 200,
+                ];
+            }
         }
 
-        $stmt = $this->connection_sur->prepare('INSERT INTO big_sur_draft (access, uid, pid, title, body) VALUES(1, ?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $uid, $pid, $title, $body);
-        $stmt->execute();
-        unset($stmt, $result, $rows, $title, $body, $pid, $uid);
+        $this->conn->insert('big_sur_draft', ['access'=>1, 'uid'=>$uid, 'pid'=>$pid, 'title'=>$title, 'body'=>$body]);
+        unset($title, $body, $pid, $uid);
         return [
             'message' => 'Saved',
             'status'  => 200,
@@ -172,37 +163,26 @@ class DeskProfile extends AbstractController
     protected function desk_save($uid, $pid, $title, $notes, $paragraphs, $img, $which_editor, $extensions)
     {
         # Note scoring
-            # Score = Paragraphs * First_Paragraphs_Words * Title Red Flags            
-            $First_Paragraphs_Words = [0,1];
-            $red = 0;
-            $red_flags = 0;
-            $flags = 0;
-            (string) $note_score = $this->desk_score_algo($paragraphs, $First_Paragraphs_Words[0], $red_flags);
+            # Score = Flesch-Kincaid
+            $score = 0;
+            (string) $note_score = $this->desk_score_algo($score);
         #
 
-        $stmt = $this->connection_sur->prepare('INSERT INTO big_sur (access, uid, pid, note_score) VALUES(1, ?, ?, ?)');
-        $stmt->bind_param('sss', $uid, $pid, $note_score);
-        $executeOne = $stmt->execute();
+        $stmt = $this->conn->insert('big_sur', ['access'=>1, 'uid'=>$uid, 'pid'=>$pid]);
 
-        if($executeOne)
+        if($stmt == true)
         {
-            $stmt = $this->connection_sur->prepare('INSERT INTO big_sur_list (access, state, pid, title, note, parags, cover, cover_extension) VALUES(1, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssssss', $which_editor, $pid, $title, $notes, $paragraphs, $img, $extensions);
-            $executeTwo = $stmt->execute();
+            $this->conn->insert('big_sur_list', ['access'=>1, 'state'=>$which_editor, 'pid'=>$pid, 'title'=>$title, 'note'=>$notes, 'parags'=>$paragraphs, 'cover'=>$img, 'cover_extension'=>$extensions]);
 
-            $stmt = $this->connection_sur->prepare('INSERT INTO note_score_details (pid, paragraphs, red_flags, flags, score) VALUES(?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssss', $pid, $paragraphs, $red_flags, $flags, $note_score);
-            $executeScore = $stmt->execute();
+            // $this->conn->insert('big_sur_fkscore', []);
 
             unset($uid, $pid, $title, $notes, $paragraphs, $img);
-            unset($stmt, $executeOne, $executeTwo, $executeScore, $First_Paragraphs_Words, $red_flags, $flags, $note_score);
             return [
                 'message' => 'Success',
                 'status'  => 200,
             ];
         }
         unset($uid, $pid, $title, $body, $paragraphs, $img);
-        unset($stmt, $executeOne, $executeTwo, $executeScore, $First_Paragraphs_Words, $red_flags, $flags, $note_score);
         return [
             'message' => 'Error encountered',
             'status'  => 500,

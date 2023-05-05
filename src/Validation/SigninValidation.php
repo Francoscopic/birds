@@ -17,11 +17,11 @@ class SigninValidation
     private $session_cell;
     private $cookie_cell;
     private $request;
-    private $connection;
+    private $conn;
 
-    public function __construct($conn)
+    public function __construct($connection)
     {
-        $this->connection = $conn;
+        $this->conn = $connection;
 
         $this->session_cell = new Session();
         // $this->session_cell->start();
@@ -97,7 +97,7 @@ class SigninValidation
 
     protected function validate_sesh_login($userId, $isSignedIn, $sessionId): bool
     {
-        $stmt = $this->connection->fetchOne('SELECT id FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY id DESC LIMIT 1', [$userId, $sessionId]);
+        $stmt = $this->conn->fetchOne('SELECT id FROM user_onyx WHERE uid=? AND seshkey=? ORDER BY id DESC LIMIT 1', [$userId, $sessionId]);
 
         if($stmt == false) {
             return false;
@@ -133,7 +133,7 @@ class SigninValidation
     }
     protected function add_visitor($visitor_id): void
     {
-        $this->connection->insert('user_visitor', ['v_id'=>$visitor_id, 'visits'=>'visits + 1']);
+        $this->conn->insert('user_visitor', ['v_id'=>$visitor_id, 'visits'=>'visits + 1']);
         unset($visitor_id);
     }
 
@@ -150,7 +150,7 @@ class SigninValidation
                 'uid'      => $uid,
                 'visit'    => false,
                 'intruder' => $intruder,
-                'user'     => IndexFunction::user_profile_state($this->connection, $uid),
+                'user'     => IndexFunction::user_profile_state($this->conn, $uid),
             );
         } else {
 
@@ -190,7 +190,7 @@ class SigninValidation
                 'uid'      => $uid, 
                 'visit'    => true,
                 'intruder' => $intruder,
-                'user'     => IndexFunction::user_profile_state($this->connection, false),
+                'user'     => IndexFunction::user_profile_state($this->conn, false),
             );
         }
         return array(
@@ -198,7 +198,7 @@ class SigninValidation
             'uid'      => $uid,
             'visit'    => true,
             'intruder' => $intruder,
-            'user'     => IndexFunction::user_profile_state($this->connection, false),
+            'user'     => IndexFunction::user_profile_state($this->conn, false),
         );
     }
 }

@@ -73,10 +73,11 @@
                         </div>
                         <div class="plain-right">
                             <a href="#" id="nt_app_menu" class="note-menu-open" title="Menu">
-                                <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p>
+                                {# <p><img src="{{canvas.profile.user.display_small}}" alt="{{canvas.profile.user.username}}" /></p> #}
+                                <p><i class="fa-solid fa-bars"></i></p>
                             </a>
                             <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
-                                <p><i class="fa-regular fa-square-plus"></i></p>
+                                <p><i class="fa-solid fa-plus"></i></p>
                             </a>
                             <a href="{{ url('note_home') }}" title="From the community">
                                 <p><i class="fa-solid fa-house"></i></p>
@@ -90,7 +91,7 @@
                             <a href="#" class="note-menu-open" title="Show menu">
                                 <p><i class="fa-solid fa-bars"></i><br><span>More</span></p>
                             </a>
-                            <a href="{{ url('note_write') }}" class="note-yours-prevent" title="Share something great">
+                            <a href="{{ url('note_write') }}" class="note-yours-prevent" title="What's on your mind?">
                                 <p><i class="fa-solid fa-plus"></i><br><span>Write</span></p>
                             </a>
                             <a href="{{ url('note_home') }}" title="From the community">
