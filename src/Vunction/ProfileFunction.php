@@ -9,12 +9,17 @@ use Symfony\Component\HttpFoundation\Request;
 class ProfileFunction
 {
     private $conn;
+
+    public function __construct(Connection $connection) {
+        $this->conn = $connection;
+    }
     
-    public function notes_profile($uid, Connection $connection): array
+    public function notes_profile($uid): array
     {
+        // $this->conn = $connection;
         $content = array();
 
-        $get_user_figures_array = IndexFunction::profile_user_figures($uid);
+        $get_user_figures_array = IndexFunction::profile_user_figures($this->conn, $uid);
 
         $username      = strtolower($get_user_figures_array['username']);
         $name          = $get_user_figures_array['name'];
@@ -26,8 +31,8 @@ class ProfileFunction
         $cover         = $get_user_figures_array['cover'];
         $display       = $get_user_figures_array['display'];
 
-        $subs_number = IndexFunction::subscribes($uid, 'followers');   // the people who follow me
-        $my_subs     = IndexFunction::subscribes($uid, 'following');    // the people I follow
+        $subs_number = IndexFunction::subscribes($this->conn, $uid, 'follower');   // the people who follow me
+        $my_subs     = IndexFunction::subscribes($this->conn, $uid, 'following');    // the people I follow
 
         $content = [
             'username'  => $username,
@@ -48,38 +53,30 @@ class ProfileFunction
     {
         $content = array();
 
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        // $stmt = $connection_sur->prepare("SELECT uid, pid FROM big_sur WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 15");
-        $stmt = $connection_sur->prepare("SELECT uid, pid, access FROM big_sur WHERE uid = ? ORDER BY sid DESC LIMIT 15");
-        $stmt->bind_param('s', $uid);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        $num_rows = $get_result->num_rows;
-
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
-
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, uid, pid, access FROM big_sur WHERE uid = ? ORDER BY id DESC LIMIT 15', [$uid]) 
+            as $id => $data
+        ) {
             # Get post and my details
-                $the_pid    = $get_rows['pid'];
-                $poster_uid = $get_rows['uid'];
-                $the_access = $get_rows['access'];
+                $the_pid    = $data['pid'];
+                $poster_uid = $data['uid'];
+                $the_access = $data['access'];
             #
 
             # Instantiate acting variables
-                $my_note_row = IndexFunction::get_this_note($the_pid);
+                $my_note_row = IndexFunction::get_this_note($this->conn, $the_pid);
                 $note_title  = stripslashes($my_note_row['title']);
                 $note_parags = $my_note_row['paragraphs'];
                 $note_cover  = IndexFunction::note_cover($my_note_row['cover'], 'notes');
                 $note_state_article_or_image = ($my_note_row['state'] == 'art') ? false : true;
             #
 
-            $get_note_poster_details = IndexFunction::get_me($poster_uid);
+            $get_note_poster_details = IndexFunction::get_me($this->conn, $poster_uid);
             $note_poster_name        = $get_note_poster_details['name'];
             $note_poster_uname       = $get_note_poster_details['username'];
 
             # Get me view details
-                $if_view  = IndexFunction::get_if_views($the_pid, $uid);
+                $if_view  = IndexFunction::get_if_views($this->conn, $the_pid, $uid);
                 $view_eye = ($if_view === true) ? '*' : '';
             #
             $content[] = [
@@ -99,7 +96,7 @@ class ProfileFunction
 
     public function notes_subscribe($people_uid, $uid, $visitor_state): array
     {
-        $subscribe_state = ($visitor_state == true) ? false : IndexFunction::get_subscribe_state($people_uid, $uid);
+        $subscribe_state = ($visitor_state == true) ? false : IndexFunction::get_subscribe_state($this->conn, $people_uid, $uid);
         $state_variables = IndexFunction::subscribe_state_variables($subscribe_state);
         $sub_state_text  = $state_variables['title'];
         $sub_state_state = $state_variables['state'];
@@ -112,20 +109,14 @@ class ProfileFunction
     public function notes_follows($uid): array
     {
         $content = array();
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
 
-        $stmt = $connection_sur->prepare("SELECT customer FROM subscribes WHERE publisher = ? AND state = 1");
-        $stmt->bind_param('s', $uid);
-        $stmt->execute();
-        $get_subbers = $stmt->get_result();
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, follower FROM big_sur_subscribes WHERE following = ? AND state = 1', [$uid]) 
+            as $id => $data
+        ) {
+            $subber_id = $data['follower'];
 
-        $check = ($get_subbers->num_rows > 0); // returns bool
-        while( $check && ($subbers = $get_subbers->fetch_array(MYSQLI_ASSOC)) ) {
-
-            $subber_id = $subbers['customer'];
-
-            $subber_details = IndexFunction::retrieve_details($subber_id);
+            $subber_details = IndexFunction::retrieve_details($this->conn, $subber_id);
             $subber_uname   = $subber_details['username'];
             $subber_name    = $subber_details['name'];
             $subber_display = $subber_details['display_small'];
@@ -143,20 +134,14 @@ class ProfileFunction
     public function notes_following($uid): array
     {
         $content = array();
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
 
-        $stmt = $connection_sur->prepare("SELECT publisher FROM subscribes WHERE customer = ? AND state = 1");
-        $stmt->bind_param('s', $uid);
-        $stmt->execute();
-        $get_subs = $stmt->get_result();
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, following FROM big_sur_subscribes WHERE follower = ? AND state = 1', [$uid]) 
+            as $id => $data
+        ) {
+            $subs_id = $data['following'];
 
-        $check = ($get_subs->num_rows > 0); // returns bool
-        while( $check && ($subs = $get_subs->fetch_array(MYSQLI_ASSOC)) ) {
-
-            $subs_id = $subs['publisher'];
-
-            $subs_details = IndexFunction::retrieve_details($subs_id);
+            $subs_details = IndexFunction::retrieve_details($this->conn, $subs_id);
             $subber_uname   = $subs_details['username'];
             $subber_name    = $subs_details['name'];
             $subber_display = $subs_details['display_small'];
@@ -182,20 +167,14 @@ class ProfileFunction
     public function notes_history($uid): array 
     {
         $content = array();
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
 
-        $stmt = $connection_verb->prepare("SELECT DISTINCT(post_id) FROM visits WHERE user_id=? AND state=1 ORDER BY date DESC LIMIT 15");
-        $stmt->bind_param('s', $uid);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        $num_rows = $get_result->num_rows;
-
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
-
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, DISTINCT(post_id) AS pid FROM verb_visits WHERE uid=? AND state=1 ORDER BY id DESC LIMIT 15', [$uid]) 
+            as $id => $data
+        ) {
             # Get post and my details
-                $the_pid        = $get_rows['post_id'];
-                $poster_user_id = IndexFunction::get_poster_uid($the_pid)['uid'];
+                $the_pid        = $data['pid'];
+                $poster_user_id = IndexFunction::get_poster_uid($this->conn, $the_pid)['uid'];
             #
 
             # Instantiate acting variables
@@ -207,7 +186,7 @@ class ProfileFunction
                 $note_date          = IndexFunction::timeAgo($my_note_row['date']);
             #
 
-            $note_poster_data  = IndexFunction::get_me($poster_user_id);
+            $note_poster_data  = IndexFunction::get_me($this->conn, $poster_user_id);
             $note_poster_name  = $note_poster_data['name'];
             $note_poster_uname = $note_poster_data['username'];
 
@@ -231,23 +210,17 @@ class ProfileFunction
     public function notes_draft($uid): array
     {
         $content = array();
-        $connection_sur = new DatabaseAccess();
-        $connection_sur = $connection_sur->connect('sur');
-
-        $stmt = $connection_sur->prepare("SELECT pid, title, body, date FROM big_sur_draft WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 10");
-        $stmt->bind_param('s', $uid);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        $num_rows = $get_result->num_rows;
 
         $check = ($num_rows > 0); // returns bool
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
-
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, pid, title, body, date FROM big_sur_draft WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 10', [$uid]) 
+            as $id => $data
+        ) {
             # Get post and my details
-                $the_pid        = $get_rows['pid'];
-                $the_title      = stripslashes($get_rows['title']);
-                $the_paragraphs = IndexFunction::count_paragraphs($get_rows['body']);
-                $the_date       = IndexFunction::timeAgo($get_rows['date']);
+                $the_pid        = $data['pid'];
+                $the_title      = stripslashes($data['title']);
+                $the_paragraphs = IndexFunction::count_paragraphs($data['body']);
+                $the_date       = IndexFunction::timeAgo($data['date']);
             #
             $content[] = [
                 'pid'        => $the_pid,
@@ -256,31 +229,25 @@ class ProfileFunction
                 'date'       => $the_date,
             ];
         }
-        unset($connection_sur, $stmt, $get_result, $num_rows, $check, $the_pid, $the_title, $the_paragraphs, $the_date);
+        unset($the_pid, $the_title, $the_paragraphs, $the_date);
         return $content;
     }
 
     public function notes_saved($uid): array 
     {
         $content = array();
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
 
-        $stmt = $connection_verb->prepare("SELECT puid, pid FROM saves WHERE uid = ? AND state = 1 ORDER BY sid DESC LIMIT 12");
-        $stmt->bind_param('s', $uid);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        $num_rows = $get_result->num_rows;
-
-        while( $get_rows = $get_result->fetch_array(MYSQLI_ASSOC) ) {
-
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, puid, pid FROM verb_saves WHERE uid = ? AND state = 1 ORDER BY sid DESC LIMIT 12', [$uid]) 
+            as $id => $data
+        ) {
             # Get post and my details
-                $the_pid    = $get_rows['pid'];
-                $poster_uid = $get_rows['puid'];
+                $the_pid    = $data['pid'];
+                $poster_uid = $data['puid'];
             #
 
             # Instantiate acting variables
-                $my_note_row                 = IndexFunction::get_this_note($the_pid);
+                $my_note_row                 = IndexFunction::get_this_note($this->conn, $the_pid);
                 $note_title                  = IndexFunction::ShowMore(stripslashes($my_note_row['title']));
                 $note_parags                 = $my_note_row['paragraphs'];
                 $note_cover                  = IndexFunction::note_cover($my_note_row['cover'], 'notes');
@@ -288,12 +255,12 @@ class ProfileFunction
                 $note_date                   = IndexFunction::timeAgo($my_note_row['date']);
             #
 
-            $note_poster_data  = IndexFunction::get_me($poster_uid);
+            $note_poster_data  = IndexFunction::get_me($this->conn, $poster_uid);
             $note_poster_name  = $note_poster_data['name'];
             $note_poster_uname = $note_poster_data['username'];
 
             # Get me view details
-                $if_view = IndexFunction::get_if_views($the_pid, $uid);
+                $if_view = IndexFunction::get_if_views($this->conn, $the_pid, $uid);
                 $view_eye = ($if_view === true) ? '*' : '';
             #
 
@@ -310,7 +277,7 @@ class ProfileFunction
             ];
         }
         unset(
-            $connection_verb, $stmt, $get_result, $num_rows, $the_pid, $poster_uid, 
+            $the_pid, $poster_uid, 
             $my_note_row, $note_title, $note_parags, $note_cover, $note_state_article_or_image, 
             $note_date, $note_poster_data, $note_poster_name, $note_poster_uname, $if_view, $view_eye
         );

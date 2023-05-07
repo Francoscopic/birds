@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-// use App\Database\DatabaseAccess;
 use App\Validation\SigninValidation;
 use App\Verb\Cookie\RetrieveCookie;
 use App\Vunction\IndexFunction;
@@ -72,20 +71,23 @@ class ArticleFollowHome extends AbstractController
 
     protected function subscribe_me($pub_uid, $cusm_uid): void
     {
-        # Close variables, free memory
-        $this->conn->insert('user_subscribes', ['following'=>$pub_uid, $customer=>$cusm_uid, 'state'=>1]);
+        # users cannot subscribe to their own account.
+        if($pub_uid == $cusm_uid) {
+            unset($pub_uid, $cusm_uid);
+            return;
+        }
+        $this->conn->insert('big_sur_subscribes', ['following'=>$pub_uid, 'follower'=>$cusm_uid, 'state'=>1]);
         unset($pub_uid, $cusm_uid);
     }
 
     protected function validate_subscribe($pub_uid, $cusm_uid): bool
     {
         $handle = false;
-        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total, state FROM user_subscribes WHERE following = ? AND follower = ?', [$pub_uid, $cusm_]);
+        $stmt = $this->conn->fetchAssociative('SELECT COUNT(id) AS total, state FROM big_sur_subscribes WHERE following = ? AND follower = ?', [$pub_uid, $cusm_uid]);
 
         if($stmt == true && $stmt['total'] >= 1) {
             # Is a subscriber or unsubscriber
-            $state = $stmt['state'];
-            if($state == 1) {
+            if($stmt['state'] == 1) {
                 # Then, unsubscribe
                 $this->unsubscribe_me($pub_uid, $cusm_uid);
             } else {
@@ -94,13 +96,13 @@ class ArticleFollowHome extends AbstractController
             }
             $handle = true;
         }
-        unset($stmt, $pub_uid, $cusm_uid, $state);
+        unset($stmt, $pub_uid, $cusm_uid);
         return $handle; // no follow history
     }
 
     protected function unsubscribe_me($pub_uid, $cusm_uid, $state = 0): void
     {
-        $this->conn->update('user_subscribes', ['state'=>$state], ['following'=>$pub_uid, 'follower'=>$cusm_uid]);
+        $this->conn->update('big_sur_subscribes', ['state'=>$state], ['following'=>$pub_uid, 'follower'=>$cusm_uid]);
         # Close variables, free memory
         unset($pub_uid, $cusm_uid, $state);
     }

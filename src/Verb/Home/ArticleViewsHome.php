@@ -80,19 +80,19 @@ class ArticleViewsHome extends AbstractController
 
     protected function save_outshares($share_id, $post_id, $user_id, $media)
     {
-        $this->conn->insert('verb_shares', ['share_id'=>$share_id, 'post_id'=>$post_id, 'user_id'=>$user_id, 'media'=>$media]);
+        $this->conn->insert('verb_shares', ['share_id'=>$share_id, 'pid'=>$post_id, 'uid'=>$user_id, 'media'=>$media]);
         unset($share_id, $post_id, $user_id, $media);
     }
     
     protected function save_inshares($share_id, $post_id, $user_id, $media)
     {
-        $this->conn->insert('verb_visits', ['visit_id'=>$share_id, 'post_id'=>$post_id, 'user_id'=>$user_id, 'media'=>$media]);
+        $this->conn->insert('verb_visits', ['visit_id'=>$share_id, 'pid'=>$post_id, 'uid'=>$user_id, 'media'=>$media]);
         unset($share_id, $post_id, $user_id, $media);
     }
 
     protected function remove_views($pid, $uid)
     {
-        $this->conn->update('verb_visits', ['state'=>0], ['post_id'=>$pid, 'user_id'=>$uid]);
+        $this->conn->update('verb_visits', ['state'=>0], ['pid'=>$pid, 'uid'=>$uid]);
         unset($pid, $uid);
     }
 }

@@ -113,7 +113,7 @@ class ChangeProfile extends AbstractController
             if( $same ) {
 
                 return [
-                    'message' => 'You made no changes to bio',
+                    'message' => 'No changes observed',
                     'status'  => 500,
                 ];
             } else {
@@ -122,13 +122,11 @@ class ChangeProfile extends AbstractController
                 $loc_cleaned  = IndexFunction::validateInput($loc);
                 $bio_cleaned  = IndexFunction::test_input($bio);
                 // Save the changes
-                $stmt = $connection->prepare("UPDATE user_sapphire SET name=?, about=?, location=?, date=? WHERE uid=?");
-                $stmt->bind_param("sssss", $name_cleaned, $bio_cleaned, $loc_cleaned, $date, $uid);
-                $stmt->execute();
+                $this->conn->update('user_sapphire', ['name'=>$name_cleaned, 'about'=>$bio_cleaned, 'location'=>$loc_cleaned], ['uid'=>$uid]);
 
                 # Success
                 // Unset varaiables to free memory
-                unset($stmt, $name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
+                unset($name, $bio, $loc, $name_saved, $bio_saved, $loc_saved, $name_cleaned, $loc_cleaned, $goodSaveBio, $same, $uid, $goodName, $goodLoc);
                 return [
                     'message' => 'Success',
                     'status'  => 200,
@@ -150,7 +148,7 @@ class ChangeProfile extends AbstractController
 
         // Set-up the necessary image changes
         $format    = explode('.', $file_name);
-        $new_name  = IndexFunction::randomKey(9).'.'.end($format);
+        $new_name  = IndexFunction::randomKey(11).'.'.end($format);
 
         // Initiate the image changes
         $saveImage = $file_path.$new_name;
@@ -214,7 +212,7 @@ class ChangeProfile extends AbstractController
 
         // Set-up the necessary image changes
         $format    = explode('.', $file_name);
-        $new_name  = IndexFunction::randomKey(9).'.'.end($format);
+        $new_name  = IndexFunction::randomKey(11).'.'.end($format);
 
         // Initiate the image changes
         $saveImage   = $file_path.$new_name;

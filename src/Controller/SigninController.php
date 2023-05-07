@@ -15,10 +15,11 @@ use App\Validation\SigninValidation;
 
 class SigninController extends AbstractController
 {
-
+    private $conn;
     #[Route('/o/signin/', name: 'note_signin')]
-    public function signin(Connection $conn): Response
+    public function signin(Connection $connection): Response
     {
+        $this->conn = $connection;
         $canvas = array(
             'notes'   => array(),
             'profile' => array(

@@ -39,6 +39,9 @@ class UserController extends AbstractController
             $name = $stmt;
         }
         return new Response('Result of query: '.$name);
+        // return $this->render('test/index.html.twig', [
+        //     'name' => 'Joshua Francis',
+        // ]);
 
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Vunction;
 
-use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -168,11 +167,11 @@ class IndexFunction
 
     public static function get_profile_uid($conn, $the_username=''): array 
     {
-        $stmt = $conn->fetchOne('SELECT uid FROM user_sapphire WHERE uname=?', [$the_username]);
+        $stmt = $conn->fetchAssociative('SELECT uid FROM user_sapphire WHERE uname=?', [$the_username]);
         if($stmt == true) {
             return [
                 'message' => 'found',
-                'uid'     => $stmt
+                'uid'     => $stmt['uid']
             ];
         }
 
@@ -207,8 +206,8 @@ class IndexFunction
 
     public static function get_if_views($conn, $note_id, $viewer_id): bool
     {
-        $stmt = $conn->fetchOne('SELECT COUNT(DISTINCT(visit_id)) AS total FROM verb_visits WHERE pid=? AND uid=?', [$note_id, $viewer_id]);
-        if($stmt == true && $stmt >= 1) {
+        $stmt = $conn->fetchAssociative('SELECT COUNT(DISTINCT(visit_id)) AS total FROM verb_visits WHERE pid=? AND uid=?', [$note_id, $viewer_id]);
+        if($stmt == true && $stmt['total'] >= 1) {
             unset($stmt, $note_id, $viewer_id);
             return true;
         }
@@ -219,11 +218,11 @@ class IndexFunction
 
     public static function get_note_views($conn, $note_id): string
     {
-        $stmt = $conn->fetchOne('SELECT COUNT(id) AS total verb_views WHERE pid=?', [$note_id]);
+        $stmt = $conn->fetchAssociative('SELECT COUNT(id) AS total verb_views WHERE pid=?', [$note_id]);
 
-        if( $stmt == true && $stmt >= 1 ) {
+        if( $stmt == true && $stmt['total'] >= 1 ) {
             unset($conn, $note_id, $stmt);
-            return ($stmt === 1) ? $stmt.' view' : $stmt.' views';
+            return ($stmt['total'] == 1) ? $stmt.' view' : $stmt.' views';
         }
         unset($conn, $note_id, $stmt);
         return 'no views';
@@ -351,16 +350,16 @@ class IndexFunction
             $save_state = $like_state = $unlike_state = null;
 
             # SAVE
-            $save_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_saves WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
-            $save_state = ($save_state == true && $save_state == 1) ? 1 : 0;
+            $save_state = $connection->fetchAssociative('SELECT COUNT(id) AS total FROM verb_saves WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
+            $save_state = ($save_state == true && $save_state['total'] == 1) ? 1 : 0;
 
             # LIKES
-            $like_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_likes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
-            $like_state = ($like_state == true && $like_state == 1) ? 1 : 0;
+            $like_state = $connection->fetchAssociative('SELECT COUNT(id) AS total FROM verb_likes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
+            $like_state = ($like_state == true && $like_state['total'] == 1) ? 1 : 0;
 
             # UNLIKES
-            $unlike_state = $connection->fetchOne('SELECT COUNT(id) FROM verb_unlikes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
-            $unlike_state = ($like_state == true && $unlike_state == 1) ? 1 : 0;
+            $unlike_state = $connection->fetchAssociative('SELECT COUNT(id) AS total FROM verb_unlikes WHERE uid = ? AND pid = ? AND state = 1', [$viewer_uid, $pid] );
+            $unlike_state = ($like_state == true && $unlike_state['total'] == 1) ? 1 : 0;
 
             return array(
                 'save'   => $save_state,
@@ -379,10 +378,10 @@ class IndexFunction
         }
         public static function GET_validate_people($conn, $get): array
         { # Is GET request name valid
-            $stmt = $conn->fetchOne('SELECT uid FROM user_sapphire WHERE uname = ?', [$get]);
+            $stmt = $conn->fetchAssociative('SELECT uid FROM user_sapphire WHERE uname = ?', [$get]);
             if($stmt == true) {
                 unset($conn, $stmt, $get);
-                return [$stmt, 0];
+                return [$stmt['uid'], 0];
             }
 
             unset($conn, $stmt, $get);
@@ -452,9 +451,9 @@ class IndexFunction
         {
             $poster_uid = null;
 
-            $stmt = $conn->fetchOne('SELECT uid FROM big_sur WHERE pid=?', [$post_id]);
+            $stmt = $conn->fetchAssociative('SELECT uid FROM big_sur WHERE pid=?', [$post_id]);
             if($stmt == true) {
-                $poster_uid = $stmt;
+                $poster_uid = $stmt['uid'];
             }
 
             return array(
@@ -520,31 +519,29 @@ class IndexFunction
 
             $table = 'verb_'.$table;
 
-            $stmt = $conn->fetchOne("SELECT COUNT(id) as total FROM $table WHERE pid = ? AND state = ?", [$thePid, $state]);
+            $stmt = $conn->fetchAssociative("SELECT COUNT(id) AS total FROM $table WHERE pid = ? AND state = ?", [$thePid, $state]);
             # if rows is zero.
             if($stmt == false) {
-                # Return number of NOTES
+                # Request to take action
                 $number = 'Like';
-                unset($conn, $stmt, $thePid, $table, $state);
-                return array(
-                    'number' => $number
-                );
             }
+            # return number of actions taken
+            $number = $stmt['total'] . ' likes';
+
             unset($conn, $stmt, $thePid, $table, $state);
-            # Return handler: false = NOT NOTED
             return array(
-                'number' => $number . ' likes',
+                'number' => $number
             );
         }
         public static function note_views($conn, $id)
         {
-            $stmt = $conn->fetchOne('SELECT COUNT(DISTINCT(uid)) AS total FROM verb_visits WHERE pid = ?', [$id]);
+            $stmt = $conn->fetchAssociative('SELECT COUNT(DISTINCT(uid)) AS total FROM verb_visits WHERE pid = ?', [$id]);
             $ans = null;
             if($stmt == true) {
-                $ans = $stmt;
+                $ans = $stmt['total'];
             }
 
-            unset($conn, $id);
+            unset($conn, $stmt, $id);
             return $ans;
         }
         public static function get_comment($conn, $comment_id): array
@@ -577,28 +574,28 @@ class IndexFunction
                 'username' => $uname
             );
         }
-        public static function get_comments_number($conn, $note_id, $reason = 'number', $comment_no = 200): array
+        public static function get_comments_number($conn, $note_id, $reason = 'number', $comment_no = 50): array
         {
-            $stmt = $conn->fetchOne('SELECT COUNT(id) as total FROM verb_comments WHERE pid = ?', [$note_id]);
+            $stmt = $conn->fetchAssociative('SELECT COUNT(id) AS total FROM verb_comments WHERE pid = ?', [$note_id]);
 
             if($stmt == true) {
-                if( $stmt >= $comment_no && $reason === 'more' ) {
+                if( $stmt['total'] >= $comment_no && $reason === 'more' ) {
 
                     $show_more = '<a href="#" class="notes-more-comments calib a"><p>more <span class="trn3"><i class="sm-i fa fa-arrow-right"></i></span></p></a>';
-                    unset($conn, $stmt);
+                    unset($conn, $stmt, $note_id, $reason, $comment_no);
                     return [$show_more];
-                } elseif( $stmt <= $comment_no && $reason === 'more' ) {
+                } elseif( $stmt['total'] <= $comment_no && $reason === 'more' ) {
 
-                    unset($conn, $stmt);
+                    unset($conn, $stmt, $note_id, $reason, $comment_no);
                     return [''];
-                } elseif( $stmt == 0 ) {
+                } elseif( $stmt['total'] == 0 ) {
 
-                    unset($conn, $stmt);
+                    unset($conn, $stmt, $note_id, $reason, $comment_no);
                     return ['Comment'];
                 } else {
 
-                    unset($conn, $stmt);
-                    return [$rows_number];
+                    unset($conn, $note_id, $reason, $comment_no);
+                    return [$stmt['total']];
                 }
             }
             return ['something wrong'];
@@ -703,14 +700,13 @@ class IndexFunction
         }
         public static function profile_check_username($conn, $user_name): array
         {
-            $stmt = $conn->fetchOne('SELECT uid FROM user_sapphire WHERE uname = ?', [$user_name]);
+            $stmt = $conn->fetchAssociative('SELECT uid FROM user_sapphire WHERE uname = ?', [$user_name]);
             
             if($stmt == true) {
-                $data = $result->fetch_array(MYSQLI_ASSOC);
                 return array(
                     'state'   => true,
                     'message' => 'found',
-                    'uid'     => $stmt,
+                    'uid'     => $stmt['uid'],
                 );
             }
             return array(
@@ -791,9 +787,9 @@ class IndexFunction
         {
             $notes_number = null;
 
-            $stmt = $conn->fetchOne('SELECT COUNT(id) AS total FROM big_sur WHERE uid = ?', [$uid]);
-            if($stmt == true && $stmt != 0) {
-                $notes_number = $stmt;
+            $stmt = $conn->fetchAssociative('SELECT COUNT(id) AS total FROM big_sur WHERE uid = ?', [$uid]);
+            if($stmt == true && $stmt['total'] != 0) {
+                $notes_number = $stmt['total'];
             }
 
             unset($conn, $stmt, $uid);
@@ -806,9 +802,9 @@ class IndexFunction
         {
             $subs_number = null;
 
-            $stmt = $conn->fetchOne("SELECT COUNT(id) AS total FROM big_sur_subscribes WHERE $select = ? AND state = 1", [$uid]);
-            if($stmt == true && $stmt != 0) {
-                $subs_number = $stmt;
+            $stmt = $conn->fetchAssociative("SELECT COUNT(id) AS total FROM big_sur_subscribes WHERE $select = ? AND state = 1", [$uid]);
+            if($stmt == true && $stmt['total'] != 0) {
+                $subs_number = $stmt['total'];
             }
 
             unset($stmt, $conn, $uid, $select);
@@ -854,7 +850,7 @@ class IndexFunction
         {
             $action = 1;
 
-            $stmt = $conn->fetchOne('SELECT hid FROM help_articles WHERE hid = ?', [$get]);
+            $stmt = $conn->fetchOne('SELECT id FROM help_articles WHERE hid = ?', [$get]);
             if($stmt == true) {
                 $action = 0;
             }

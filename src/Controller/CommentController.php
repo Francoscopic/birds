@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-// use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,7 +10,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-use App\Database\DatabaseAccess;
 use App\Vunction\IndexFunction;
 use App\Validation\SigninValidation;
 
@@ -19,12 +18,14 @@ class CommentController extends AbstractController
 {
     private bool $article_found     = false;
     private string $article_message = 'Found article';
+    private $conn;
 
     #[Route('/c/{post_id}/', name: 'note_comment')]
-    public function index(string $post_id, Request $request): Response
+    public function index(string $post_id, Connection $connection): Response
     {
+        $this->conn = $connection;
         // Profile data
-        $login          = new SigninValidation();
+        $login          = new SigninValidation($this->conn);
         $login_state    = $login->alright($login->page_state);
         $uid            = $login_state['uid'];
         $visitor_state  = $login_state['visit'];
@@ -32,8 +33,8 @@ class CommentController extends AbstractController
 
         // data
         $link = $this->generateUrl('note_posts', ['post_id'=>$post_id], UrlGeneratorInterface::ABSOLUTE_URL);
-        $this->article_found = IndexFunction::article_validate_post_id($post_id);
-        $theme_data = IndexFunction::get_user_state($uid, $visitor_state);
+        $this->article_found = IndexFunction::article_validate_post_id($this->conn, $post_id);
+        $theme_data = IndexFunction::get_user_state($this->conn, $uid, $visitor_state);
 
         if( $intruder_state === true ) {
             $this->redirectToRoute('note_home');
@@ -84,28 +85,23 @@ class CommentController extends AbstractController
 
     protected function notes_comment($pid_note)
     {
-        $connection_verb = new DatabaseAccess();
-        $connection_verb = $connection_verb->connect('verb');
-
         $content = array();
 
-        $stmt = $connection_verb->prepare('SELECT uid, cid FROM comments WHERE pid = ? ORDER BY sid DESC LIMIT 200');
-        $stmt->bind_param("s", $pid_note);
-        $stmt->execute();
-        $get_result = $stmt->get_result();
-        while( $get_result_row = $get_result->fetch_array(MYSQLI_ASSOC) ) {
-
+        foreach($this->conn->iterateAssociativeIndexed(
+            'SELECT id, uid, cid FROM verb_comments WHERE pid = ? ORDER BY id DESC LIMIT 50', [$pid_note]) 
+            as $id => $data
+        ) {
             # Instantiate the variables.
-                $comment_id         = $get_result_row['cid'];
-                $comment_poster_uid = $get_result_row['uid'];
+                $comment_id         = $data['cid'];
+                $comment_poster_uid = $data['uid'];
             #
             # Get the user i.e. commenter
-                $commenter_row  = IndexFunction::get_comment_poster($comment_poster_uid);
+                $commenter_row  = IndexFunction::get_comment_poster($this->conn, $comment_poster_uid);
                 $comment_poster = $commenter_row['name'];
                 $comment_uname  = $commenter_row['username'];
             #
             # Get the comment
-                $comments_row    = IndexFunction::get_comment($comment_id);
+                $comments_row    = IndexFunction::get_comment($this->conn, $comment_id);
                 $comment_comment = $comments_row['comment'];
                 $comment_date    = $comments_row['date'];
             #
@@ -124,8 +120,8 @@ class CommentController extends AbstractController
 
     protected function notes_poster($pid, $visitor_state)
     {
-        $uid_poster = IndexFunction::get_poster_uid($pid)['uid'];
-        $get_user_result_array = ($visitor_state == true) ? IndexFunction::retrieve_details(false) : IndexFunction::retrieve_details($uid_poster);
+        $uid_poster = IndexFunction::get_poster_uid($this->conn, $pid)['uid'];
+        $get_user_result_array = ($visitor_state == true) ? IndexFunction::retrieve_details($this->conn, false) : IndexFunction::retrieve_details($this->conn, $uid_poster);
 
         $content = [
             'username' => $get_user_result_array['username'],
@@ -138,7 +134,7 @@ class CommentController extends AbstractController
 
     protected function notes_viewer($uid, $visitor_state)
     {
-        $viewer_array = ($visitor_state == true) ? IndexFunction::get_note_poster(false) : IndexFunction::get_note_poster($uid);
+        $viewer_array = ($visitor_state == true) ? IndexFunction::get_note_poster($this->conn, false) : IndexFunction::get_note_poster($this->conn, $uid);
 
         $content = [
             'name'     => $viewer_array['name'],
@@ -150,7 +146,7 @@ class CommentController extends AbstractController
 
     protected function notes_article($pid)
     {
-        $get_note_result_array = IndexFunction::get_my_note($pid);
+        $get_note_result_array = IndexFunction::get_my_note($this->conn, $pid);
 
         $article_url = $this->generateUrl('note_posts', array('post_id'=>$pid));
 

@@ -10,15 +10,16 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use App\Database\DatabaseAccess;
 use App\Vunction\IndexFunction;
 use App\Validation\SigninValidation;
 
 class HomeController extends AbstractController
 {
+    private $conn;
     #[Route('/', name: 'note_home')]
     public function index(Connection $connection): Response
     {
+        $this->conn = $connection;
         # Profile data
         $login          = new SigninValidation($connection);
         $login_state    = $login->alright($login->page_state);
@@ -27,7 +28,7 @@ class HomeController extends AbstractController
         $intruder_state = $login_state['intruder'];
 
         if( $intruder_state == true ) {
-            // $this->redirectToRoute('note_signin');
+            $this->redirectToRoute('note_signin');
         }
 
         // data

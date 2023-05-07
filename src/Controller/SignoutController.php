@@ -2,22 +2,23 @@
 
 namespace App\Controller;
 
-// use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-use App\Database\DatabaseAccess;
 use App\Vunction\IndexFunction;
 
 class SignoutController extends AbstractController
 {
     private $session_cell;
+    private $conn;
 
-    public function __construct()
+    public function __construct(Connection $connection)
     {
+        $this->conn = $connection;
         $this->session_cell = new Session();
     }
 
@@ -52,14 +53,9 @@ class SignoutController extends AbstractController
     protected function change_user_session_keys($new_key, $uid): bool
     {
         // Update the database with the fresh session-key
-        # Database Access
-        $connection = new DatabaseAccess();
-        $connection = $connection->connect('');
+        $stmt = $this->conn->update('user_onyx', ['seshkey'=>$new_key], ['uid'=>$uid]);
 
-        $stmt = $connection->prepare("UPDATE user_diamond SET seshkey = ? WHERE uid = ?");
-        $stmt->bind_param("ss", $new_key, $uid);
-
-        if( $stmt->execute() ) {
+        if( $stmt == true ) {
             
             return true;
         }
