@@ -811,9 +811,9 @@ class IndexFunction
             return $subs_number;
         }
 
-        public static function subscribe_but($uid_poster, $uid): array
+        public static function subscribe_but($conn, $uid_poster, $uid): array
         {   # Get the subscribe state between the user and people
-            $subscribe_state = self::get_subscribe_state($uid_poster, $uid);
+            $subscribe_state = self::get_subscribe_state($conn, $uid_poster, $uid);
             $state_variables = self::subscribe_state_variables($subscribe_state);
             $subs_text       = $state_variables['title'];
             $subs_state      = $state_variables['state'];

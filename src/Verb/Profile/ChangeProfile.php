@@ -175,7 +175,7 @@ class ChangeProfile extends AbstractController
                 if(!IndexFunction::nPhoto_resize($file_tmp, $file_size, $file_type, $saveImage)) {
 
                     // update database
-                    $this->conn->update('user_sapphire', ['cover'=>$new_name, 'date'=>$date], ['uid'=>$uid]);
+                    $this->conn->update('user_sapphire', ['cover'=>$new_name], ['uid'=>$uid]);
 
                     // free-up memory
                     unset($uid, $file_path, $saveImage, $valid_types, $format, $new_name, $file_error, $file_type, $file_size, $file_tmp, $file_name);

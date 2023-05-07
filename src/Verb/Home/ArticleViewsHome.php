@@ -86,7 +86,7 @@ class ArticleViewsHome extends AbstractController
     
     protected function save_inshares($share_id, $post_id, $user_id, $media)
     {
-        $this->conn->insert('verb_visits', ['visit_id'=>$share_id, 'pid'=>$post_id, 'uid'=>$user_id, 'media'=>$media]);
+        $this->conn->insert('verb_visits', ['visit_id'=>$share_id, 'pid'=>$post_id, 'uid'=>$user_id, 'media'=>$media, 'state'=>1]);
         unset($share_id, $post_id, $user_id, $media);
     }
 

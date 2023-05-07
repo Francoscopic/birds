@@ -147,7 +147,7 @@ class ProfileFunction
             $subber_display = $subs_details['display_small'];
 
             # For the subscribe button
-            $subs_state       = IndexFunction::subscribe_but($subs_id, $uid);
+            $subs_state       = IndexFunction::subscribe_but($this->conn, $subs_id, $uid);
             $subs_state_text  = $subs_state['text'];
             $subs_state_state = $subs_state['state'];
 
@@ -169,16 +169,16 @@ class ProfileFunction
         $content = array();
 
         foreach($this->conn->iterateAssociativeIndexed(
-            'SELECT id, DISTINCT(post_id) AS pid FROM verb_visits WHERE uid=? AND state=1 ORDER BY id DESC LIMIT 15', [$uid]) 
+            'SELECT DISTINCT(pid) AS pid FROM verb_visits WHERE uid=? AND state=1 ORDER BY id DESC LIMIT 15', [$uid]) 
             as $id => $data
         ) {
             # Get post and my details
-                $the_pid        = $data['pid'];
+                $the_pid        = $id;
                 $poster_user_id = IndexFunction::get_poster_uid($this->conn, $the_pid)['uid'];
             #
 
             # Instantiate acting variables
-                $my_note_row        = IndexFunction::get_this_note($the_pid);
+                $my_note_row        = IndexFunction::get_this_note($this->conn, $the_pid);
                 $note_title         = IndexFunction::ShowMore(stripslashes($my_note_row['title']), 15);
                 $note_parags        = $my_note_row['paragraphs'];
                 $note_cover         = IndexFunction::note_cover($my_note_row['cover'], 'notes');
@@ -211,9 +211,8 @@ class ProfileFunction
     {
         $content = array();
 
-        $check = ($num_rows > 0); // returns bool
         foreach($this->conn->iterateAssociativeIndexed(
-            'SELECT id, pid, title, body, date FROM big_sur_draft WHERE uid = ? AND access = 1 ORDER BY sid DESC LIMIT 10', [$uid]) 
+            'SELECT id, pid, title, body, date FROM big_sur_draft WHERE uid = ? AND access = 1 ORDER BY id DESC LIMIT 10', [$uid]) 
             as $id => $data
         ) {
             # Get post and my details
@@ -238,7 +237,7 @@ class ProfileFunction
         $content = array();
 
         foreach($this->conn->iterateAssociativeIndexed(
-            'SELECT id, puid, pid FROM verb_saves WHERE uid = ? AND state = 1 ORDER BY sid DESC LIMIT 12', [$uid]) 
+            'SELECT id, puid, pid FROM verb_saves WHERE uid = ? AND state = 1 ORDER BY id DESC LIMIT 12', [$uid]) 
             as $id => $data
         ) {
             # Get post and my details

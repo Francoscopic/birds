@@ -79,7 +79,7 @@ class DraftController extends AbstractController
         }
 
         // Work
-        $ProfileFunction = new ProfileFunction();
+        $ProfileFunction = new ProfileFunction($this->conn);
         $this->canvas['notes']['profile']   = $ProfileFunction->notes_profile($this->profile_found['uid']);
         $this->canvas['notes']['nav_menu']  = IndexFunction::profile_navigation('draft');
         $this->canvas['notes']['articles']  = $ProfileFunction->notes_draft($this->profile_found['uid']);
