@@ -33,7 +33,7 @@
         {# STYLES #}
             <link href="{{ asset('images/logo/favicon.ico') }}" rel="icon" type="image/x-icon" />
             <link href="{{ asset('lib/icons/fontawesome6/css/all.min.css') }}" rel="stylesheet" />
-            {# {{ encore_entry_link_tags('app') }} #}
+            {{ encore_entry_link_tags('app') }}
             <link rel="stylesheet" href="{{ asset('stylesheets/framework.css') }}" />
             <link rel="stylesheet" href="{{ asset('stylesheets/notes_v2.css') }}" />
             {% block stylesheets %}{% endblock %}
@@ -125,6 +125,7 @@
             {# {% block script_others %}{% endblock %} #}
         
         {# SCRIPT #}
+            {{ encore_entry_script_tags('app') }}
             <script type="text/javascript" src="{{ asset('scripts/jquery/jquery-3.1.1.min.js') }}" defer></script>
             <script type="text/javascript" src="{{  asset('/scripts/article/copy_on_click.js')}}" defer data-turbo-track="reload"></script>
             <script type="text/javascript" src="{{ asset('scripts/plugins/lozad.js') }}" defer></script>

@@ -11,9 +11,9 @@
 
 // JS
 // import $ from 'jquery'
-import Vue from 'vue'
-import '../public/scripts/index.js';
-import '../public/scripts/grow.js';
+// import Vue from 'vue'
+// import '../public/scripts/index.js';
+// import '../public/scripts/grow.js';
 
 // start the Stimulus application
 import './bootstrap';
