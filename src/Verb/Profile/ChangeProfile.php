@@ -151,7 +151,7 @@ class ChangeProfile extends AbstractController
         $new_name  = IndexFunction::randomKey(11).'.'.end($format);
 
         // Initiate the image changes
-        $saveImage = $file_path.$new_name;
+        $saveImage = ['other'=>$file_path.$new_name];
         $valid_types = array("image/jpeg", "image/jpg", "image/png");
 
         if( empty($file_name) ) {

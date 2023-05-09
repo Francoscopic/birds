@@ -106,12 +106,15 @@ class DeskProfile extends AbstractController
             $cover_new_name_ext = $cover_new_name.'.'.end($cover_format);
 
             # Initiate the image changes
-            $save_cover_image   = $this->file_path.$cover_new_name_ext;
+            $save_cover_image   = [
+                'other' => $this->file_path.$cover_new_name_ext,
+                'shrink' => $this->file_path.'shk_'.$cover_new_name_ext
+            ];
         #
 
         if($notes_save_handle == 0) { # Save article
 
-            $cover_upload = !IndexFunction::nPhoto_resize( $cover_tmp, $cover_size, $cover_type, $save_cover_image );
+            $cover_upload = !IndexFunction::nPhoto_resize( $cover_tmp, $cover_size, $cover_type, $save_cover_image, 'shrink' );
             if($cover_upload) {
 
                 $res = $this->desk_save($uid, $pid, $title, $body, $paragraphs, $cover_new_name_ext, 'art', $articlePrivacy);

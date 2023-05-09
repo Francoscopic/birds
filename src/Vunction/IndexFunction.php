@@ -301,13 +301,12 @@ class IndexFunction
             */
             $test_default = self::def_cover_display($file, $path);
             if($test_default == false) {
-                $dir_a = self::image_file_paths('note')['content'] . $file;
+                $dir_a = self::image_file_paths('note')['content'] . self::get_size($size) . $file;
                 $dir_b = self::image_file_paths('profile')['content'] . self::get_size($size) . $file;
 
                 $dir = ($typ == 'notes') ? $dir_a : $dir_b; # Find which folder: notes/profile
 
-                $return = file_exists($dir) ? $dir : $dir; //to debug: replace "not-found" with $dir
-                return $return;
+                return file_exists($dir) ? $dir : $dir; //to debug: replace "not-found" with $dir;
             }
             return $test_default;
         }
@@ -943,7 +942,16 @@ class IndexFunction
                 imagedestroy($square_image);
         }
 
-        public static function nPhoto_resize($photoTmp, $file_size, $file_type, $savePhoto)
+        protected static function nPhoto_retouch($photoTmp, $ext, $savePhoto, $size_multiplier=0.5) {
+            list( $width, $height ) = getimagesize( $photoTmp );
+            $newWidth  = $width * $size_multiplier;
+            $newHeight = $height * $size_multiplier;
+            $tmp = imagecreatetruecolor( $newWidth, $newHeight );
+            imagecopyresampled( $tmp, $ext, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height );
+            imagejpeg( $tmp, $savePhoto, 80 );
+        }
+
+        public static function nPhoto_resize($photoTmp, $file_size, $file_type, $savePhoto, $reaction='other')
         {
             switch($file_type)
             {
@@ -954,19 +962,20 @@ class IndexFunction
                 default: $ext = ''; break;
             }
 
-            if( $file_size > 1024768 ) {
-                list( $width, $height ) = getimagesize( $photoTmp );
-                $newWidth  = $width/2;
-                $newHeight = $height/2;
-                $tmp = imagecreatetruecolor( $newWidth, $newHeight );
-                imagecopyresampled( $tmp, $ext, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height );
-                imagejpeg( $tmp, $savePhoto, 80 );
-                # save image
+            if ($reaction == 'shrink') {
+                self::nPhoto_retouch($photoTmp, $ext, $savePhoto['shrink'], 0.3);
+            }
+
+            if( $file_size > 5242880 ) { // 5MB
+
+                self::nPhoto_retouch($photoTmp, $ext, $savePhoto['other'], 0.5);
+
+                # murder image
                     imagedestroy( $ext );
                     imagedestroy( $tmp );
-                # murder image
             } else {
-                move_uploaded_file( $photoTmp, $savePhoto );
+
+                move_uploaded_file( $photoTmp, $savePhoto['other'] );
             }
             unset($photoTmp, $file_size, $file_type, $savePhoto);
         }

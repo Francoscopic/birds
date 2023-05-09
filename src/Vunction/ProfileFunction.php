@@ -16,7 +16,6 @@ class ProfileFunction
     
     public function notes_profile($uid): array
     {
-        // $this->conn = $connection;
         $content = array();
 
         $get_user_figures_array = IndexFunction::profile_user_figures($this->conn, $uid);
