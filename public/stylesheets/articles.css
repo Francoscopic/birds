@@ -10,7 +10,6 @@
 
 .note-article-quick-comment,
 .na-one-two,
-.comment-back-article,
 .na-two {
     width: calc(100% - 200px);
     margin: 0 auto;
@@ -68,14 +67,6 @@
 }
 
 
-.comment-back-article {
-    margin: 2em auto;
-}
-.comment-back-article a {
-    font-size: 0.9em;
-    font-weight: lighter;
-    color: #606060;
-}
 .note-article-abode {
     width: 100%;
     margin: 2em auto;

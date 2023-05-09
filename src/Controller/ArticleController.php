@@ -225,19 +225,21 @@ class ArticleController extends AbstractController
             #
             # Get the user i.e. commenter
                 $commenter_row = IndexFunction::get_comment_poster($conn, $comment_poster_uid);
-                $comment_poster = $commenter_row['name'];
+                $commenter_name = $commenter_row['name'];
+                $commenter_username = $commenter_row['username'];
+
             #
             # Get the comment
                 $comments_row    = IndexFunction::get_comment($conn, $comment_id);
                 $comment_comment = htmlspecialchars_decode($comments_row['comment']);
-                $comment_url     = $this->generateUrl('note_comment', array('post_id'=>$pid_note));
+                $commenter_profile = $this->generateUrl('note_profile', array('user_name'=>$commenter_username));
             #
 
             $content[] = [
                 'pid'         => $pid_note,
-                'name'        => $comment_poster,
+                'name'        => $commenter_name,
                 'comment'     => $comment_comment,
-                'comment_url' => $comment_url,
+                'profile'     => $commenter_profile,
                 'date'        => $comment_date,
             ];
         }

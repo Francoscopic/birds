@@ -115,7 +115,8 @@ function share_comment(){ // working
         i = $("#comment-assistant"),
         n = $("#cmt-area-post"),
         e = i.attr("pid"),
-        o = i.attr("name");
+        o = i.attr("name"),
+        eo = i.attr('uname');
         
         function c(t, i=!0, n=".5"){
             $(t).attr("disabled", i).css("opacity",n)
@@ -123,8 +124,8 @@ function share_comment(){ // working
         function u(i, n){
             $("#comment_un_list").prepend(`
                 <li id="article-note-comment-park" class="nu-li ft-sect">
-                    <a href="/c/${e}/" class="a">
-                        <strong>${i}</strong>
+                    <a class="a">
+                        <a class="a" href="/${eo}/"><strong>${i}</strong></a>
                         <span>${n}</span>
                         <br><span>now</span>
                     </a>

@@ -254,18 +254,10 @@ body, html {
     #article-sower-note-paragraphs {
         color: #d0d0d0;
     }
-    #cmt-area,
-    .atc-comment .atc-comment-caveat {
+    #cmt-area {
         color: #e0e0e0;
-        
         border-color: rgba(255, 255, 255, 0.1);
-        border-color: #ffffff1a;
-
         background-color:  rgba(214, 144, 144, 0.05);
-        background-color:  #ffffff0d;
-    }
-    .atc-comment-caveat {
-        color: #a0a0a0;
     }
 
     .note-options > span:first-of-type {

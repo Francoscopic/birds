@@ -81,7 +81,6 @@ function infinite_home() // working
                 <a href="${iterator.post_url}" class="nts-host-anchor a">
                     <div class="nts-host-display lozad bck relative" data-background-image="${iterator.cover}">
                         ${if_img}
-                        <div class="nts-host-display-filter"></div>
                     </div>
                     <div class="nts-host-verb ft-sect">
                         <p>

@@ -36,6 +36,7 @@ Border-Color: #909090
     --canvas-hover-light-palette: rgba(255, 255, 255, 0.85);
     /* --canvas-hover-light-palette: rgba(245, 245, 245, 0.85); */
 
+    --nt-secondary: #E0B868;
     --nt-white: #fff;
     --nt-white-rgba: rgba(255, 255, 255, 0.6);
     --border-color: #f5f5f5;
@@ -57,6 +58,7 @@ Border-Color: #909090
     --glass-background-3: rgba(255, 255, 255, 0.75);
     --glass-dark-background-2: rgba(0, 0, 0, 0.95);
     --glass-dark-background-3: rgba(0, 0, 0, 0.75);
+    --glass-dark-background-4: rgba(0, 0, 0, 0.5);
     --header-hover-color: var(--text-header-color);
     --nt-bck-color: var(--border-color);
     --nt-but-bck-color: var(--nt-bck-color);

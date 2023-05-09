@@ -193,7 +193,7 @@ function nt_small_menu() {
                 function e(t, i) {
                     $(t).css('text-decoration', i)
                 }
-                (ask == true) ? e(t, 'line-through 4px red') : e(t, 'none');
+                (ask == true) ? e(t, 'line-through 3px red') : e(t, 'none');
             }
             function report_actions() {
 

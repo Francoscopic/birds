@@ -132,8 +132,8 @@
             <ul id="comment_un_list" class="ul">
                 {% for comment in canvas.notes.comment %}
                     <li id="article-note-comment-park" class="nu-li ft-sect">
-                        <a class="a" href="{{ comment.comment_url }}">
-                            <strong>{{- comment.name -}}</strong>
+                        <a class="a">
+                            <a class="a" href="{{ comment.profile }}"><strong>{{- comment.name -}}</strong></a>
                             <span>{{- comment.comment -}}</span>
                             <br><small>{{- comment.date -}}</small>
                         </a>
