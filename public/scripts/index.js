@@ -375,13 +375,13 @@ function note_light_mode() { // working
 
     $(trigger).on('click', function() {
 
-        var the_state = $(this).attr('mode'), //1 is DARK, 0 is LIGHT
+        var the_state = $(this).attr('mode'), //0 is DARK, 1 is LIGHT
             handle2 = $(this).is(':checked'), //checked is DARK, unchecked is LIGHT
             parent = $(this).parent('label');
 
         handle2 ? 
-            mode_response(parent, 'fa-solid fa-sun', 'Light', 'dark', 'darkmode', 'notes-white') : 
-            mode_response(parent, 'fa-solid fa-moon', 'Dark', 'light', 'lightmode', 'notes')
+            mode_response(parent, 'fa-solid fa-moon', 'Dark', 'light', 'lightmode', 'notes') :
+            mode_response(parent, 'fa-solid fa-sun', 'Light', 'dark', 'darkmode', 'notes-white')
     });
 
     function mode_response(parent, icon, text, mode, theme, theme_logo) {
@@ -394,7 +394,7 @@ function note_light_mode() { // working
     }
     function update_database(light_or_dark) {
         $.post('/ajax/universe/theme_update/', { state:light_or_dark, uid:'' }, function(data){
-            console.log(data)
+            // console.log(data)
         }).fail(function (t, e, n) {
             console.error(n)
         })
@@ -417,7 +417,6 @@ $(document).ready(function (){
 
     notes_new_menu(),
     nt_small_menu(),
-    note_light_mode(),
     click_to_copy_link(),
     lozad().observe();
 });

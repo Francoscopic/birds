@@ -48,10 +48,9 @@ class ThemeUpdateHome extends AbstractController
     protected function update_theme($uid)
     {
         $the_state = $this->request->request->get('state');
-        $state     = ($the_state == 'dark') ? 1 : 0;
 
         // validate
-        $state = ($the_state == 'dark') ? 1 : 0;
+        $state = ($the_state == 'dark') ? 0 : 1;
         // update
         $this->conn->update('user_sapphire', ['state'=>$state], ['uid'=>$uid]);
 

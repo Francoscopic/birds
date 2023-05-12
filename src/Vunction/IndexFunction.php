@@ -30,8 +30,8 @@ class IndexFunction
     {
         if( $visit_state == true ) {
             return array(
-                'state' => 0,
-                'logo'  => self::get_path('images').'/logo/notes.png',
+                'state' => 1,
+                'logo'  => self::get_path('images').'/logo/notes-white.png',
             );
         }
 
@@ -42,7 +42,7 @@ class IndexFunction
 
         unset($conn, $user_id, $visit_state);
         return array(
-            'state' => $state,
+            'state' => $state['state'],
             'logo'  => $theme_logo,
         );
     }
@@ -1062,8 +1062,8 @@ class IndexFunction
 
         public static function light_mode_response($cur_state): array 
         {
-            $state_icon = ($cur_state == 1) ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; // 1 is currently Dark, 0 is currently Light
-            $state_text = ($cur_state == 1) ? 'Light' : 'Dark';
+            $state_icon = ($cur_state == 1) ? 'fa-solid fa-moon' : 'fa-solid fa-sun'; // (1) LIGHT, (0) DARK
+            $state_text = ($cur_state == 1) ? 'Dark' : 'Light';
             return array(
                 'icon' => $state_icon, 
                 'text' => $state_text

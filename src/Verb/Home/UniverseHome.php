@@ -48,7 +48,7 @@ class UniverseHome extends AbstractController
         $display  = $details['display'];
 
         $theme_state   = IndexFunction::get_user_state($this->conn, $uid)['state'];
-        $theme_checked = ($theme_state == 1) ? 'checked' : '';
+        $theme_checked = ($theme_state == 1) ? 'checked' : ''; // checked is LIGHT(1), other is DARK(0)
         $get_theme     = IndexFunction::light_mode_response($theme_state);
         $theme_icon    = $get_theme['icon'];
         $theme_text    = $get_theme['text'];
