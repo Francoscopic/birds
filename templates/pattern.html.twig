@@ -39,6 +39,8 @@
             {% block stylesheets %}{% endblock %}
             {% if canvas.misc.theme_state == false %}
                 <link rel="stylesheet" href="{{ asset('stylesheets/darkmode.css') }}" watch="theme" />
+            {% else %}
+                <link rel="stylesheet" href="{{ asset('stylesheets/lightmode.css') }}" watch="theme" />
             {% endif %}
     </head>
     <body>
@@ -102,6 +104,15 @@
                 </div>
             {% endif %}
         {% endblock %}
+
+        <input type="hidden" name="app-assistant" id="app-assistant" 
+                dsp="{{ canvas.profile.user.display_small }}" 
+                un="{{ canvas.profile.user.username }}" 
+                nm="{{ canvas.profile.user.name }}" 
+                ths="{{ canvas.profile.user.theme_state }}" 
+                thc="{{ canvas.profile.user.theme_check }}" 
+                thi="{{ canvas.profile.user.theme_icon }}" 
+                tht="{{ canvas.profile.user.theme_text }}" />
 
         <div class="notes-small-menu-container" id="app-menu-jar" style="display:none">
             <a href="#" class="note-small-menu-container-close a">

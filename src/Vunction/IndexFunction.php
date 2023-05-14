@@ -17,12 +17,23 @@ class IndexFunction
         $state          = ($user_file['state'] === 1) ? 'darkmode' : 'lightmode';
         $display        = $user_file['display'];
         $display_small  = $user_file['display_small'];
+
+        $theme_list  = self::light_mode_response($user_file['state']);
+        $theme_state = $user_file['state'];
+        $theme_icon  = $theme_list['icon'];
+        $theme_text  = $theme_list['text'];
+        $theme_check = $theme_list['check'];
         return array(
             'name'          => $name,
             'username'      => $username,
             'state'         => $state,
             'display'       => $display,
             'display_small' => $display_small,
+
+            'theme_state' => $theme_state,
+            'theme_check' => $theme_check,
+            'theme_text'  => $theme_text,
+            'theme_icon'  => $theme_icon
         );
     }
 
@@ -1064,9 +1075,11 @@ class IndexFunction
         {
             $state_icon = ($cur_state == 1) ? 'fa-solid fa-moon' : 'fa-solid fa-sun'; // (1) LIGHT, (0) DARK
             $state_text = ($cur_state == 1) ? 'Dark' : 'Light';
+            $state_checked = ($cur_state == 1) ? 'checked' : ''; // checked(LIGHT), unchecked(DARK)
             return array(
-                'icon' => $state_icon, 
-                'text' => $state_text
+                'icon'  => $state_icon,
+                'text'  => $state_text,
+                'check' => $state_checked
             );
         }
     #

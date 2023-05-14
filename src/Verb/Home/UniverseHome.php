@@ -41,11 +41,12 @@ class UniverseHome extends AbstractController
 
     protected function get_content_menu($uid)
     {
-        $details = IndexFunction::profile_user_figures($this->conn, $uid);
+        $details = IndexFunction::user_profile_state($this->conn, $uid);
 
         $name     = $details['name'];
         $username = $details['username'];
         $display  = $details['display'];
+        $dis_small = $details['display_small'];
 
         $theme_state   = IndexFunction::get_user_state($this->conn, $uid)['state'];
         $theme_checked = ($theme_state == 1) ? 'checked' : ''; // checked is LIGHT(1), other is DARK(0)
@@ -57,6 +58,7 @@ class UniverseHome extends AbstractController
             'name'        => $name,
             'username'    => $username,
             'display'     => $display,
+            'display_small' => $dis_small,
 
             'theme_state' => $theme_state,
             'theme_check' => $theme_checked,

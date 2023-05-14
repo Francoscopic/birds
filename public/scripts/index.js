@@ -270,19 +270,27 @@ function notes_new_menu() { // Working
         small_menu = $('.nts-host-menu');
 
     function menu_container(data) {
+        var dataList = $('#app-assistant'),
+            name     = dataList.attr('nm'),
+            username = dataList.attr('un'),
+            display  = dataList.attr('dsp'),
+            theme_check = dataList.attr('thc'),
+            theme_state = dataList.attr('ths'),
+            theme_icon  = dataList.attr('thi'),
+            theme_text  = dataList.attr('tht');
 
         var ele = `
             <nav id="menu-august-nav" class="menu-august-nav">
                 <div class="menu-august-cover ft-sect">
                     <div class="menu-august" give-trans-bck>
                         <div class="menu-august-profile">
-                            <a href="/${data.username}/">
+                            <a href="/${username}/">
                                 <div prof-img>
-                                    <img src="${data.display}" alt="${data.name}'s display picture" />
+                                    <img src="${display}" alt="${name}'s display picture" />
                                 </div>
                                 <div prof-text>
-                                    <h1>${data.name}</h1>
-                                    <p>@${data.username}</p>
+                                    <h1>${name}</h1>
+                                    <p>@${username}</p>
                                 </div>
                             </a>
                         </div>
@@ -294,16 +302,13 @@ function notes_new_menu() { // Working
                                     <a href="/">
                                         <li>Home</li>
                                     </a>
-                                    <a href="/${data.username}/">
-                                        <li>Profile</li>
-                                    </a>
-                                    <a href="/${data.username}/saved/">
+                                    <a href="/${username}/saved/">
                                         <li>Saved</li>
                                     </a>
-                                    <a href="/${data.username}/history/">
+                                    <a href="/${username}/history/">
                                         <li>History</li>
                                     </a>
-                                    <a href="/${data.username}/change/">
+                                    <a href="/${username}/change/">
                                         <li>Settings</li>
                                     </a>
                                 </ul>
@@ -319,13 +324,13 @@ function notes_new_menu() { // Working
                         <div class="menu-august-profile">
                             <div class="menu-august-profile-mixt">
                                 <label class="note-color-mode">
-                                    <input type="checkbox" class="hd" name="color_mode" mode="${data.theme_state}" ${data.theme_check} />
+                                    <input type="checkbox" class="hd" name="color_mode" mode="${theme_state}" ${theme_check} />
                                     <div>
-                                        <h1><i class="${data.theme_icon}"></i></h1>
-                                        <p>${data.theme_text}</p>
+                                        <h1><i class="${theme_icon}"></i></h1>
+                                        <p>${theme_text}</p>
                                     </div>
                                 </label>
-                                <a href="/${data.username}/signout/">
+                                <a href="/${username}/signout/">
                                     <div>
                                         <h1><i class="fa-solid fa-right-from-bracket"></i></h1>
                                         <p>Log out</p>
@@ -365,7 +370,8 @@ function notes_new_menu() { // Working
 
         call_loader();
         small_menu_parent_container.fadeIn();
-        get_menu('menu');
+        // get_menu('menu');
+        menu_container('')
     })
 }
 
@@ -375,8 +381,8 @@ function note_light_mode() { // working
 
     $(trigger).on('click', function() {
 
-        var the_state = $(this).attr('mode'), //0 is DARK, 1 is LIGHT
-            handle2 = $(this).is(':checked'), //checked is DARK, unchecked is LIGHT
+        var the_state = $(this).attr('mode'), // 0 is DARK, 1 is LIGHT
+            handle2 = $(this).is(':checked'), //checked is LIGHT, unchecked is DARK
             parent = $(this).parent('label');
 
         handle2 ? 
@@ -393,7 +399,7 @@ function note_light_mode() { // working
         $('.plain-left img').attr('src',`/images/logo/${theme_logo}.png`)
     }
     function update_database(light_or_dark) {
-        $.post('/ajax/universe/theme_update/', { state:light_or_dark, uid:'' }, function(data){
+        $.post('/ajax/universe/theme_update/', { state:light_or_dark }, function(data){
             // console.log(data)
         }).fail(function (t, e, n) {
             console.error(n)
