@@ -176,7 +176,7 @@ class IndexFunction
         );
     }
 
-    public static function get_profile_uid($conn, $the_username=''): array 
+    public static function get_profile_uid($conn, $the_username=''): array
     {
         $stmt = $conn->fetchAssociative('SELECT uid FROM user_sapphire WHERE uname=?', [$the_username]);
         if($stmt == true) {
@@ -383,7 +383,7 @@ class IndexFunction
         public static function GET_validate($conn, $get): bool
         { # Is article found
             $stmt = $conn->fetchAssociative('SELECT COUNT(id) AS total FROM big_sur WHERE pid = ?', [$get]);
-            
+
             return ( $stmt==true && $stmt['total']>0 ) ?true :false;
         }
         public static function GET_validate_people($conn, $get): array
@@ -434,9 +434,9 @@ class IndexFunction
         {
             if ($theUid == false) {
                 return array(
-                    'name' => 'John Doe', 
-                    'username' => 'john_doe', 
-                    'state' => false, 
+                    'name' => 'John Doe',
+                    'username' => 'john_doe',
+                    'state' => false,
                     'display' => ''
                 );
             }
@@ -711,7 +711,7 @@ class IndexFunction
         public static function profile_check_username($conn, $user_name): array
         {
             $stmt = $conn->fetchAssociative('SELECT uid FROM user_sapphire WHERE uname = ?', [$user_name]);
-            
+
             if($stmt == true) {
                 return array(
                     'state'   => true,
@@ -767,7 +767,7 @@ class IndexFunction
 
             $username = $name = $location = $website = $bio = $cover = $display = $display_shrink = null;
 
-            $stmt = $conn->fetchAssociative('SELECT uname, name, location, website, about, cover, display FROM user_sapphire WHERE uid=?', [$user_id]); 
+            $stmt = $conn->fetchAssociative('SELECT uname, name, location, website, about, cover, display FROM user_sapphire WHERE uid=?', [$user_id]);
             if($stmt == true) {
                 $username = $stmt['uname'];
                 $name     = $stmt['name'];
@@ -877,7 +877,7 @@ class IndexFunction
             $properName = preg_match("/^[$reGex]*$/", $name);
             return $properName;
         }
-        
+
         public static function validateInput($var)
         {
             // $connection = new DatabaseAccess();
@@ -1053,7 +1053,7 @@ class IndexFunction
             );
             $response->sendHeaders();
             return true;
-            /* 
+            /*
                 $response->headers->setCookie(new Cookie($cookie_name, $cookie_value, strtotime($cookie_time)));
                 setcookie('vst', 'haha', strtotime('+1 month'));
             */
@@ -1066,12 +1066,12 @@ class IndexFunction
             $for_dark = (trim($state) === 'darkmode') ? 'bcg-e' : '';
             $for_light = (trim($state) === 'lightmode') ? 'bcg-e' : '';
             return array(
-                'dark'  => $for_dark, 
+                'dark'  => $for_dark,
                 'light' => $for_light
             );
         }
 
-        public static function light_mode_response($cur_state): array 
+        public static function light_mode_response($cur_state): array
         {
             $state_icon = ($cur_state == 1) ? 'fa-solid fa-moon' : 'fa-solid fa-sun'; // (1) LIGHT, (0) DARK
             $state_text = ($cur_state == 1) ? 'Dark' : 'Light';

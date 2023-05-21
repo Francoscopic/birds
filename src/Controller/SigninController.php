@@ -20,16 +20,23 @@ class SigninController extends AbstractController
     public function signin(Connection $connection): Response
     {
         $this->conn = $connection;
+        # Profile data
+        $login          = new SigninValidation($connection);
+        $login_state    = $login->alright($login->page_state);
+
+        $theme_data = IndexFunction::get_user_state($this->conn, null, true);
+
         $canvas = array(
             'notes'   => array(),
             'profile' => array(
+                'user'          => $login_state['user'],
                 'username'      => 'signin-visitor',
                 'visitor_state' => true,
             ),
             'misc' => array(
                 'outside'     => true,
-                'theme_state' => '',
-                'theme_logo'  => '',
+                'theme_state' => $theme_data['state'],
+                'theme_logo'  => $theme_data['logo']
             ),
             'headers' => array(
                 'title' => 'Login',

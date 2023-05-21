@@ -68,7 +68,7 @@ class HomeController extends AbstractController
     {
         $num_rows = 0;
         foreach($conn->iterateAssociativeIndexed(
-            'SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT 15', [], []) 
+            'SELECT uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT 15', [], [])
             as $uid => $data
         ) {
             $num_rows++;

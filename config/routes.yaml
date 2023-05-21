@@ -57,4 +57,3 @@ ajax_changes_on_cover:
 ajax_desk_save_draft:
     path: /ajax/verb/desk/save_draft/
     controller: App\Verb\Profile\DeskProfile::index
-
