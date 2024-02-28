@@ -62,7 +62,7 @@ function writeCover(){
         const e=$("#wrt-cover-div"),
         t=$("#write-add-cover-show"),
         n=$("#write-add-cover-hide");
-        
+
         function i(e=null,a=null){
             1 == e && ($(t).addClass("write-add-cover-span-clicks-active"),
             $(n).removeClass("write-add-cover-span-clicks-active")),
@@ -102,8 +102,8 @@ function writeTitle(){
     }
     $(e).keyup(function(){
         !function(e,t,o,r){
-            e>100 ? (a("tomato", `${e-o} off`), i(n, "tomato"), submit_handle(0)) : 
-            100==e ? (a("#909090", "Wedge"), i(n, "#505050"), submit_handle(1)) : 
+            e>100 ? (a("tomato", `${e-o} off`), i(n, "tomato"), submit_handle(0)) :
+            100==e ? (a("#909090", "Wedge"), i(n, "#505050"), submit_handle(1)) :
             (a("#909090", `${o-e} left`), i(n, "#505050"), submit_handle(1))
         }($(this).val().length, 0, 100)
     }),
@@ -132,10 +132,10 @@ function writeIdea(){
         var t, r;
         n = $(this).val().split("\n").length,
         r = 7,
-        ((t=n) >= 1 && t<=r) ? 
-            (i(`${t} / ${r} paragraphs`), o(a, "#505050"), submit_handle(1)) : 
-            t>r ? 
-            (i(`${t} / ${r} paragraphs`, "note-er"), o(a, "tomato"), submit_handle(0)) : 
+        ((t=n) >= 1 && t<=r) ?
+            (i(`${t} / ${r} paragraphs`), o(a, "#505050"), submit_handle(1)) :
+            t>r ?
+            (i(`${t} / ${r} paragraphs`, "note-er"), o(a, "tomato"), submit_handle(0)) :
             (i("Strange situation. Please retry", "note-er"), submit_handle(0))
     }),
     k()
@@ -154,7 +154,7 @@ function tools(){
             // get current values of work
             var nt_title = $("#write-title").val(),
                 nt_body = $("#wrt-parags-edit").val();
-            
+
             (nt_title.trim()=='' && nt_body.trim()=='') ? alert('Nothing to save') : (save_draft_now(nt_title, nt_body));
         });
 
@@ -234,9 +234,9 @@ function select_privacy(){
         var theButton      = $(handle).children('p'),
             theButtonPublic  = $('.write-selector-public'),
             theButtonPrivate = $('.write-selector-private');
-                
-        (theButton.attr('type') == 'public') 
-            ? ( c(theButtonPublic, theButtonPrivate), privateNote=0) 
+
+        (theButton.attr('type') == 'public')
+            ? ( c(theButtonPublic, theButtonPrivate), privateNote=0)
             : ( c(theButtonPrivate, theButtonPublic), privateNote=1);
     }
 
@@ -323,7 +323,7 @@ function saveEditing(){
                 a.append('mydesk',''),
                 a
         }($("#wrt-parags-edit").val(), $("#write-title").val(), privateNote);
-        
+
         $.ajax({
             url: write_url,
             type: "POST",
@@ -337,8 +337,8 @@ function saveEditing(){
             cache: !1,
             processData: !1,
             success: function(res){
-                '200' == res.status ? 
-                    (a(res.message, 'mediumseagreen'), t(!0, '.5'), i='/', $(location).attr('href',i)) : 
+                '200' == res.status ?
+                    (a(res.message, 'mediumseagreen'), t(!0, '.5'), i='/', $(location).attr('href',i)) :
                     (a(n), t(!1, '1'), e.text(res.message));
                     var i
             },

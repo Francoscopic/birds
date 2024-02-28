@@ -37,26 +37,27 @@ class SigninProcess extends AbstractController
             $user = $request->request->get('clt');
             $pass = $request->request->get('psw');
             $mySeshKey = round(microtime(true)) . IndexFunction::randomKey(7);
-    
+
             $one_ = $this->validate_user_input($user, $pass);
             if($one_['handle'] === true) {
-    
+
                 $two_ = $this->validate_details_exist($conn, $user);
                 if($two_['handle'] === true) {
-    
+
                     $three_ = $this->validate_correct_details($conn, $user, $pass);
                     if($three_['handle'] == true) {
-    
+
                         $uid = $three_['uid'];
-    
+
                         $four_ = $this->set_cookie_variables($uid, $mySeshKey);
-                        if($this->update_session_key($conn, $uid, $mySeshKey) == true) {
-    
+                        $five_ = $this->update_session_key($this->connection, $uid, $mySeshKey);
+                        if($five_['status'] == true) {
+
                             # Create session
                             $this->session->set('sesh', $mySeshKey);
                             $this->session->set('uid', $uid);
                             $this->session->set('isin', true);
-    
+
                             # Success
                             return $this->json([
                                 'message' => 'Login success',
@@ -64,8 +65,8 @@ class SigninProcess extends AbstractController
                             ]);
                         }
                         return $this->json([
-                            'message' => '[4500] Bite refused you access. Seek support',
-                            'status' => $four_,
+                            'message' => $five_['message'],
+                            'status' => $five_['status'],
                         ]);
                     }
                     return $this->json([
@@ -89,7 +90,7 @@ class SigninProcess extends AbstractController
         ]);
     }
 
-    protected function validate_user_input($email, $pass): array 
+    protected function validate_user_input($email, $pass): array
     {
         $valid_email = filter_var($email, FILTER_VALIDATE_EMAIL);
         $handle = true;
@@ -101,7 +102,7 @@ class SigninProcess extends AbstractController
             $handle = false;
             $status = '11';
         } elseif( !$valid_email ) {
-            
+
             $message = '[12] Email incorrect';
             $handle = false;
             $status = '12';
@@ -114,7 +115,7 @@ class SigninProcess extends AbstractController
         );
     }
 
-    protected function validate_details_exist($conn, $email): array 
+    protected function validate_details_exist($conn, $email): array
     {
         $message = '[20] Indentity/password incorrect';
         $status = '20';
@@ -147,7 +148,7 @@ class SigninProcess extends AbstractController
         );
     }
 
-    protected function validate_correct_details($conn, $email, $pass): array 
+    protected function validate_correct_details($conn, $email, $pass): array
     {
         $message = '[30] Indentity/password incorrect';
         $status = '30';
@@ -220,15 +221,19 @@ class SigninProcess extends AbstractController
         return $handle;
     }
 
-    protected function update_session_key($conn, $uid, $mySeshKey): bool
+    protected function update_session_key($conn, $uid, $mySeshKey): array
     {
         $handle = true;
 
-        $handle = $conn->insert('user_onyx', ['uid' => $uid, 'seshkey' => $mySeshKey]);
-        $handle = $conn->update('user_secure', ['passcount' => 0], ['uid' => $uid]);
+        $stmt_1 = $conn->insert('user_onyx', ['uid' => $uid, 'seshkey' => $mySeshKey]);
+        $stmt_2 = $conn->update('user_secure', ['passcount' => 0], ['uid' => $uid]);
+        $handle = ($stmt_1==true) ? true : false;
 
         unset($conn, $uid, $mySeshKey);
-        return $handle;
+        return array(
+            'message' => 'I really do not know what happened',
+            'status'  => $handle
+        );
     }
 
     protected function update_login_passcount($conn, $uid)
@@ -237,7 +242,7 @@ class SigninProcess extends AbstractController
         unset($conn, $uid);
     }
 
-    protected function validate_password($conn, $email, $pass): bool 
+    protected function validate_password($conn, $email, $pass): bool
     {
         $stmt = $conn->fetchAssociative('SELECT ud.password
             FROM user_diamond ud

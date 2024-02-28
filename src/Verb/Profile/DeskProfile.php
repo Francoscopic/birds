@@ -68,7 +68,7 @@ class DeskProfile extends AbstractController
         if($stmt == true) {
             if( $stmt['total'] > 0  ) {
                 $this->conn->update('big_sur_draft', ['title'=>$title, 'body'=>$body], ['uid'=>$uid, 'pid'=>$pid]);
-                
+
                 unset($stmt, $title, $body, $pid, $uid);
                 return [
                     'message' => 'Updated',

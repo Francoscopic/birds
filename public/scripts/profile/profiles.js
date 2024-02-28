@@ -2,7 +2,7 @@
 
 // Working
 function saved_menu() {
-    
+
     var ellipsis                    = $('.nts-show-menu-saved'),
         close_exit                  = $('.note-small-menu-container-close'),
         small_menu_parent_container = $('.notes-small-menu-container'),
@@ -27,14 +27,14 @@ function saved_menu() {
 
             var confirmDelete = confirm("Confirm to remove");
 
-            (confirmDelete == true) ? 
+            (confirmDelete == true) ?
                 (
                     removeFeedback(this_trigger),
                     $.post('/ajax/verb/saved/remove_saved/', {saved_remove:'', saved_remove_pid:pid}, function(){
-                        
+
                     }).fail(function(a,b,er){console.error(er)}),
                     close_exit.click()
-                ) : 
+                ) :
                 (
                     close_exit.click()
                 )
@@ -47,7 +47,7 @@ function saved_menu() {
     ellipsis.on('click', function(e){
         e.preventDefault();
 
-        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
+        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'),
             post_id      = $assistant.attr('pid');
 
         (small_container(post_id) == true) ? small_menu_parent_container.fadeIn() : null;
@@ -76,7 +76,7 @@ function draft_verbs() {
         });
         function query_db(pid) {
             $.post('/ajax/verb/draft/delete_draft/',{draft_delete:'',draft_pid:pid}, function(){
-                
+
             }).fail(function(a,b,er){
                 console.error(er)
             })
@@ -95,7 +95,7 @@ function profile_notes_small_menu() {
         close_exit                  = $('.note-small-menu-container-close'),
         small_menu_parent_container = $('.notes-small-menu-container'),
         small_menu_container        = $('.nts-host-menu');
-    
+
     var page_assistant = $('#profile-assistant'),
         if_people      = page_assistant.attr('place');
 
@@ -115,7 +115,7 @@ function profile_notes_small_menu() {
                 </a>
             </div>
             <div class="nts-host-menu-post-response">
-                
+
             </div>`;
         }
         small_menu_container.html(ele);
@@ -129,12 +129,12 @@ function profile_notes_small_menu() {
 
            var confirmDelete = confirm("Confirm to continue");
 
-           (confirmDelete == true) ? 
+           (confirmDelete == true) ?
            (
                 $.post('/ajax/verb/profile/hide_article/',{hide_article:'',profile_pid:pid}).fail( function(a,b,er){console.error(er)} ),
                 removeFeedback(the_canvas),
                 close_exit.click()
-            ) : 
+            ) :
             (
                 close_exit.click()
             )
@@ -147,7 +147,7 @@ function profile_notes_small_menu() {
     ellipsis.on('click', function(e){
         e.preventDefault();
 
-        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
+        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'),
             post_id      = $assistant.attr('pid');
 
         (small_container(post_id) == true) ? small_menu_parent_container.fadeIn() : null;
@@ -185,14 +185,14 @@ function history_small_menu() {
 
             var confirmDelete = confirm("Confirm to remove");
 
-            (confirmDelete == true) ? 
+            (confirmDelete == true) ?
                 (
                     $.post('/ajax/verb/article/views/',{removeVisit:'',remove_pid:pid},function(){
-                        
+
                     }).fail( function(a,b,er){console.error(er)} ),
                     removeFeedback(this_trigger),
                     close_exit.click()
-                ) : 
+                ) :
                 (
                     close_exit.click()
                 )
@@ -205,7 +205,7 @@ function history_small_menu() {
     ellipsis.on('click', function(e){
         e.preventDefault();
 
-        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'), 
+        var $assistant   = $(this).parents('.nts-host').children('#page-assistant'),
             post_id      = $assistant.attr('pid');
 
         (small_container(post_id) == true) ? small_menu_parent_container.fadeIn() : null;
@@ -224,4 +224,3 @@ $(document).ready(function(){
     draft_verbs(),
     saved_menu()
 });
-

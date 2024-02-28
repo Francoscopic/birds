@@ -63,7 +63,7 @@ class InfiniteHome extends AbstractController
         $current_position = intval($this->request->request->get('start'));
 
         foreach(
-            $this->conn->iterateAssociativeIndexed('SELECT id, uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT ?, 15', [$current_position], [Type::getType('integer')]) 
+            $this->conn->iterateAssociativeIndexed('SELECT id, uid, pid FROM big_sur WHERE access = 1 ORDER BY id DESC LIMIT ?, 15', [$current_position], [Type::getType('integer')])
             as $id => $data
         )
         {
@@ -108,7 +108,7 @@ class InfiniteHome extends AbstractController
                 'profile_url'  => $profile_url,
             ];
         }
-        unset($uid, $current_position, $stmt, $get_result, $get_rows, $the_pid, $poster_uid, $my_note_row, $note_title, $note_parags, 
+        unset($uid, $current_position, $stmt, $get_result, $get_rows, $the_pid, $poster_uid, $my_note_row, $note_title, $note_parags,
             $note_cover, $note_date, $note_poster_name, $note_poster_uname, $if_view, $view_eye
         );
     }
